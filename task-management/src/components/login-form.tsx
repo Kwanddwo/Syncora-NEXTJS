@@ -17,7 +17,7 @@ export function LoginForm({
   const [error,setError]=useState("");
   const router = useRouter();
   const handleGoogleLogin = async () => {
-    await signIn("google",{callbackUrl:"http://localhost:3000/dashbord"});
+    await signIn("google",{callbackUrl:"http://localhost:3000/home"});
   }
     const handleSubmit = async (e:React.FormEvent) => {
       e.preventDefault();
@@ -106,7 +106,7 @@ export function LoginForm({
       </div>
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <a href="#" className="underline underline-offset-4">
+        <a href="/sign-up" className="underline underline-offset-4">
           Sign up
         </a>
       </div>
