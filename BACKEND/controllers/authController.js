@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
+
 dotenv.config();
 const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || "secret";
@@ -23,11 +24,11 @@ export const login = async (req, res) => {
     const token = jwt
     .sign({ id: user.id, email: user.email }, SECRET, { expiresIn: "1h" });
 
-    res.cookie('token', token, {
-        httpOnly: true,   
-        secure: process.env.NODE_ENV === 'production', 
-        maxAge: 3600000, 
-        sameSite: 'strict', 
+    res.cookie("authToken", token, {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === "production", 
+        sameSite: "Strict",
+        maxAge: 3600 * 1000,
     });
     res.json({ user: { id: user.id, email: user.email, name: user.name }, token });
 }
