@@ -9,6 +9,8 @@ const SECRET = process.env.JWT_SECRET || "secret";
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
+    console.log("Received email:", email); 
+    console.log("Received password:", password);
     const user = await prisma.users.findUnique({ where: { email } });
 
     if (!user) return res
@@ -16,10 +18,17 @@ export const login = async (req, res) => {
         .json({ message: "User doesn't exist" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+    if (!isMatch) return res.status(401).json({ message: "Invalid Information" });
 
     const token = jwt
     .sign({ id: user.id, email: user.email }, SECRET, { expiresIn: "1h" });
+
+    res.cookie('token', token, {
+        httpOnly: true,   
+        secure: process.env.NODE_ENV === 'production', 
+        maxAge: 3600000, 
+        sameSite: 'strict', 
+    });
     res.json({ user: { id: user.id, email: user.email, name: user.name }, token });
 }
 
