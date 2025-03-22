@@ -22,7 +22,7 @@ export function SignUpForm({
     e.preventDefault();
 
     const name = nameRef.current?.value;
-    const lastname = lastnameRef.current?.value; 
+    const lastname = lastnameRef.current?.value;
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
 
@@ -30,30 +30,54 @@ export function SignUpForm({
       setError("All fields are required.");
       return;
     }
+     try {
+       const res = await axios.post(
+         "http://localhost:3001/api/auth/emailCheck",
+         {
+           email,
+         }
+       );
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3001/api/auth/register",
-        {
-          name,
-          lastname,
-          email,
-          password,
-        }
-      );
+       if (res.data.exists) {
+         setError("Email is already in use");
+         return;
+       }
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     } catch (err: any) {
+       console.error("Email check error:", err);
+       setError("Failed to verify email. Please try again.");
+       return;
+     }
 
-      console.log("User registered:", response.data); 
-      alert("User created successfully");
+     try {
+       const response = await axios.post(
+         "http://localhost:3001/api/auth/register",
+         {
+           name,
+           lastname,
+           email,
+           password,
+         }
+       );
 
-      router.push("/home");
-    } catch (err: any) {
-      console.error("Error details:", err);
-      setError(err.response ? err.response.data.message : "An error occurred");
-    }
+       console.log("User registered:", response.data);
+       alert("User created successfully");
+       router.push("/home");
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     } catch (err: any) {
+       console.error("Registration error:", err);
+       setError(
+         err.response ? err.response.data.message : "Registration failed."
+       );
+     }
   };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Create an account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -102,10 +126,7 @@ export function SignUpForm({
           </div>
           <Input id="password" type="password" ref={passwordRef} required />
         </div>
-        <Button
-          type="submit"
-          className="w-full cursor-pointer"
-        >
+        <Button type="submit" className="w-full cursor-pointer">
           Sign Up
         </Button>
       </div>

@@ -50,3 +50,18 @@ export const addUser = async (req, res) => {
         .json({ message: "Error creating user" });
     }
 }
+
+export const emailCheck = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const emailExists = await prisma.users.findUnique({
+            where: { email },
+        });
+
+        res.json({ exists: !!emailExists });
+    } catch (error) {
+        console.error("Error checking email:", error);
+        res.status(500).json({ message: "Error occurred, please try again" });
+    }
+};
