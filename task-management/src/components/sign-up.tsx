@@ -38,7 +38,7 @@ export function SignUpForm({
          }
        );
 
-       if (res.data.exists) {
+       if (res.data.user) {
          setError("Email is already in use");
          return;
        }

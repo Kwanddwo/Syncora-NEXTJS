@@ -55,11 +55,11 @@ export const emailCheck = async (req, res) => {
     const { email } = req.body;
 
     try {
-        const emailExists = await prisma.users.findUnique({
+        const user = await prisma.users.findUnique({
             where: { email },
         });
 
-        res.json({ exists: !!emailExists });
+        res.json({ user: user || null });
     } catch (error) {
         console.error("Error checking email:", error);
         res.status(500).json({ message: "Error occurred, please try again" });
