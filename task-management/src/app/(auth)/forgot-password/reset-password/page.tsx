@@ -47,7 +47,7 @@ export default function ResetPassowrd() {
   };
   
   return (
-    <div className="flex items-center justify-center min-h-screen ">
+    <div className=" flex items-center justify-center min-h-screen ">
       <form onSubmit={handleSubmit}>
         <Card className="flex flex-col h-full">
           <CardHeader>
