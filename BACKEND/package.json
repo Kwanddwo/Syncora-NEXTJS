@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "dev": "npm run db:generate && nodemon index.js",
+    "db:generate": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
