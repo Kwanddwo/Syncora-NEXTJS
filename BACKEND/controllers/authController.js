@@ -3,65 +3,62 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
-
 dotenv.config();
 const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || "secret";
 
 export const login = async (req, res) => {
-    const { email, password } = req.body;
-    console.log("Received email:", email); 
-    console.log("Received password:", password);
-    const user = await prisma.users.findUnique({ where: { email } });
+  const { email, password } = req.body;
+  console.log("Received email:", email);
+  console.log("Received password:", password);
+  const user = await prisma.users.findUnique({ where: { email } });
 
-    if (!user) return res
-        .status(404)
-        .json({ message: "User doesn't exist" });
+  if (!user) return res.status(404).json({ message: "User doesn't exist" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid Information" });
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(401).json({ message: "Invalid Information" });
 
-    const token = jwt
-    .sign({ id: user.id, email: user.email }, SECRET, { expiresIn: "1h" });
+  const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
+    expiresIn: "1h",
+  });
 
-    res.cookie("authToken", token, {
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === "production", 
-        sameSite: "Strict",
-        maxAge: 3600 * 1000,
-    });
-    res.json({ user: { id: user.id, email: user.email, name: user.name }, token });
-}
+  res.cookie("authToken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+    maxAge: 3600 * 1000,
+  });
+  res.json({
+    user: { id: user.id, email: user.email, name: user.name },
+    token,
+  });
+};
 
 export const addUser = async (req, res) => {
-    const { name,lastname, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const { name, lastname, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-    try {
-        const user = await prisma.users.create({
-            data: { name,lastname, email, password: hashedPassword },
-        });
-        res
-        .status(201)
-        .json({ message: "User registered successfully" });
-    } catch (error) {
-        res
-        .status(500)
-        .json({ message: "Error creating user" });
-    }
-}
+  try {
+    const user = await prisma.users.create({
+      data: { name, lastname, email, password: hashedPassword },
+    });
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error creating user" });
+  }
+};
 
 export const emailCheck = async (req, res) => {
-    const { email } = req.body;
+  const { email } = req.body;
 
-    try {
-        const user = await prisma.users.findUnique({
-            where: { email },
-        });
+  try {
+    const user = await prisma.users.findUnique({
+      where: { email },
+    });
 
-        res.json({ user: user || null });
-    } catch (error) {
-        console.error("Error checking email:", error);
-        res.status(500).json({ message: "Error occurred, please try again" });
-    }
+    res.json({ user: user || null });
+  } catch (error) {
+    console.error("Error checking email:", error);
+    res.status(500).json({ message: "Error occurred, please try again" });
+  }
 };
