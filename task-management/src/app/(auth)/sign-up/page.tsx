@@ -1,3 +1,4 @@
+"use client"
 import { SignUpForm } from "@/app/(auth)/sign-up/sign-up";
 import Logo from "@/components/Logo";
 import { useTheme } from "next-themes";
