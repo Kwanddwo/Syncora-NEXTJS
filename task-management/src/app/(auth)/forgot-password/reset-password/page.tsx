@@ -2,6 +2,7 @@
 import React, { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {  useSearchParams } from "next/navigation";
+import ResetAlert from "@/app/(auth)/forgot-password/reset-password/reset-dialog";
 import {
   Card,
   CardContent,
@@ -10,8 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ResetAlert from "@/app/(auth)/forgot-password/reset-password/reset-dialog";
-
 
 
 export default function ResetPassowrd() {
@@ -21,13 +20,12 @@ export default function ResetPassowrd() {
    const searchParams = useSearchParams();
    const token = searchParams.get("token");
 
-
   return (
     <div className=" flex items-center justify-center min-h-screen ">
       <form >
-        <Card className="flex flex-col h-full">
+        <Card className="flex flex-col h-full w-[400px]">
           <CardHeader>
-            <CardTitle>Reset Password</CardTitle>
+            <CardTitle >Reset Password</CardTitle>
             <CardDescription>
               <p>Enter your New Password</p>
             </CardDescription>
