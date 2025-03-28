@@ -22,11 +22,11 @@ export function SignUpForm({
     e.preventDefault();
 
     const name = nameRef.current?.value;
-    const lastname = lastnameRef.current?.value;
+    const lastName = lastnameRef.current?.value;
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
 
-    if (!name || !lastname || !email || !password) {
+    if (!name || !lastName || !email || !password) {
       setError("All fields are required.");
       return;
     }
@@ -54,7 +54,7 @@ export function SignUpForm({
          "http://localhost:3001/api/auth/register",
          {
            name,
-           lastname,
+           lastName,
            email,
            password,
          }

@@ -74,7 +74,7 @@ export default function ForgotPassowrd() {
             required
           ></Input>
         </CardContent>
-        <CardFooter className="mt-auto">
+        <CardFooter className="mt-auto flex justify-end">
           <div className="cursor-pointer">
             <Button type="submit">
               Reset

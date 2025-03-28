@@ -11,7 +11,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
   console.log("Received email:", email);
   console.log("Received password:", password);
-  const user = await prisma.users.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) return res.status(404).json({ message: "User doesn't exist" });
 
@@ -35,12 +35,12 @@ export const login = async (req, res) => {
 };
 
 export const addUser = async (req, res) => {
-  const { name, lastname, email, password } = req.body;
+  const { name, lastName, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await prisma.users.create({
-      data: { name, lastname, email, password: hashedPassword },
+    const user = await prisma.user.create({
+      data: { name : name, lastName : lastName, email : email, password: hashedPassword },
     });
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
@@ -52,7 +52,7 @@ export const emailCheck = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 
