@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import axios from "axios";
-import {useRouter} from "next/navigation";
-import { Dispatch, RefObject, SetStateAction } from "react";
+import {Dispatch, RefObject, SetStateAction, useState} from "react";
+import {DialogSuccessAlert} from "@/components/SuccessAlert";
 
 interface ResetAlertProps {
   passRef: RefObject<HTMLInputElement | null>;
@@ -24,28 +24,42 @@ interface ResetAlertProps {
 export default function ResetAlert(
     {passRef,ConfirmpassRef,setError,token} :ResetAlertProps
 ) {
-    const router = useRouter();
-    const handleClick = async () =>{
-        const password = passRef.current?.value;
-        const confirmpass = ConfirmpassRef.current?.value;
-        if (password !== confirmpass) {
-            setError("Password does not match");
+    const [open, setOpen] = useState(false);
+    const handleClick = async () => {
+        const password = passRef.current?.value.trim();
+        const confirmpass = ConfirmpassRef.current?.value.trim();
+
+        if (!password || !confirmpass) {
+            setError("Both fields are required.");
             return;
         }
+
+        if (password !== confirmpass) {
+            setError("Passwords do not match.");
+            return;
+        }
+
         try {
-            const response = await axios.post(
+            await axios.post(
                 "http://localhost:3001/api/auth/reset-password",
                 { token, password }
             );
-            alert(response.data.message);
-            router.push("/")
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (err: any) {
-            setError(
-                err.response ? err.response.data.message : "Invalid or expired token"
-            );
+            setOpen(true);
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    setError(err.response.data?.message || "An error occurred.");
+                } else if (err.request) {
+                    setError("Server did not respond. Please try again later.");
+                } else {
+                    setError("An unexpected error occurred. Please try again.");
+                }
+            } else {
+                setError("An unexpected error occurred.");
+            }
         }
-    }
+    };
+
 
     return (
         <>
@@ -69,6 +83,7 @@ export default function ResetAlert(
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <DialogSuccessAlert open={open} setOpen={setOpen} />
         </>
     )
 }
