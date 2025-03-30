@@ -9,13 +9,13 @@ const SECRET = process.env.JWT_SECRET || "secret";
 export const ResetPass = async (req, res) => {
   const { email } = req.body;
 
-  const user = await prisma.users.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     return res.status(400).send("User not found");
   }
 
   const resetToken = jwt.sign({ email: user.email }, SECRET, {
-    expiresIn: "1h",
+    expiresIn: "15m",
   });
 
   res.json({
@@ -36,7 +36,7 @@ export const ResetPassword = async (req, res) => {
   try {
     const decoded = jwt.verify(token, SECRET);
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email: decoded.email },
     });
     if (!user) {
@@ -45,7 +45,7 @@ export const ResetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.users.update({
+    await prisma.user.update({
       where: { email: decoded.email },
       data: { password: hashedPassword },
     });

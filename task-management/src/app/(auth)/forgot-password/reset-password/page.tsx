@@ -24,7 +24,7 @@ export default function ResetPassowrd() {
     <div className=" flex items-center justify-center min-h-screen ">
       <form >
         <Card className="flex flex-col h-full w-[400px]">
-          <CardHeader>
+          <CardHeader className="text-center">
             <CardTitle >Reset Password</CardTitle>
             <CardDescription>
               <p>Enter your New Password</p>
@@ -42,6 +42,7 @@ export default function ResetPassowrd() {
               ref={passRef}
               required
             ></Input>
+            <br />
             <label>Confirm your Password</label>
             <Input
               type="password"
@@ -51,8 +52,10 @@ export default function ResetPassowrd() {
               required
             ></Input>
           </CardContent>
-          <CardFooter className="mt-auto">
+          <p className="text-center text-sm text-muted-foreground">This link will expire in 15 minutes </p>
+          <CardFooter className="mt-auto flex justify-center">
             <div className="cursor-pointer">
+              <br />
               <ResetAlert passRef={passRef} ConfirmpassRef={ConfirmpassRef} setError={setError} token={token} />
             </div>
           </CardFooter>
