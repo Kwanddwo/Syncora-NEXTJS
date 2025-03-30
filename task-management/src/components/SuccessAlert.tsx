@@ -23,7 +23,7 @@ export function DialogSuccessAlert({ open, setOpen }: { open: boolean; setOpen: 
                 <DialogFooter className="w-full flex justify-center">
                     <DialogClose asChild>
                         <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                            <Link href="/" >Back to Login</Link>
+                            <Link href="/sign-in" >Back to Login</Link>
                         </Button>
                     </DialogClose>
                 </DialogFooter>
