@@ -1,32 +1,32 @@
 "use Client";
 
-import { useTheme } from "next-themes";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface LogoProps {
   isText: boolean;
+  width: number | undefined;
+  height: number | undefined;
 }
 
-const Logo: React.FC<LogoProps> = ({ isText }) => {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  // This ensures resolvedTheme will not be undefined, if the effect runs, the theme will be loaded
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div className="w-[150px] h-[100px] mb-4 text-center">Loading...</div>
-    );
-  }
-
-  const imgSrc = `/logo-${resolvedTheme}${isText ? "-text" : ""}.png`;
-
+const Logo: React.FC<LogoProps> = ({ isText, width, height }) => {
   return (
-    <Image src={imgSrc} alt="logo" width={150} height={100} className="mb-4" />
+    <>
+      <Image
+        src={`/logo-light${isText ? "-text" : ""}.png`}
+        className="mb-4 dark:hidden"
+        width={width || 150}
+        height={height || 100}
+        alt="Syncora"
+      />
+      <Image
+        src={`/logo-dark${isText ? "-text" : ""}.png`}
+        className="mb-4 not-dark:hidden"
+        width={width || 150}
+        height={height || 100}
+        alt="Syncora"
+      />
+    </>
   );
 };
 
