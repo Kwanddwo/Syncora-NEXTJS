@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 export function LandingPageContent() {
     return (
@@ -6,7 +7,6 @@ export function LandingPageContent() {
         <section className="hero">
           <h1 className="hook">
             <span className="main-text">Time to organize your work</span>
-
             <img
               className="vector"
               src="https://c.animaapp.com/m8uiljkus1uQ04/img/vector-1.svg"
@@ -19,7 +19,9 @@ export function LandingPageContent() {
           </p>
           <div className="button-group">
             <button className="button button-secondary">Take a Look</button>
-            <button className="button button-primary">Get Started</button>
+            <button className="button button-primary">
+              <Link href="/sign-up">Get Started</Link>
+            </button>
           </div>
         </section>
         <img
