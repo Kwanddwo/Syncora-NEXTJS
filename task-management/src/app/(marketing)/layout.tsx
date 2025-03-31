@@ -1,0 +1,70 @@
+import Logo from "@/components/Logo";
+import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ui/modeToggle";
+import Link from "next/link";
+
+export default function marketingLayout({ children }) {
+  return (
+    <>
+      <header className="flex justify-between items-center h-16 py-3 px-5.5">
+        <Logo height={32} width={110} isText={true} />
+        <div className="flex gap-4">
+          <Link href="/sign-up">
+            <Button variant="outline">Sign Up</Button>
+          </Link>
+          <Link href="/sign-in">
+            <Button>Sign In</Button>
+          </Link>
+          <ModeToggle />
+        </div>
+      </header>
+
+      {children}
+
+      <footer className="flex flex-col justify-between gap-4 py-6">
+        <div className="flex justify-between flex-wrap px-5.5">
+          <div>
+            <Logo height={32} width={110} isText={true} />
+            <p>A simplified task manager.</p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <div className="w-50">
+              <p className="typography-large">Learn</p>
+              <ul>
+                <li>
+                  <Link href="#">Guides</Link>
+                </li>
+                <li>
+                  <Link href="#">Tutorials</Link>
+                </li>
+              </ul>
+            </div>
+            <div className="w-50">
+              <p className="typography-large">Resources</p>
+              <ul>
+                <li>
+                  <Link href="#">Documentation</Link>
+                </li>
+                <li>
+                  <Link href="#">Github</Link>
+                </li>
+              </ul>
+            </div>
+            <div className="w-50">
+              <p className="typography-large">Legal</p>
+              <ul>
+                <li>
+                  <Link href="#">Terms of Service</Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center items-center p-4 border-t-1 border-border">
+          <p className="typography-muted">© 2025 Syncora. Built by AFM.</p>
+        </div>
+      </footer>
+    </>
+  );
+}
