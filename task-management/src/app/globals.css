@@ -150,11 +150,6 @@
     @apply font-medium text-primary underline underline-offset-4;
   }
 
-  /* Unordered List */
-  ul {
-    @apply my-6 ml-6 list-disc [&>li]:mt-2;
-  }
-
   /* Table */
   table {
     @apply w-full;
