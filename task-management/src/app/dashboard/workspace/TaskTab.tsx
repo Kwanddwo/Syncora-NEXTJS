@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TabsContent } from '@/components/ui/tabs';
 import { Plus, User } from 'lucide-react';
 import React from 'react'
+import { NewTaskDialog } from './AddTaskForm';
 
 function TaskTab() {
 
@@ -91,7 +92,10 @@ function TaskTab() {
                   <TableRow key={todo.id}>
                     <TableCell className="font-medium">{todo.title}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={getStatusStyle(todo.status)}>
+                      <Badge
+                        variant="outline"
+                        className={getStatusStyle(todo.status)}
+                      >
                         {todo.status}
                       </Badge>
                     </TableCell>
@@ -108,13 +112,7 @@ function TaskTab() {
                 ))}
                 <TableRow>
                   <TableCell colSpan={5}>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-muted-foreground"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Task...
-                    </Button>
+                    <NewTaskDialog />
                   </TableCell>
                 </TableRow>
               </TableBody>
