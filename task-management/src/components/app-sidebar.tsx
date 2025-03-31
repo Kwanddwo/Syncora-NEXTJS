@@ -51,18 +51,18 @@ const data = {
     },
     {
       title: "Dashbord",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboard,
       isActive: true,
     },
     {
       title: "My Workspaces",
-      url: "#",
+      url: "/dashboard/workspace",
       icon: Building,
     },
     {
       title: "Personal",
-      url: "#",
+      url: "/dashboard/personal",
       icon: User,
       badge: "10",
     },
@@ -75,7 +75,7 @@ const data = {
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/dashboard/settings",
       icon: Settings2,
     },
     {
