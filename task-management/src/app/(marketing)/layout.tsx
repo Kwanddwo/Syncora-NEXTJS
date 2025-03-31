@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function marketingLayout({ children }) {
   return (
     <>
-      <header className="flex justify-between items-center h-16 py-3 px-5.5">
+      <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
         <Logo height={32} width={110} isText={true} />
         <div className="flex gap-4">
           <Link href="/sign-up">
@@ -21,7 +21,7 @@ export default function marketingLayout({ children }) {
 
       {children}
 
-      <footer className="flex flex-col justify-between gap-4 py-6">
+      <footer className="flex flex-col justify-between gap-4 py-6 border-border border-t-1">
         <div className="flex justify-between flex-wrap px-5.5">
           <div>
             <Logo height={32} width={110} isText={true} />
