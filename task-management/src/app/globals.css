@@ -147,7 +147,7 @@
 
   /* Links */
   a {
-    @apply font-medium text-primary underline underline-offset-4;
+    @apply font-medium  underline-offset-4;
   }
 
   /* Table */
