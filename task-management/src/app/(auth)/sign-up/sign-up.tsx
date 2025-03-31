@@ -62,7 +62,7 @@ export function SignUpForm({
 
        console.log("User registered:", response.data);
        alert("User created successfully");
-       router.push("/home");
+       router.push("/dashboard");
      // eslint-disable-next-line @typescript-eslint/no-explicit-any
      } catch (err: any) {
        console.error("Registration error:", err);

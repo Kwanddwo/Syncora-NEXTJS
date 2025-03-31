@@ -31,9 +31,7 @@ export function LoginForm({
             password:password,
           }
         );
-        alert("Login successful");
-      
-        router.push("/home");
+        router.push("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err:any) {
         setError(
