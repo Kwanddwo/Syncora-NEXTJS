@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col-reverse md:flex-row justify-center md:justify-between gap-6 min-h-[calc(100vh-64px)] px-2 md:px-10 md:pt-32">
+    <div className="flex flex-col-reverse md:flex-row justify-center md:justify-between gap-6 min-h-[calc(100vh-64px)] px-2 md:px-10 md:pt-32 overflow-clip">
       <div className="text-center items-center justify-center md:text-start">
         <h1 className="whitespace-nowrap">
           Time to organize your{" "}
@@ -32,7 +32,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </div>
-      <div>
+      <div className="min-w-xs">
         <Image
           height={366}
           width={650}
