@@ -5,23 +5,31 @@ import React from "react";
 
 interface LogoProps {
   isText: boolean;
-  width: number | undefined;
-  height: number | undefined;
+  width?: number;
+  height?: number;
+  hasBottomGutter?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({ isText, width, height }) => {
+const Logo: React.FC<LogoProps> = ({
+  isText,
+  width,
+  height,
+  hasBottomGutter,
+}) => {
+  const bottomGutter = hasBottomGutter ? " mb-4" : "";
+
   return (
     <>
       <Image
         src={`/logo-light${isText ? "-text" : ""}.png`}
-        className="mb-4 dark:hidden"
+        className={"dark:hidden" + bottomGutter}
         width={width || 150}
         height={height || 100}
         alt="Syncora"
       />
       <Image
         src={`/logo-dark${isText ? "-text" : ""}.png`}
-        className="mb-4 not-dark:hidden"
+        className={"not-dark:hidden" + bottomGutter}
         width={width || 150}
         height={height || 100}
         alt="Syncora"

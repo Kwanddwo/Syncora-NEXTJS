@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   Building,
@@ -13,16 +13,16 @@ import {
   User,
 } from "lucide-react";
 
-import { NavFavorites } from "@/components/nav-favorites"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavWorkspaces } from "@/components/nav-workspaces"
+import { NavFavorites } from "@/components/nav-favorites";
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
+import { NavWorkspaces } from "@/components/nav-workspaces";
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import Logo from "./Logo";
 
 // This is sample data.
@@ -251,7 +251,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
-          <Logo isText={true} width={100} height={undefined}/>
+          <Logo isText={true} width={100} hasBottomGutter={true} />
         </div>
         <NavMain items={data.navMain} />
       </SidebarHeader>

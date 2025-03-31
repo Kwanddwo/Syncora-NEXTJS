@@ -10,7 +10,7 @@ export default function SignUp() {
     <>
       <div className="flex items-center justify-center min-h-screen ">
         <div className="p-8 rounded-lg shadow-lg w-96 flex flex-col items-center">
-          <Logo isText={true} width={undefined} height={undefined} />
+          <Logo isText={true} hasBottomGutter={true} />
           <SignUpForm />
         </div>
       </div>
