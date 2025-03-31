@@ -32,7 +32,7 @@ export default function LandingPage() {
           </Link>
         </div>
       </div>
-      <div className="min-w-xs">
+      <div className="min-w-xs not-md:flex justify-center">
         <Image
           height={366}
           width={650}
