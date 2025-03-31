@@ -11,13 +11,13 @@ export default function LandingPage() {
           <span className="relative inline-block">
             work{" "}
             <Image
-              className="not-md:hidden absolute left-0 bottom-0"
+              className="absolute left-0 bottom-0"
               width={120}
               height={36}
               src="/scribble.png"
               alt="cross-out"
             />{" "}
-            <span className="not-md:hidden absolute left-[50%] rotate-[-15deg] translate-y-[-80%] font-accent text-6xl text-[#7574C3]">
+            <span className="absolute left-[50%] rotate-[-15deg] translate-y-[-80%] font-accent text-6xl not-md:text-5xl text-[#7574C3]">
               life
             </span>
           </span>
