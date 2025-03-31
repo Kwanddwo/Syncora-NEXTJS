@@ -6,8 +6,71 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { TabsContent } from '@/components/ui/tabs';
 import { Plus, User } from 'lucide-react';
 import React from 'react'
+import { NewTaskDialog } from './AddTaskForm';
 
 function TaskTab() {
+
+   const todos = [
+     {
+       id: "1",
+       title: "Finish project documentation",
+       due: "Today",
+       assigne: "Person X",
+       status: "Done",
+       priority: "High",
+     },
+     {
+       id: "2",
+       title: "Review pull requests",
+       due: "Tomorrow",
+       assigne: "Person X",
+       status: "On going",
+       priority: "Low",
+     },
+     {
+       id: "3",
+       title: "Fix UI bugs in dashboard",
+       due: "Friday",
+       assigne: "Person X",
+       status: "On going",
+       priority: "High",
+     },
+     {
+       id: "4",
+       title: "Optimize database queries",
+       due: "Friday",
+       assigne: "Person X",
+       status: "Done",
+       priority: "Medium",
+     },
+     {
+       id: "5",
+       title: "Plan next sprint tasks",
+       due: "Sunday",
+       assigne: "Person X",
+       status: "Done",
+       priority: "Medium",
+     },
+   ];
+   const status = [
+     { title: "To Do", style: "bg-gray-100" },
+     { title: "Done", style: "bg-green-100 text-green-800" },
+     { title: "On going", style: "bg-blue-100 text-blue-800" },
+   ];
+   const priorities = [
+     { title: "High", style: "bg-red-500 hover:bg-red-600" },
+     { title: "Medium", style: "bg-yellow-500 hover:bg-yellow-600" },
+     { title: "Low", style: "bg-blue-500 hover:bg-blue-600" },
+   ];
+
+   const getStatusStyle = (taskStatus: string) => {
+     const foundStatus = status.find((s) => s.title === taskStatus);
+     return foundStatus ? foundStatus.style : "bg-gray-100"; // Default style if not found
+   };
+   const getPriorityStyle = (taskPriority: string) => {
+     const foundPriority = priorities.find((p) => p.title === taskPriority);
+     return foundPriority ? foundPriority.style : "bg-gray-100"; // Default style if not found
+   };
   return (
     <TabsContent value="tasks" className="space-y-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -25,68 +88,31 @@ function TaskTab() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Throw Trash</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="bg-gray-100">
-                      To do
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className="bg-yellow-500 hover:bg-yellow-600">
-                      Medium
-                    </Badge>
-                  </TableCell>
-                  <TableCell>Feb 9, 2025</TableCell>
-                  <TableCell className="flex items-center gap-2">
-                    <User className="h-4 w-4" /> Person
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Pay rent</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="bg-green-100 text-green-800"
-                    >
-                      Done
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className="bg-blue-500 hover:bg-blue-600">Low</Badge>
-                  </TableCell>
-                  <TableCell>Feb 9, 2025</TableCell>
-                  <TableCell className="flex items-center gap-2">
-                    <User className="h-4 w-4" /> Person
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Make report</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className="bg-blue-100 text-blue-800"
-                    >
-                      Ongoing
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className="bg-red-500 hover:bg-red-600">High</Badge>
-                  </TableCell>
-                  <TableCell>Feb 9, 2025</TableCell>
-                  <TableCell className="flex items-center gap-2">
-                    <User className="h-4 w-4" /> Person
-                  </TableCell>
-                </TableRow>
+                {todos.map((todo) => (
+                  <TableRow key={todo.id}>
+                    <TableCell className="font-medium">{todo.title}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={getStatusStyle(todo.status)}
+                      >
+                        {todo.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getPriorityStyle(todo.priority)}>
+                        {todo.priority}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{todo.due}</TableCell>
+                    <TableCell className="flex items-center gap-2">
+                      <User className="h-4 w-4" /> {todo.assigne}
+                    </TableCell>
+                  </TableRow>
+                ))}
                 <TableRow>
                   <TableCell colSpan={5}>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start text-muted-foreground"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Task...
-                    </Button>
+                    <NewTaskDialog />
                   </TableCell>
                 </TableRow>
               </TableBody>

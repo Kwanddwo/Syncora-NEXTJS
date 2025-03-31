@@ -1,4 +1,4 @@
-import { NavActions } from '@/components/nav-actions';
+
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -21,9 +21,6 @@ function DashbordHeader() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-      </div>
-      <div className="ml-auto px-3">
-        <NavActions />
       </div>
     </header>
   );

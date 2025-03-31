@@ -23,6 +23,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import Logo from "./Logo";
 
 // This is sample data.
 const data = {
@@ -250,13 +251,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
-          <img
-            src="logo-light-text.png"
-            alt="Syncora Logo"
-            width={150}
-            height={40}
-            className="h-8 w-auto"
-          />
+          <Logo isText={true} width={100} height={undefined}/>
         </div>
         <NavMain items={data.navMain} />
       </SidebarHeader>
