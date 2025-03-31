@@ -31,7 +31,7 @@ export default function marketingLayout({ children }) {
           <div className="flex flex-wrap gap-3">
             <div className="w-50">
               <p className="typography-large">Learn</p>
-              <ul>
+              <ul className="flex flex-col gap-2 mt-2">
                 <li>
                   <Link href="#">Guides</Link>
                 </li>
@@ -42,7 +42,7 @@ export default function marketingLayout({ children }) {
             </div>
             <div className="w-50">
               <p className="typography-large">Resources</p>
-              <ul>
+              <ul className="flex flex-col gap-2 mt-2">
                 <li>
                   <Link href="#">Documentation</Link>
                 </li>
@@ -53,7 +53,7 @@ export default function marketingLayout({ children }) {
             </div>
             <div className="w-50">
               <p className="typography-large">Legal</p>
-              <ul>
+              <ul className="flex flex-col gap-2 mt-2">
                 <li>
                   <Link href="#">Terms of Service</Link>
                 </li>
