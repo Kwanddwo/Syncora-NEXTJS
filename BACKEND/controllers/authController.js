@@ -62,3 +62,18 @@ export const emailCheck = async (req, res) => {
     res.status(500).json({ message: "Error occurred, please try again" });
   }
 };
+export const decodeTokenToUserId = async (req, res) => {
+  const token = req.cookies.authToken || req.headers["authorization"];
+
+  if (!token) {
+    return res.status(401).json({ message: "No Token Provided." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, SECRET);
+    res.json({ userId: decoded.id });
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    res.status(403).json({ message: "Invalid Token" });
+  }
+};
