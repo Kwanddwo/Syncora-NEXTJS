@@ -4,6 +4,7 @@ import authRoutes from "./routes/authRoutes.js";
 import emailVrfRoute from "./routes/emailVrfRoute.js";
 import cookieParser from "cookie-parser";
 import taskroutes from "./routes/taskroutes.js"
+import {routerr} from "./routes/workspaceRoutes.js";
 const app = express();
 app.use(express.json());
 app.use(cors());
