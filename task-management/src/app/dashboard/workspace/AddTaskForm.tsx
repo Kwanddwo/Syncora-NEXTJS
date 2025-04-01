@@ -22,6 +22,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
 export function NewTaskDialog() {
+  const members = [
+    { id: "1", name: "Alex Johnson" },
+    { id: "2", name: "Sarah Williams" },
+    { id: "3", name: "Michael Brown" },
+    { id: "4", name: "Emma Davis" },
+  ];
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -49,29 +55,45 @@ export function NewTaskDialog() {
             <Label htmlFor="description">Description</Label>
             <Textarea id="description" placeholder="Enter task description" />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="status">Status</Label>
-            <Select>
-              <SelectTrigger id="status">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todo">Todo</SelectItem>
-                <SelectItem value="ongoing">On going</SelectItem>
-                <SelectItem value="done">Done</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="status">Status</Label>
+              <Select>
+                <SelectTrigger id="status">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todo">Todo</SelectItem>
+                  <SelectItem value="ongoing">On going</SelectItem>
+                  <SelectItem value="done">Done</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="priority">Priority</Label>
+              <Select>
+                <SelectTrigger id="priority">
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <div className="grid gap-2">
-            <Label htmlFor="priority">Priority</Label>
+            <Label htmlFor="assignee">Assignee</Label>
             <Select>
-              <SelectTrigger id="priority">
-                <SelectValue placeholder="Select priority" />
+              <SelectTrigger id="assignee">
+                <SelectValue placeholder="Select assignee" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
+                {members.map((member) => (
+                  <SelectItem key= {member.id} value={member.name}>{member.name}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
