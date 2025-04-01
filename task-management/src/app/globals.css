@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "CoveredByYourGrace";
+  font-style: normal;
+  font-weight: 400;
+  src: url(CoveredByYourGrace-Regular.ttf) format("trueType");
+}
+
 :root {
   --radius: 0.625rem;
   --background: var(--color-white);
@@ -78,6 +85,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-accent: "CoveredByYourGrace", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -124,15 +132,15 @@
 
   /* Headings */
   h1 {
-    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+    @apply scroll-m-20 text-3xl font-extrabold tracking-tight md:text-5xl;
   }
 
   h2 {
-    @apply mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+    @apply mt-10 scroll-m-20 border-b pb-2 text-2xl md:text-3xl font-semibold tracking-tight transition-colors first:mt-0;
   }
 
   h3 {
-    @apply mt-8 scroll-m-20 text-2xl font-semibold tracking-tight;
+    @apply mt-8 scroll-m-20 text-xl md:text-2xl font-semibold tracking-tight;
   }
 
   /* Paragraphs */
@@ -147,7 +155,7 @@
 
   /* Links */
   a {
-    @apply font-medium  underline-offset-4;
+    @apply font-medium text-primary hover:underline underline-offset-4;
   }
 
   /* Table */
@@ -165,5 +173,21 @@
 
   td {
     @apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+
+  .typography-lead {
+    @apply text-xl text-muted-foreground;
+  }
+
+  .typography-small {
+    @apply text-sm font-medium leading-none;
+  }
+
+  .typography-large {
+    @apply text-lg font-semibold;
+  }
+
+  .typography-muted {
+    @apply text-sm text-muted-foreground;
   }
 }

@@ -251,7 +251,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-2">
-          <Logo isText={true} width={100} height={undefined}/>
+          <Logo
+            isText={true}
+            width={100}
+            height={undefined}
+            hasBottomGutter={true}
+          />
         </div>
         <NavMain items={data.navMain} />
       </SidebarHeader>
