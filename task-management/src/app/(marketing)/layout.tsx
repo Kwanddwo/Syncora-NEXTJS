@@ -2,8 +2,9 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import Link from "next/link";
+import React from "react";
 
-export default function marketingLayout({ children }) {
+export default function marketingLayout({ children }:{children : React.ReactNode}) {
   return (
     <>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
