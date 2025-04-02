@@ -2,7 +2,7 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ImageIcon } from 'lucide-react';
+import { Building } from "lucide-react";
 import React from 'react'
 
 function DashbordHeader() {
@@ -15,7 +15,7 @@ function DashbordHeader() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbPage className="line-clamp-1 flex items-center gap-2">
-                <ImageIcon className="h-5 w-5" />
+                <Building className="h-5 w-5" />
                 <span className="text-xl font-bold">Workspace</span>
               </BreadcrumbPage>
             </BreadcrumbItem>
