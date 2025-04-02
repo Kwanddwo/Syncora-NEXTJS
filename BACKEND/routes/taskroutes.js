@@ -4,7 +4,7 @@ import express from "express"
 const router = express.Router();
 
 // Middleware to verify token for all routes
-router.get('/tasks', (req, res) => getAllTasks(req, res)); //ALL TASKS
+router.post('/tasks', getAllTasks); //ALL TASKS
 
 /* router.get('/tasks/:id', taskController.getTaskById);
 router.post('/tasks', taskController.createTask);
