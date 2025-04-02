@@ -1,7 +1,7 @@
 import RecentWorkspaces from "./_dashbordComponents/RecentWorkspaces";
 import TaskForToday from "./_dashbordComponents/TaskForToday";
 import ActiveWorkspaces from "./_dashbordComponents/ActiveWorkspaces";
-import Calendar from "./_dashbordComponents/Calendar";
+import Calendar from "./_dashbordComponents/CalendarSection";
 
 export default function Page() {
   return (
