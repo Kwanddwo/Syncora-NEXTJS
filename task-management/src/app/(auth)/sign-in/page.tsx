@@ -1,7 +1,6 @@
 "use client";
 import { LoginForm } from "@/app/(auth)/sign-in/login-form";
 import Logo from "@/components/Logo";
-
 export default function Home() {
   return (
     <>
