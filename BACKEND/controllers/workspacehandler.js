@@ -118,20 +118,4 @@ export const getWorkspacesByuserId = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-export const getMembersByWorkspaceId = async (req, res) => {
-    try {
-        const { workspaceId } =decodeTokenToUserId(req); 
-        const members = await prisma.workspaceMember.findMany({
-            where: {
-                workspaceId: workspaceId, 
-            },
-            include: {
-                user: true,
-            },
-        });
-        res.status(200).json(members);
-    } catch (error) {
-        console.error("Error fetching members:", error);
-        res.status(500).json({ error: "Internal server error" }); 
-    }
-}
+
