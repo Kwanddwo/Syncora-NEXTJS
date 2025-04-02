@@ -63,18 +63,3 @@ export const emailCheck = async (req, res) => {
   }
 };
 
-export const decodeTokenToUserId = async (req, res) => {
-  const {token} = req.body;
-
-  if (!token) {
-    return res.status(401).json({ message: "No Token Provided." });
-  }
-
-  try {
-    const decoded = jwt.verify(token, SECRET);
-    res.json({ userId: decoded.id });
-  } catch (error) {
-    console.error("Error decoding token:", error);
-    res.status(403).json({ message: "Invalid Token" });
-  }
-};
