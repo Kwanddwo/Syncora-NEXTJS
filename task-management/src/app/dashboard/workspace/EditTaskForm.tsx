@@ -19,9 +19,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Edit } from "lucide-react";
 
-export function NewTaskDialog() {
+export function EditTaskDialog() {
   const members = [
     { id: "1", name: "Alex Johnson" },
     { id: "2", name: "Sarah Williams" },
@@ -35,15 +35,15 @@ export function NewTaskDialog() {
           variant="ghost"
           className="w-full justify-start text-muted-foreground"
         >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Task...
+          <Edit className="mr-2 h-2 w-4" />
+          Edit
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>New Task</DialogTitle>
+          <DialogTitle>Update Task</DialogTitle>
           <DialogDescription>
-            Create a new task by filling out the form below.
+            Update a the task by filling out the form below.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -92,7 +92,9 @@ export function NewTaskDialog() {
               </SelectTrigger>
               <SelectContent>
                 {members.map((member) => (
-                  <SelectItem key= {member.id} value={member.name}>{member.name}</SelectItem>
+                  <SelectItem key={member.id} value={member.name}>
+                    {member.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -104,7 +106,7 @@ export function NewTaskDialog() {
               Cancel
             </Button>
           </DialogClose>
-          <Button type="submit">Create</Button>
+          <Button type="submit">Update</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -5,21 +5,39 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronRight, ImageIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { fetchActiveWorkspaces } from "@/app/_api/activeWorkspaces";
 interface OpenStates {
   [key: string]: boolean;
 }
+interface Task {
+  id: string;
+  title: string;
+  dueDate?: string;
+}
+
+interface Workspace {
+  id: string;
+  name: string;
+  defaultOpen: boolean;
+  tasks: Task[];
+}
+
+
 function ActiveWorkspaces() {
-  const workspaces = [
-    {
-      id: "1",
-      name: "Personal",
-      tasks: ["Pay rent", "Talk to Johns"],
-      defaultOpen: false,
-    },
-    { id: "2", name: "Project X", tasks: ["Chill Out"], defaultOpen: false },
-    { id: "3", name: "School", tasks: ["Make report"], defaultOpen: true },
-  ];
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  useEffect(() => {
+    const getWorkspaces = async () => {
+      try {
+        const data = await fetchActiveWorkspaces();
+        setWorkspaces(data);
+      } catch (error) {
+        console.error("Failed to fetch workspaces:", error);
+      }
+    };
+
+    getWorkspaces();
+  }, []);
 
   const [openStates, setOpenStates] = useState(
     workspaces.reduce((acc: OpenStates, workspace) => {
@@ -68,7 +86,7 @@ function ActiveWorkspaces() {
                       key={index}
                       className="flex items-center justify-between rounded-md border p-3"
                     >
-                      <div>{task}</div>
+                      <div>{task.title}</div>
                       <div className="text-sm text-gray-500">Due: Soon</div>
                     </div>
                   ))}

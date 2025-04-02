@@ -19,3 +19,11 @@ export const verifyToken = (req, res, next) => {
     res.status(403).json({ message: "Invalid Token" });
   }
 };
+
+export const handleInputError = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  next();
+}

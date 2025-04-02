@@ -31,6 +31,8 @@ export function LoginForm({
             password:password,
           }
         );
+        const token = response.data.token; 
+        localStorage.setItem("authToken", token);
         router.push("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err:any) {
