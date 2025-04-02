@@ -1,3 +1,4 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -5,64 +6,49 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TabsContent } from '@/components/ui/tabs';
 import { Delete, MoreHorizontal, Plus, User } from 'lucide-react';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { NewTaskDialog } from './AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from './EditTaskForm';
-
+import { useSearchParams } from 'next/navigation';
+import axios from 'axios';
+import { Assignee } from '@/types';
+interface Task {
+  id: string;
+  title: string;
+  dueDate?: string;
+  assignees: Assignee[];
+  status: string;
+  priority: string;
+}
 function TaskTab() {
+  const searchParams = useSearchParams();
+  const workspaceId=searchParams.get("id");
+  const [todos, setTodos] = useState<Task[]>([]);
+  useEffect(()=>{
+      const getTasks =async() =>{
+        try{
+          const response = await axios.post("http://localhost:3001/api/tasks",{workspaceId});
+          setTodos(response.data)
+        }catch(error){
+          console.error(
+            `Error fetching tasks for workspace ${workspaceId}:`,
+            error
+          );
+        }
+      };
+      getTasks();
+  },[workspaceId]);
 
-   const todos = [
-     {
-       id: "1",
-       title: "Finish project documentation",
-       due: "Today",
-       assigne: "Person X",
-       status: "Done",
-       priority: "High",
-     },
-     {
-       id: "2",
-       title: "Review pull requests",
-       due: "Tomorrow",
-       assigne: "Person X",
-       status: "On going",
-       priority: "Low",
-     },
-     {
-       id: "3",
-       title: "Fix UI bugs in dashboard",
-       due: "Friday",
-       assigne: "Person X",
-       status: "On going",
-       priority: "High",
-     },
-     {
-       id: "4",
-       title: "Optimize database queries",
-       due: "Friday",
-       assigne: "Person X",
-       status: "Done",
-       priority: "Medium",
-     },
-     {
-       id: "5",
-       title: "Plan next sprint tasks",
-       due: "Sunday",
-       assigne: "Person X",
-       status: "Done",
-       priority: "Medium",
-     },
-   ];
    const status = [
-     { title: "To Do", style: "bg-gray-100" },
-     { title: "Done", style: "bg-green-100 text-green-800" },
-     { title: "On going", style: "bg-blue-100 text-blue-800" },
+     { title: "pending", style: "bg-gray-100" },
+     { title: "in_progress", style: "bg-green-100 text-green-800" },
+     { title: "completed", style: "bg-blue-100 text-blue-800" },
    ];
    const priorities = [
-     { title: "High", style: "bg-red-500 hover:bg-red-600" },
-     { title: "Medium", style: "bg-yellow-500 hover:bg-yellow-600" },
-     { title: "Low", style: "bg-blue-500 hover:bg-blue-600" },
+     { title: "high", style: "bg-red-500 hover:bg-red-600" },
+     { title: "medium", style: "bg-yellow-500 hover:bg-yellow-600" },
+     { title: "low", style: "bg-blue-500 hover:bg-blue-600" },
    ];
 
    const getStatusStyle = (taskStatus: string) => {
@@ -110,9 +96,9 @@ function TaskTab() {
                         {todo.priority}
                       </Badge>
                     </TableCell>
-                    <TableCell>{todo.due}</TableCell>
+                    <TableCell>{todo.dueDate}</TableCell>
                     <TableCell className="flex items-center pt-3">
-                      <User className="h-4 w-4" /> {todo.assigne}
+                      <User className="h-4 w-4" /> {todo.assignees[0]?.user?.name}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

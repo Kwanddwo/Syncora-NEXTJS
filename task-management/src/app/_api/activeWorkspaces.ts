@@ -16,7 +16,7 @@ interface Workspace {
 }
 
 // Function to fetch tasks for a given workspace ID
-const fetchTasksForWorkspace = async (workspaceId: string): Promise<Task[]> => {
+export const fetchTasksForWorkspace = async (workspaceId: string): Promise<Task[]> => {
   try {
     const response = await axios.post(TASKS_API, { workspaceId : workspaceId });
     return response.data; // Assuming the API returns an array of tasks

@@ -10,3 +10,26 @@ export interface Workspace {
   defaultOpen: boolean;
   tasks: Task[];
 }
+interface User {
+  id: string;
+  name: string;
+  lastName: string;
+  email?: string;
+  avatarUrl?: string | null;
+}
+
+interface AssignedBy {
+  id: string;
+  name: string;
+  lastName: string;
+}
+
+export interface Assignee {
+  id: string;
+  taskId: string;
+  userId: string;
+  assignedAt: string; // ISO date string
+  assignedById: string;
+  user: User;
+  assignedBy: AssignedBy;
+}
