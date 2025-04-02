@@ -196,4 +196,4 @@ function TaskTab() {
   );
 }
 
-export default TaskTab
+export default TaskTab;

@@ -4,7 +4,11 @@ import { ModeToggle } from "@/components/ui/modeToggle";
 import Link from "next/link";
 import React from "react";
 
-export default function marketingLayout({ children }:{children : React.ReactNode}) {
+export default function marketingLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
       <header className="flex justify-between items-center h-16 py-3 px-5.5 border-border border-b-1">
@@ -30,7 +34,7 @@ export default function marketingLayout({ children }:{children : React.ReactNode
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <div className="w-50">
+            <div className="w-36">
               <p className="typography-large">Learn</p>
               <ul className="flex flex-col gap-2 mt-2">
                 <li>
@@ -41,7 +45,7 @@ export default function marketingLayout({ children }:{children : React.ReactNode
                 </li>
               </ul>
             </div>
-            <div className="w-50">
+            <div className="w-36">
               <p className="typography-large">Resources</p>
               <ul className="flex flex-col gap-2 mt-2">
                 <li>
@@ -52,7 +56,7 @@ export default function marketingLayout({ children }:{children : React.ReactNode
                 </li>
               </ul>
             </div>
-            <div className="w-50">
+            <div className="w-36">
               <p className="typography-large">Legal</p>
               <ul className="flex flex-col gap-2 mt-2">
                 <li>
