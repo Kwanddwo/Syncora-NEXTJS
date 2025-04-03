@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TabsContent } from '@/components/ui/tabs';
-import { Delete, MoreHorizontal, Plus, User } from 'lucide-react';
+import { ChevronRight, Delete, MoreHorizontal, Plus, User } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { NewTaskDialog } from './AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -13,6 +13,7 @@ import { EditTaskDialog } from './EditTaskForm';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { Assignee } from '@/types';
+import { cn } from '@/lib/utils';
 interface Task {
   id: string;
   title: string;
@@ -25,6 +26,15 @@ function TaskTab() {
   const searchParams = useSearchParams();
   const workspaceId=searchParams.get("id");
   const [todos, setTodos] = useState<Task[]>([]);
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+
+  const toggleRowExpand = (id: string) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   useEffect(()=>{
       const getTasks =async() =>{
         try{
@@ -81,7 +91,8 @@ function TaskTab() {
               </TableHeader>
               <TableBody>
                 {todos.map((todo) => (
-                  <TableRow key={todo.id}>
+                  <React.Fragment key={todo.id}>
+                  <TableRow>
                     <TableCell className="font-medium">{todo.title}</TableCell>
                     <TableCell>
                       <Badge
@@ -98,7 +109,25 @@ function TaskTab() {
                     </TableCell>
                     <TableCell>{todo.dueDate}</TableCell>
                     <TableCell className="flex items-center pt-3">
-                      <User className="h-4 w-4" /> {todo.assignees[0]?.user?.name}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-1" />
+                          {todo.assignees[0]?.user?.name}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0"
+                          onClick={() => toggleRowExpand(todo.id)}
+                        >
+                          <ChevronRight
+                            className={cn(
+                              "h-4 w-4 transition-transform",
+                              expandedRows[todo.id] ? "transform rotate-90" : ""
+                            )}
+                          />
+                        </Button>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -120,10 +149,29 @@ function TaskTab() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
+                   {expandedRows[todo.id] && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="py-2 px-4 bg-muted/50">
+                        <div className="pl-8">
+                          <p className="font-medium text-sm mb-1">All Assignees:</p>
+                          <div className="space-y-1">
+                            {todo.assignees.map((assignee, index) => (
+                              <div key={index} className="flex items-center gap-2 text-sm">
+                                <User className="h-3 w-3" />
+                                <span>{assignee.user.name}</span>
+                                <span className="text-muted-foreground text-xs">({assignee.user.email})</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  </React.Fragment>
                 ))}
                 <TableRow>
                   <TableCell colSpan={6}>
-                    <NewTaskDialog />
+                    <NewTaskDialog workspaceId={workspaceId as string}/>
                   </TableCell>
                 </TableRow>
               </TableBody>

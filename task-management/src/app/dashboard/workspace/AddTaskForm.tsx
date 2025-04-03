@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,15 +22,43 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, ChevronDown, Check, User } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import {WorkspaceMember} from "@/lib/types"
+import { fetchMembersByWorkspaceId } from "@/app/_api/activeWorkspaces";
 
-export function NewTaskDialog() {
-  const members = [
-    { id: "1", name: "Alex Johnson" },
-    { id: "2", name: "Sarah Williams" },
-    { id: "3", name: "Michael Brown" },
-    { id: "4", name: "Emma Davis" },
-  ];
+export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
+  const [members,setMembers]=useState<WorkspaceMember[]>([]);
+  useEffect(() => {
+    const getWorkspaceMembers = async ()=>{
+      const response=await fetchMembersByWorkspaceId(workspaceId);
+      setMembers(response)
+    }
+    getWorkspaceMembers();
+  },[workspaceId]);
+  
+  const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
+
+  const toggleAssignee = (id: string) => {
+    setSelectedAssignees((current) =>
+      current.includes(id)
+        ? current.filter((item) => item !== id)
+        : [...current, id]
+    );
+  };
+
+  const getSelectedNames = () => {
+    return members
+      .filter((member) => selectedAssignees.includes(member.id))
+      .map((member) => member.user.name);
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -85,17 +116,73 @@ export function NewTaskDialog() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="assignee">Assignee</Label>
-            <Select>
-              <SelectTrigger id="assignee">
-                <SelectValue placeholder="Select assignee" />
-              </SelectTrigger>
-              <SelectContent>
-                {members.map((member) => (
-                  <SelectItem key= {member.id} value={member.name}>{member.name}</SelectItem>
+            <Label htmlFor="assignee">Assignees</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className={cn(
+                    "w-full justify-between",
+                    !selectedAssignees.length && "text-muted-foreground"
+                  )}
+                >
+                  {selectedAssignees.length > 0 ? (
+                    <div className="flex items-center gap-1 truncate">
+                      <span className="truncate">
+                        {selectedAssignees.length === 1
+                          ? getSelectedNames()[0]
+                          : `${getSelectedNames()[0]} +${selectedAssignees.length - 1}`}
+                      </span>
+                    </div>
+                  ) : (
+                    "Select assignees"
+                  )}
+                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0" align="start">
+                <div className="max-h-[200px] overflow-auto p-1">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center space-x-2 rounded-sm px-2 py-1.5 hover:bg-muted cursor-pointer"
+                      onClick={() => toggleAssignee(member.id)}
+                    >
+                      <Checkbox
+                        id={`assignee-${member.id}`}
+                        checked={selectedAssignees.includes(member.id)}
+                        onCheckedChange={() => toggleAssignee(member.id)}
+                      />
+                      <label
+                        htmlFor={`assignee-${member.id}`}
+                        className="flex-grow cursor-pointer text-sm"
+                      >
+                        {member.user.name}
+                      </label>
+                      {selectedAssignees.includes(member.id) && (
+                        <Check className="h-4 w-4" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Display selected assignees */}
+            {selectedAssignees.length > 0 && (
+              <div className="mt-1 flex flex-wrap gap-1">
+                {getSelectedNames().map((name, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                  >
+                    <User className="h-3 w-3" />
+                    {name}
+                  </div>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
+            )}
           </div>
         </div>
         <DialogFooter className="flex justify-between sm:justify-end">

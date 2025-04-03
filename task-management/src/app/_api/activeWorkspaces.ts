@@ -16,9 +16,11 @@ interface Workspace {
 }
 
 // Function to fetch tasks for a given workspace ID
-export const fetchTasksForWorkspace = async (workspaceId: string): Promise<Task[]> => {
+export const fetchTasksForWorkspace = async (
+  workspaceId: string
+): Promise<Task[]> => {
   try {
-    const response = await axios.post(TASKS_API, { workspaceId : workspaceId });
+    const response = await axios.post(TASKS_API, { workspaceId: workspaceId });
     return response.data; // Assuming the API returns an array of tasks
   } catch (error) {
     console.error(`Error fetching tasks for workspace ${workspaceId}:`, error);
@@ -49,5 +51,34 @@ export const fetchActiveWorkspaces = async (): Promise<Workspace[]> => {
   } catch (error) {
     console.error("Error fetching workspaces:", error);
     return [];
+  }
+};
+
+export const fetchMembersByWorkspaceId = async (workspaceId: string) => {
+  if (!workspaceId || typeof workspaceId !== "string") {
+    throw new Error("Invalid workspaceId: It must be a non-empty string.");
+  }
+
+  try {
+    const res = await axios.post(
+      "http://localhost:3001/api/workspace/members",
+      {
+        workspaceId,
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error:", error.response?.data || error.message);
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch workspace members."
+      );
+    } else {
+      console.error("Unexpected error:", error);
+      throw new Error(
+        "An unexpected error occurred while fetching workspace members."
+      );
+    }
   }
 };

@@ -5,5 +5,5 @@ import { getMembersByWorkspaceId } from "../controllers/workspacehandler.js"
 export const routerr = express.Router();
 
 routerr.get('/workspaces', getWorkspacesByuserId); 
-routerr.get('/members', handleInputError,getMembersByWorkspaceId); //ALL members by workspaceId
+routerr.post('/members', handleInputError,getMembersByWorkspaceId); //ALL members by workspaceId
 export default routerr;
