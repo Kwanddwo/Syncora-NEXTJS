@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import { validationResult } from "express-validator"
 const SECRET = process.env.JWT_SECRET || "secret";
 
 export const verifyToken = (req, res, next) => {
