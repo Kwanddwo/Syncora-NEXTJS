@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 export const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 dotenv.config();
+const SECRET = process.env.JWT_SECRET || "secret";
 
 /* export const verifyworkspace = async (req, res) => {
     const { workspaceId } = req.body;
@@ -74,7 +75,7 @@ export const getWorkspacesByuserId = async (req, res) => {
         // Decode token to extract user ID
         let decoded;
         try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET);
+            decoded = jwt.verify(token, SECRET);
         } catch (error) {
             console.error("Error decoding token:", error);
             return res.status(403).json({ error: "Invalid Token" });
