@@ -81,61 +81,61 @@ export const CreateTask = async (req, res) => {
 
 
 export const getAllTasks = async (req, res) => {
-    try {
-        const { workspaceId } = req.body;
-        const tasks = await prisma.task.findMany({
-            where: {
-                workspaceId: workspaceId
+  try {
+    const { workspaceId } = req.body;
+    const tasks = await prisma.task.findMany({
+      where: {
+        workspaceId: workspaceId,
+      },
+      include: {
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true,
+              },
             },
-            include: {
-                assignees: {
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                name: true,
-                                lastName: true,
-                                email: true,
-                                avatarUrl: true
-                            }
-                        },
-                        assignedBy: {
-                            select: {
-                                id: true,
-                                name: true,
-                                lastName: true
-                            }
-                        }
-                    }
-                },
-                createdBy: {
-                    select: {
-                        id: true,
-                        name: true,
-                        lastName: true,
-                        email: true
-                    }
-                },
-                workspace: {
-                    select: {
-                        id: true,
-                        name: true,
-                        icon: true
-                    }
-                }
+            assignedBy: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
             },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-        res.status(200).json(tasks);
-    } catch (error) {
-        console.error('Error fetching workspace tasks:', error);
-        res.status(500).json({
-            error: 'Internal server error',
-            details: error.message
-        });
-    }
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error("Error fetching workspace tasks:", error);
+    res.status(500).json({
+      error: "Internal server error",
+      details: error.message,
+    });
+  }
 };
 /**expected return 
  [

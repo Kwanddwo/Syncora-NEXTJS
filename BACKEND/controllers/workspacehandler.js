@@ -4,7 +4,7 @@ export const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
-export const verifyworkspace = async (req, res, next) => {
+export const verifyworkspace = async (req, res, next) => 
     const { workspaceId } = req.body;
     try {
         const workspace = await prisma.workspace.findUnique({
@@ -139,15 +139,12 @@ export const getWorkspacesByuserId = async (req, res) => {
         // Decode token to extract user ID
         let decoded;
         try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET);
+            decoded = jwt.verify(token, SECRET);
         } catch (error) {
             console.error("Error decoding token:", error);
             return res.status(403).json({ error: "Invalid Token" });
         }
         const userId = decoded.id;
-
-        // Debugging log (before using the variable)
-        console.log("userId:", userId);
 
         if (!userId) {
             // If the user ID is not found, return an unauthorized error
@@ -171,9 +168,6 @@ export const getWorkspacesByuserId = async (req, res) => {
                 },
             },
         });
-
-        // Debugging log (before sending response)
-        console.log("workspaces:", workspaces);
 
         // Return the fetched workspaces in the response
         res.status(200).json(workspaces);
