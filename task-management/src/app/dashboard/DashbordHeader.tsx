@@ -1,14 +1,19 @@
-
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
+import { ModeToggle } from "@/components/ui/modeToggle";
+import { Separator } from "@/components/ui/separator";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Building } from "lucide-react";
-import React from 'react'
+import React from "react";
 
 function DashbordHeader() {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2 border-b">
-      <div className="flex flex-1 items-center gap-2 px-3">
+    <header className="flex h-14 shrink-0 justify-between items-center gap-2 border-b px-3">
+      <div className="flex flex-1 items-center gap-2">
         <SidebarTrigger />
         <Separator orientation="vertical" className="mr-2 h-4" />
         <Breadcrumb>
@@ -22,8 +27,11 @@ function DashbordHeader() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
+      <div className="flex items-center">
+        <ModeToggle />
+      </div>
     </header>
   );
 }
 
-export default DashbordHeader
+export default DashbordHeader;
