@@ -117,7 +117,7 @@ export const getWorkspacesByuserId = async (req, res) => {
 };
 export const getMembersByWorkspaceId = async (req, res) => {
     try {
-        const { workspaceId } =req.body.workspaceId; 
+        const { workspaceId } =req.body; 
         const members = await prisma.workspaceMember.findMany({
             where: {
                 workspaceId: workspaceId, 
