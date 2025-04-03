@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const prisma = new PrismaClient();
-import { decodeTokenToUserId } from "./authController.js";
 
 export const getAllTasks = async (req, res) => {
     try {

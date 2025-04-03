@@ -107,9 +107,6 @@ export const getWorkspacesByuserId = async (req, res) => {
             },
         });
 
-        // Debugging log (before sending response)
-        console.log("workspaces:", workspaces);
-
         // Return the fetched workspaces in the response
         res.status(200).json(workspaces);
     } catch (error) {
