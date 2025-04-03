@@ -74,7 +74,7 @@ export const getWorkspacesByuserId = async (req, res) => {
         // Decode token to extract user ID
         let decoded;
         try {
-            decoded = jwt.verify(token,SECRET);
+            decoded = jwt.verify(token, SECRET);
         } catch (error) {
             console.error("Error decoding token:", error);
             return res.status(403).json({ error: "Invalid Token" });
@@ -115,13 +115,12 @@ export const getWorkspacesByuserId = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 export const getMembersByWorkspaceId = async (req, res) => {
     try {
-        const { workspaceId } = req.body.workspaceId;
+        const { workspaceId } =req.body.workspaceId; 
         const members = await prisma.workspaceMember.findMany({
             where: {
-                workspaceId: workspaceId,
+                workspaceId: workspaceId, 
             },
             include: {
                 user: true,
@@ -130,7 +129,8 @@ export const getMembersByWorkspaceId = async (req, res) => {
         res.status(200).json(members);
     } catch (error) {
         console.error("Error fetching members:", error);
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ error: "Internal server error" }); 
         console.log("Error fetching members:", error);
     }
 }
+

@@ -1,4 +1,4 @@
-import { handleInputError } from "../middleware/middleware.js"
+import { handleInputError } from "../middleware/middleware.js";
 import { getAllTasks } from "../controllers/taskhandlers.js"
 import * as taskController from "../controllers/taskhandlers.js"
 import express from "express"
@@ -6,7 +6,9 @@ const router = express.Router();
 
 // Middleware to verify token for all routes
 router.post('/tasks', getAllTasks); //ALL TASKS
+
 router.get('/usertasks', taskController.getTasksByUserId);
+
 /* router.get('/tasks/:id', taskController.getTaskById);
 router.post('/tasks', taskController.createTask);
 router.put('/tasks/:id', taskController.updateTask);
