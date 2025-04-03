@@ -1,10 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { body } from "express-validator";
 export const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 dotenv.config();
-
+const SECRET = process.env.JWT_SECRET || "secret";
 export const verifyworkspace = async (req, res, next) => {
     const { workspaceId } = req.body;
     try {
