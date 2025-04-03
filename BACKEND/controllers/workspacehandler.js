@@ -81,9 +81,6 @@ export const getWorkspacesByuserId = async (req, res) => {
         }
         const userId = decoded.id;
 
-        // Debugging log (before using the variable)
-        console.log("userId:", userId);
-
         if (!userId) {
             // If the user ID is not found, return an unauthorized error
             return res.status(401).json({ error: "Unauthorized" });

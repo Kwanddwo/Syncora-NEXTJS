@@ -12,16 +12,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { EditTaskDialog } from './EditTaskForm';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
-import { Assignee } from '@/types';
 import { cn } from '@/lib/utils';
-interface Task {
-  id: string;
-  title: string;
-  dueDate?: string;
-  assignees: Assignee[];
-  status: string;
-  priority: string;
-}
+import {Task} from "@/lib/types"
 function TaskTab() {
   const searchParams = useSearchParams();
   const workspaceId=searchParams.get("id");
@@ -92,86 +84,102 @@ function TaskTab() {
               <TableBody>
                 {todos.map((todo) => (
                   <React.Fragment key={todo.id}>
-                  <TableRow>
-                    <TableCell className="font-medium">{todo.title}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={getStatusStyle(todo.status)}
-                      >
-                        {todo.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityStyle(todo.priority)}>
-                        {todo.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{todo.dueDate}</TableCell>
-                    <TableCell className="flex items-center pt-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center">
-                          <User className="h-4 w-4 mr-1" />
-                          {todo.assignees[0]?.user?.name}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={() => toggleRowExpand(todo.id)}
-                        >
-                          <ChevronRight
-                            className={cn(
-                              "h-4 w-4 transition-transform",
-                              expandedRows[todo.id] ? "transform rotate-90" : ""
-                            )}
-                          />
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <EditTaskDialog />
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-[#ef4444] focus:text-[#ef4444] cursor-pointer">
-                            <Delete className="mr-2 h-2 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                   {expandedRows[todo.id] && (
                     <TableRow>
-                      <TableCell colSpan={6} className="py-2 px-4 bg-muted/50">
-                        <div className="pl-8">
-                          <p className="font-medium text-sm mb-1">All Assignees:</p>
-                          <div className="space-y-1">
-                            {todo.assignees.map((assignee, index) => (
-                              <div key={index} className="flex items-center gap-2 text-sm">
-                                <User className="h-3 w-3" />
-                                <span>{assignee.user.name}</span>
-                                <span className="text-muted-foreground text-xs">({assignee.user.email})</span>
-                              </div>
-                            ))}
+                      <TableCell className="font-medium">
+                        {todo.title}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={getStatusStyle(todo.status)}
+                        >
+                          {todo.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getPriorityStyle(todo.priority)}>
+                          {todo.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(todo.dueDate).toISOString().split("T")[0]}
+                      </TableCell>
+                      <TableCell className="flex items-center pt-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center">
+                            <User className="h-4 w-4 mr-1" />
+                            {todo.assignees?.[0]?.user?.name}
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                            onClick={() => toggleRowExpand(todo.id)}
+                          >
+                            <ChevronRight
+                              className={cn(
+                                "h-4 w-4 transition-transform",
+                                expandedRows[todo.id]
+                                  ? "transform rotate-90"
+                                  : ""
+                              )}
+                            />
+                          </Button>
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild>
+                              <EditTaskDialog />
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-[#ef4444] focus:text-[#ef4444] cursor-pointer">
+                              <Delete className="mr-2 h-2 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  )}
+                    {expandedRows[todo.id] && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={6}
+                          className="py-2 px-4 bg-muted/50"
+                        >
+                          <div className="pl-8">
+                            <p className="font-medium text-sm mb-1">
+                              Assignees:
+                            </p>
+                            <div className="space-y-1">
+                              {(todo.assignees || []).map((assignee, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center gap-2 text-sm"
+                                >
+                                  <User className="h-3 w-3" />
+                                  <span>{assignee.user.name}</span>
+                                  <span className="text-muted-foreground text-xs">
+                                    ({assignee.user.email})
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </React.Fragment>
                 ))}
                 <TableRow>
                   <TableCell colSpan={6}>
-                    <NewTaskDialog workspaceId={workspaceId as string}/>
+                    <NewTaskDialog workspaceId={workspaceId as string} />
                   </TableCell>
                 </TableRow>
               </TableBody>
