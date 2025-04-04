@@ -9,6 +9,7 @@ const router = express.Router();
 router.post('/tasks', getAllTasks); //ALL TASKS
 
 router.get('/usertasks', taskController.getTasksByUserId);
+
 router.post("/create",
     handleInputError,
     workspaceController.verifyworkspace,
@@ -16,5 +17,22 @@ router.post("/create",
     workspaceController.adminPrivileges,
     taskController.CreateTask);
 
+router.delete("/delete",
+    handleInputError,
+    workspaceController.verifyworkspace,
+    workspaceController.userMembershipCheck,
+    workspaceController.adminPrivileges,
+    taskController.DeleteTask);   
 
+router.put("/updateTask",
+    handleInputError,
+    workspaceController.verifyworkspace,
+    workspaceController.userMembershipCheck,
+    workspaceController.adminPrivileges,
+    taskController.UpdateTask);
+router.put("/updateStatus",
+    handleInputError,
+    workspaceController.verifyworkspace,
+    workspaceController.userMembershipCheck,
+    taskController.updateTaskStatus);
 export default router;
