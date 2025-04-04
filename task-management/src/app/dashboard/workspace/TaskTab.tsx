@@ -10,13 +10,13 @@ import React, { useEffect, useState } from 'react'
 import { NewTaskDialog } from './AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from './EditTaskForm';
-import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { cn } from '@/lib/utils';
 import {Task} from "@/lib/types"
+import { useSearchParams } from 'next/navigation';
 function TaskTab() {
   const searchParams = useSearchParams();
-  const workspaceId=searchParams.get("id");
+  const workspaceId = searchParams.get("id");
   const [todos, setTodos] = useState<Task[]>([]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
@@ -26,11 +26,11 @@ function TaskTab() {
       [id]: !prev[id],
     }));
   };
-
+ 
   useEffect(()=>{
       const getTasks =async() =>{
         try{
-          const response = await axios.post("http://localhost:3001/api/tasks",{workspaceId});
+          const response = await axios.post("http://localhost:3001/api/task/tasks",{workspaceId});
           setTodos(response.data)
         }catch(error){
           console.error(
@@ -179,7 +179,7 @@ function TaskTab() {
                 ))}
                 <TableRow>
                   <TableCell colSpan={6}>
-                    <NewTaskDialog workspaceId={workspaceId as string} />
+                    <NewTaskDialog  workspaceId={workspaceId as string}/>
                   </TableCell>
                 </TableRow>
               </TableBody>

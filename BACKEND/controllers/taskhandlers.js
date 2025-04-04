@@ -5,6 +5,80 @@ import dotenv from "dotenv";
 dotenv.config();
 const prisma = new PrismaClient();
 
+export const CreateTask = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      console.error("Authorization header missing or malformed");
+      return res.status(401).json({ error: "No Token Provided" });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        console.error("Token has expired:", error);
+        return res.status(403).json({ error: "Token Expired" });
+      } else if (error.name === "JsonWebTokenError") {
+        console.error("Invalid token:", error);
+        return res.status(403).json({ error: "Invalid Token" });
+      } else {
+        console.error("Error decoding token:", error);
+        return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+      }
+    }
+
+    const userId = decoded.id;
+    console.log("Decoded userId:", userId);
+    if (!userId) {
+      console.error("Decoded token does not contain a user ID");
+      return res.status(401).json({ error: "Unauthorized: User ID Missing" });
+    }
+    const {
+      title,
+      description,
+      priority,
+      workspaceId,
+      dueDate,
+      assigneeIds,
+    } = req.body;
+    console.log("Raw dueDate received:",dueDate);
+    console.log("Type of dueDate:", typeof dueDate);
+    // Create a new task
+    const newTask = await prisma.task.create({
+      data: {
+        title,
+        description,
+        priority,
+        workspaceId,
+        dueDate:new Date(dueDate),
+        createdById: userId,
+        status: 'pending',
+        priorityOrder: 0,
+      },
+    });
+    let ownerId = userId;
+    if (assigneeIds && assigneeIds.length > 0) {
+      const taskAssignees = assigneeIds.map(userId => ({
+        taskId: newTask.id,
+        userId,
+        assignedById: ownerId,
+      }));
+
+      await prisma.taskAssignee.createMany({
+        data: taskAssignees,
+      });
+    }
+    res.status(201).json({ message: "Task created successfully" });
+  } catch (error) {
+    console.error('Error creating task:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+};
+
+
+
 export const getAllTasks = async (req, res) => {
   try {
     const { workspaceId } = req.body;

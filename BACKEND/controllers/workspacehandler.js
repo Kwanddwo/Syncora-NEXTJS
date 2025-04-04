@@ -4,7 +4,7 @@ export const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
-/* export const verifyworkspace = async (req, res) => {
+export const verifyworkspace = async (req, res, next) => {
     const { workspaceId } = req.body;
     try {
         const workspace = await prisma.workspace.findUnique({
@@ -15,55 +15,121 @@ const SECRET = process.env.JWT_SECRET || "secret";
         if (!workspace) {
             return res.status(404).json({ message: "Workspace not found" });
         }
-        res.status(200).json({ message: "Workspace verified successfully", workspace });
+        console.log("Workspace verified successfully:");
+        next();
     } catch (error) {
         res.status(500).json({ message: "Error verifying workspace" });
     }
 }
-export const verifyuser = async (req, res) => {
-    const { userId } = req.body;
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId,
-            },
-        });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ message: "User verified successfully", user });
-    } catch (error) {
-        res.status(500).json({ message: "Error verifying user" });
+export const userMembershipCheck = async (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        console.error("Authorization header missing or malformed");
+        return res.status(401).json({ error: "No Token Provided" });
     }
-}
-export const adminPrivileges = async (req, res) => {
-    // this functions checks if the user has admin privileges in the workspace
-    const { userId, workspaceId } = req.body;
+
+    let decoded;
     try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: userId,
-            },
-        });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        const workspace = await prisma.workspace.findUnique({
-            where: {
-                id: workspaceId,
-            },
-        });
-        if (!workspace) {
-            return res.status(404).json({ message: "Workspace not found" });
-        }
-        if (user.role !== "admin") {
-            return res.status(403).json({ message: "User does not have admin privileges" });
-        }
-        res.status(200).json({ message: "User has admin privileges", user, workspace });
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
-        res.status(500).json({ message: "Error checking admin privileges" });
+        if (error.name === "TokenExpiredError") {
+            console.error("Token has expired:", error);
+            return res.status(403).json({ error: "Token Expired" });
+        } else if (error.name === "JsonWebTokenError") {
+            console.error("Invalid token:", error);
+            return res.status(403).json({ error: "Invalid Token" });
+        } else {
+            console.error("Error decoding token:", error);
+            return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+        }
     }
-}*/
+    const userId = decoded.id;
+    try {
+        const workspaceId = req.body.workspaceId;
+        console.log("workspaceId:", workspaceId);
+        const workspaceMembership = await prisma.workspaceMember.findFirst({
+            where: {
+                workspaceId: workspaceId,
+                userId: userId,
+            },
+        });
+        if (!workspaceMembership) {
+            console.error("User is not a member of the specified workspace");
+
+        }
+        console.log("User verified successfully in workspace:");
+
+
+        next();
+    } catch (error) {
+        console.error("Error verifying user membership:", error);
+
+    }
+};
+
+export const adminPrivileges = async (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+        console.error("Authorization header missing or malformed");
+        return res.status(401).json({ error: "No Token Provided" });
+    }
+
+    let decoded;
+    try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+        if (error.name === "TokenExpiredError") {
+            console.error("Token has expired:", error);
+            return res.status(403).json({ error: "Token Expired" });
+        } else if (error.name === "JsonWebTokenError") {
+            console.error("Invalid token:", error);
+            return res.status(403).json({ error: "Invalid Token" });
+        } else {
+            console.error("Error decoding token:", error);
+            return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+        }
+    }
+
+    const userId = decoded.id;
+
+    const workspaceId = req.body.workspaceId
+
+    if (!workspaceId) {
+        return res.status(400).json({ error: "Workspace ID is required" });
+    }
+
+    try {
+        // Query WorkspaceMember to find the user's role in the workspace
+        const workspaceMember = await prisma.workspaceMember.findFirst({
+            where: {
+
+                userId: userId,
+                workspaceId: workspaceId,
+
+            },
+        });
+
+        if (!workspaceMember) {
+            return res.status(404).json({ message: "User is not a member of the workspace" });
+        }
+
+        if (workspaceMember.role !== "admin") {
+            return res.status(403).json({ message: "User does not have admin privileges in this workspace" });
+        }
+
+        console.log("User has admin privileges in the workspace");
+        next();  // Proceed to the next middleware or route handler
+    } catch (error) {
+        console.error("Error checking admin privileges:", error);
+        return res.status(500).json({ message: "Error checking admin privileges", details: error.message });
+    }
+};
+
+
+
+
+
+
 export const getWorkspacesByuserId = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
