@@ -77,8 +77,176 @@ export const CreateTask = async (req, res) => {
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
+export const DeleteTask = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    console.error("Authorization header missing or malformed");
+    return res.status(401).json({ error: "No Token Provided" });
+  }
 
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      console.error("Token has expired:", error);
+      return res.status(403).json({ error: "Token Expired" });
+    } else if (error.name === "JsonWebTokenError") {
+      console.error("Invalid token:", error);
+      return res.status(403).json({ error: "Invalid Token" });
+    } else {
+      console.error("Error decoding token:", error);
+      return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+    }
+  }
 
+  const userId = decoded.id;
+  const { taskId, workspaceId } = req.body;
+
+  if (!userId) {
+    console.error("Decoded token does not contain a user ID");
+    return res.status(401).json({ error: "Unauthorized: User ID Missing" });
+  }
+
+  if (!taskId || !workspaceId) {
+    return res.status(400).json({ error: "Missing taskId or workspaceId" });
+  }
+
+  try {
+    // Delete the task
+    const deletedTask = await prisma.task.delete({
+      where: { id: taskId },
+    });
+
+    res.status(200).json({ message: "Task deleted successfully", deletedTask });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+};
+export const UpdateTask = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "No Token Provided" });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    const message =
+      error.name === "TokenExpiredError"
+        ? "Token Expired"
+        : error.name === "JsonWebTokenError"
+        ? "Invalid Token"
+        : "Token Decoding Error";
+    return res.status(403).json({ error: message, details: error.message });
+  }
+
+  const { workspaceId, taskId, ...updateFields } = req.body;
+
+  if (!workspaceId || !taskId) {
+    return res
+      .status(400)
+      .json({ error: "Both workspaceId and taskId are required." });
+  }
+
+  // Remove fields explicitly set to null or undefined
+  const filteredUpdates = Object.fromEntries(
+    Object.entries(updateFields).filter(
+      ([_, value]) => value !== null && value !== undefined
+    )
+  );
+
+  // If no valid fields to update
+  if (Object.keys(filteredUpdates).length === 0) {
+    return res
+      .status(400)
+      .json({ error: "No valid fields provided for update." });
+  }
+
+  try {
+    const updatedTask = await prisma.task.update({
+      where: {
+        id: taskId,
+        workspaceId: workspaceId,
+      },
+      data: filteredUpdates,
+    });
+
+    res.status(200).json({
+      message: "Task updated successfully.",
+      updatedTask,
+    });
+  } catch (error) {
+    console.error("Error updating task:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+};
+export const updateTaskStatus = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(403).json({ error: "Invalid or expired token" });
+  }
+
+  const userId = decoded.id;
+  const { taskId, workspaceId, status } = req.body;
+
+  if (!taskId || !workspaceId || !status) {
+    return res.status(400).json({ error: "taskId, workspaceId, and status are required" });
+  }
+
+  try {
+    // Check if user is an assignee of the task
+    const isAssignee = await prisma.taskAssignee.findFirst({
+      where: {
+        taskId,
+        userId
+      }
+    });
+
+    // Check if user is admin in the workspace
+    const isAdmin = await prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId,
+        userId,
+        role: 'admin'
+      }
+    });
+
+    if (!isAssignee && !isAdmin) {
+      return res.status(403).json({ error: "Unauthorized: Not an assignee or workspace admin" });
+    }
+
+    // Update task status
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
+      data: { status }
+    });
+
+    // Optionally log this activity
+    await prisma.taskActivity.create({
+      data: {
+        taskId,
+        userId,
+        action: 'status_changed',
+        details: { newStatus: status }
+      }
+    });
+
+    return res.status(200).json({ message: "Task status updated" });
+  } catch (error) {
+    console.error("Error updating task status:", error);
+    return res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+};
 
 export const getAllTasks = async (req, res) => {
     try {
@@ -284,42 +452,3 @@ export const getTasksByUserId = async (req, res) => {
 
   }
 };
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

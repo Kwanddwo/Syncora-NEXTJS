@@ -19,6 +19,7 @@ export const verifyworkspace = async (req, res, next) => {
     } catch (error) {
         res.status(500).json({ message: "Error verifying workspace" });
     }
+    next();
 }
 export const userMembershipCheck = async (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
@@ -135,8 +136,6 @@ export const getWorkspacesByuserId = async (req, res) => {
         if (!token) {
             return res.status(401).json({ error: "No Token Provided" });
         }
-
-        // Decode token to extract user ID
         let decoded;
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -145,12 +144,10 @@ export const getWorkspacesByuserId = async (req, res) => {
             return res.status(403).json({ error: "Invalid Token" });
         }
         const userId = decoded.id;
-
-        // Debugging log (before using the variable)
         console.log("userId:", userId);
 
         if (!userId) {
-            // If the user ID is not found, return an unauthorized error
+       
             return res.status(401).json({ error: "Unauthorized" });
         }
 
@@ -201,4 +198,6 @@ export const getMembersByWorkspaceId = async (req, res) => {
         console.log("Error fetching members:", error);
     }
 }
+
+
 
