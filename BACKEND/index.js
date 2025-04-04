@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use("/api/auth", authRoutes);
 app.use("/api/emailverification",emailVrfRoute);
-app.use("/api/",taskroutes);
+app.use("/api/task",taskroutes);
 app.use("/api/workspace/",workspaceRoutes);
 
 app.listen(3001, () => console.log("Server running on port 3001"));

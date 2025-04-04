@@ -17,8 +17,7 @@ export function LoginForm({
   const router = useRouter();
 
 
-    const handleSubmit = async (e:React.FormEvent) => {
-      e.preventDefault();
+    const handleSubmit = async () => {
        const email = emailRef.current?.value;
        const password = passwordRef.current?.value;
 

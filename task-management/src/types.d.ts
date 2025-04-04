@@ -33,3 +33,11 @@ export interface Assignee {
   user: User;
   assignedBy: AssignedBy;
 }
+export type TaskRequest = {
+  title: string;
+  description?: string;
+  priority: string;
+  workspaceId: string;
+  dueDate: string;
+  assigneesIds: string[];
+};
