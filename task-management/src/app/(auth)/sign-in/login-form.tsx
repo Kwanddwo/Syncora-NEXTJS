@@ -1,47 +1,40 @@
-"use client"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import React, { useRef, useState} from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation"
+"use client";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import React, { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 export function LoginForm({
-                            className,
-                            ...props
-                          }: React.ComponentProps<"form">) {
-
+  className,
+  ...props
+}: React.ComponentProps<"form">) {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [error,setError]=useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
+  const { login } = useAuth(); // Assuming you have a useAuth hook to manage authentication
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
 
-    const handleSubmit = async () => {
-       const email = emailRef.current?.value;
-       const password = passwordRef.current?.value;
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const response = await axios.post(
-          "http://localhost:3001/api/auth/login",
-          {
-            email:email,
-            password:password,
-          }
-        );
-        const token = response.data.token; 
-        localStorage.setItem("authToken", token);
-        router.push("/dashboard");
+    try {
+      await login(email, password);
+      router.push("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err:any) {
-        setError(
-          err.response ? err.response.data.message : "An error occurred"
-        );
-      }
-    };
+    } catch (err: any) {
+      setError(err.response ? err.response.data.message : "An error occurred");
+    }
+  };
 
-  
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
