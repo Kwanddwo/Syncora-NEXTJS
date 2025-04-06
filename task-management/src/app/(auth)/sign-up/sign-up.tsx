@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRef, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/hooks/use-auth";
 export function SignUpForm({
   className,
   ...props
@@ -17,6 +17,7 @@ export function SignUpForm({
   const lastnameRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { register, checkEmail } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,46 +31,33 @@ export function SignUpForm({
       setError("All fields are required.");
       return;
     }
-     try {
-       const res = await axios.post(
-         "http://localhost:3001/api/auth/emailCheck",
-         {
-           email,
-         }
-       );
+    try {
+      const res = await checkEmail(email);
 
-       if (res.data.user) {
-         setError("Email is already in use");
-         return;
-       }
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     } catch (err: any) {
-       console.error("Email check error:", err);
-       setError("Failed to verify email. Please try again.");
-       return;
-     }
+      if (res.data.user) {
+        setError("Email is already in use");
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Email check error:", err);
+      setError("Failed to verify email. Please try again.");
+      return;
+    }
 
-     try {
-       const response = await axios.post(
-         "http://localhost:3001/api/auth/register",
-         {
-           name,
-           lastName,
-           email,
-           password,
-         }
-       );
+    try {
+      const response = await register(email, name, lastName, password);
 
-       console.log("User registered:", response.data);
-       alert("User created successfully");
-       router.push("/dashboard");
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     } catch (err: any) {
-       console.error("Registration error:", err);
-       setError(
-         err.response ? err.response.data.message : "Registration failed."
-       );
-     }
+      console.log("User registered:", response.data);
+      alert("User created successfully");
+      router.push("/dashboard");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      setError(
+        err.response ? err.response.data.message : "Registration failed."
+      );
+    }
   };
 
   return (
