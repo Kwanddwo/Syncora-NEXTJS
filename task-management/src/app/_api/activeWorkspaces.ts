@@ -31,7 +31,7 @@ export const fetchTasksForWorkspace = async (
 // Main function to fetch workspaces with their tasks
 export const fetchActiveWorkspaces = async (): Promise<Workspace[]> => {
   try {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
 
     const response = await axios.get(WORKSPACES_API, {
       headers: { Authorization: `Bearer ${token}` },
