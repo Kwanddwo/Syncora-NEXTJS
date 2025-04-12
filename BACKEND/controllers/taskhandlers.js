@@ -30,11 +30,12 @@ export const CreateTask = async (req, res) => {
     }
 
     const userId = decoded.id;
-    console.log("Decoded userId:", userId);
+    console.log("user id" ,userId)
     if (!userId) {
       console.error("Decoded token does not contain a user ID");
       return res.status(401).json({ error: "Unauthorized: User ID Missing" });
     }
+
     const {
       title,
       description,
@@ -43,39 +44,86 @@ export const CreateTask = async (req, res) => {
       dueDate,
       assigneeIds,
     } = req.body;
-    console.log("Raw dueDate received:",dueDate);
-    console.log("Type of dueDate:", typeof dueDate);
-    // Create a new task
+
     const newTask = await prisma.task.create({
       data: {
         title,
         description,
         priority,
         workspaceId,
-        dueDate:new Date(dueDate),
+        dueDate: new Date(dueDate),
         createdById: userId,
         status: 'pending',
         priorityOrder: 0,
       },
     });
-    let ownerId = userId;
+
     if (assigneeIds && assigneeIds.length > 0) {
       const taskAssignees = assigneeIds.map(userId => ({
         taskId: newTask.id,
         userId,
-        assignedById: ownerId,
+        assignedById: userId, 
       }));
 
       await prisma.taskAssignee.createMany({
         data: taskAssignees,
       });
     }
-    res.status(201).json({ message: "Task created successfully" });
+
+    const fullTask = await prisma.task.findUnique({
+      where: { id: newTask.id },
+      include: {
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+            assignedBy: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+          },
+        },
+      },
+    });
+
+    return res.status(201).json({
+      message: "Task created successfully",
+      task: fullTask,
+    });
+
   } catch (error) {
     console.error('Error creating task:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    if (!res.headersSent) {
+      return res.status(500).json({ error: 'Internal server error', details: error.message });
+    }
   }
 };
+
 export const DeleteTask = async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {

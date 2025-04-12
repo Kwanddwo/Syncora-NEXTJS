@@ -3,12 +3,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TodoTab from "./TodoTab";
 import TaskTab from "./TaskTab";
 import CalendarTab from "./CalendarTab";
-type PageProps = {
-  params: { workspaceId: string };
-};
+import MembersTab from "./MembersTab";
 
-function page({params}:PageProps) {
-  const workspaceId = params.workspaceId
+async function page({ params }: { params: Promise<{ workspaceId: string }>}) {
+  const {workspaceId} = await params
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <Tabs defaultValue="kanban">
@@ -16,9 +14,11 @@ function page({params}:PageProps) {
           <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="members">Members</TabsTrigger>
         </TabsList>
         <TodoTab />
         <TaskTab workspaceId={workspaceId} />
+        <MembersTab workspaceId={workspaceId} />
         <CalendarTab />
       </Tabs>
     </div>
