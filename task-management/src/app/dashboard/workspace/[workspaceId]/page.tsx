@@ -3,8 +3,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TodoTab from "./TodoTab";
 import TaskTab from "./TaskTab";
 import CalendarTab from "./CalendarTab";
+type PageProps = {
+  params: { workspaceId: string };
+};
 
-function page() {
+function page({params}:PageProps) {
+  const workspaceId = params.workspaceId
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <Tabs defaultValue="kanban">
@@ -14,7 +18,7 @@ function page() {
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
         </TabsList>
         <TodoTab />
-        <TaskTab />
+        <TaskTab workspaceId={workspaceId} />
         <CalendarTab />
       </Tabs>
     </div>
