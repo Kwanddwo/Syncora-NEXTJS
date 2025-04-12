@@ -96,7 +96,8 @@ export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
         console.log("✅ Task added successfully!");
         setLoading(false);
         setOpen(false); 
-        window.location.reload(); 
+        //TODO: add setTodos
+        // window.location.reload(); 
       } else {
         throw new Error("Task creation failed.");
       }
