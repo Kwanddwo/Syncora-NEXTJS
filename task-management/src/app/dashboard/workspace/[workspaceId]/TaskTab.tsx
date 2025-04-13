@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TabsContent } from '@/components/ui/tabs';
-import { ChevronRight, Delete, MoreHorizontal,User } from 'lucide-react';
+import { ChevronRight, MoreHorizontal,User } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import { NewTaskDialog } from './AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -11,6 +11,7 @@ import { EditTaskDialog } from './EditTaskForm';
 import axios from 'axios';
 import { cn } from '@/lib/utils';
 import {Task} from "@/lib/types"
+import DeleteTaskAlert from '@/components/DeleteTaskAlert';
 function TaskTab({workspaceId} :{workspaceId : string}) {
   const [todos, setTodos] = useState<Task[]>([]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
@@ -134,9 +135,8 @@ function TaskTab({workspaceId} :{workspaceId : string}) {
                             <DropdownMenuItem asChild>
                               <EditTaskDialog />
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-[#ef4444] focus:text-[#ef4444] cursor-pointer">
-                              <Delete className="mr-2 h-2 w-4" />
-                              Delete
+                            <DropdownMenuItem asChild>
+                              <DeleteTaskAlert workspaceId={workspaceId} taskId={todo.id} setTodos={setTodos} />
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
