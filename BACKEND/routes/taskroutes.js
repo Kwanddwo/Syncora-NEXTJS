@@ -21,7 +21,7 @@ router.delete("/delete",
     handleInputError,
     workspaceController.verifyworkspace,
     workspaceController.userMembershipCheck,
-    workspaceController.adminPrivileges,
+    /* workspaceController.adminPrivileges, */
     taskController.DeleteTask);   
 
 router.put("/updateTask",
