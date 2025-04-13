@@ -1,6 +1,7 @@
 import axios from "axios";
 import { TaskRequest } from "@/types";
 const CREATE_TASK_API = "http://localhost:3001/api/task/create";
+const DELETE_TASK_API = "http://localhost:3001/api/task/delete";
 
 export const addTaskAPI = async (task: TaskRequest) => {
   const token = localStorage.getItem("token");
@@ -21,7 +22,26 @@ export const addTaskAPI = async (task: TaskRequest) => {
     );
     return response.data;
   } catch (error) {
-    console.log("Error in the addTaskAPI FRONTEND :",error);
+    console.log("Error in the TasksAPI FRONTEND :",error);
     
   }
 };
+
+export const deleteTaskAPI = async (workspaceId : string,taskId : string)=>{
+  const token = localStorage.getItem("token");
+  try{
+    const response = await axios.delete(DELETE_TASK_API, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        taskId,
+        workspaceId,
+      },
+    });
+    return response.data
+
+  }catch(error){
+      console.log("Delete task Error",error);
+  }
+}
