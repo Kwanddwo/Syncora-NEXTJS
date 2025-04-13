@@ -36,7 +36,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { addTaskAPI } from "@/app/_api/addTaskAPI";
+import { addTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
 import {ClipLoader} from "react-spinners"
 
