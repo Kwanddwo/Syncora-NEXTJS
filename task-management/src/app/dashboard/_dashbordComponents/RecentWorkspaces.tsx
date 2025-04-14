@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
-import { ImageIcon, Plus, User } from 'lucide-react';
+import { ImageIcon, User } from 'lucide-react';
 import React from 'react'
+import AddWorkspaceDialog from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceAddModalDialog";
 
 function RecentWorkspaces() {
   return (
@@ -9,7 +10,7 @@ function RecentWorkspaces() {
       <div className="flex gap-4 overflow-x-auto pb-2">
         <Card className="flex h-36 w-36 flex-col items-center justify-center bg-green-500 text-white">
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white cursor-pointer">
-            <Plus className="h-8 w-8" />
+            <AddWorkspaceDialog/>
           </div>
           <div className="mt-2 text-center">Add/Join...</div>
         </Card>
