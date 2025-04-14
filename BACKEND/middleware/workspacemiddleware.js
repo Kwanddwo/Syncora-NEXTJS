@@ -20,7 +20,6 @@ export const verifyworkspace = async (req, res, next) => {
     } catch (error) {
         res.status(500).json({ message: "Error verifying workspace" });
     }
-    next();
 }
 export const userMembershipCheck = async (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
@@ -61,7 +60,7 @@ export const userMembershipCheck = async (req, res, next) => {
         console.log("User verified successfully in workspace:");
 
 
-        next();
+        return next();
     } catch (error) {
         console.error("Error verifying user membership:", error);
 

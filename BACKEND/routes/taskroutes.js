@@ -1,7 +1,7 @@
 import { handleInputError } from "../middleware/middleware.js";
 import { getAllTasks } from "../controllers/taskhandlers.js"
 import * as taskController from "../controllers/taskhandlers.js"
-import * as workspaceController from "../controllers/workspacehandler.js";
+import * as workspaceMiddleware from "../middleware/workspacemiddleware.js"
 import express from "express"
 const router = express.Router();
 
@@ -12,27 +12,27 @@ router.get('/usertasks', taskController.getTasksByUserId);
 
 router.post("/create",
     handleInputError,
-    workspaceController.verifyworkspace,
-    workspaceController.userMembershipCheck,
-    // workspaceController.adminPrivileges,
+    workspaceMiddleware.verifyworkspace,
+    workspaceMiddleware.userMembershipCheck,
+    // workspaceMiddleware.adminPrivileges,
     taskController.CreateTask);
 
 router.delete("/delete",
     handleInputError,
-    workspaceController.verifyworkspace,
-    workspaceController.userMembershipCheck,
-    /* workspaceController.adminPrivileges, */
+    workspaceMiddleware.verifyworkspace,
+    workspaceMiddleware.userMembershipCheck,
+    /* workspaceMiddleware.adminPrivileges, */
     taskController.DeleteTask);   
 
 router.put("/updateTask",
     handleInputError,
-    workspaceController.verifyworkspace,
-    workspaceController.userMembershipCheck,
-    /* workspaceController.adminPrivileges, */
+    workspaceMiddleware.verifyworkspace,
+    workspaceMiddleware.userMembershipCheck,
+    /* workspaceMiddleware.adminPrivileges, */
     taskController.UpdateTask);
 router.put("/updateStatus",
     handleInputError,
-    workspaceController.verifyworkspace,
-    workspaceController.userMembershipCheck,
+    workspaceMiddleware.verifyworkspace,
+    workspaceMiddleware.userMembershipCheck,
     taskController.updateTaskStatus);
 export default router;
