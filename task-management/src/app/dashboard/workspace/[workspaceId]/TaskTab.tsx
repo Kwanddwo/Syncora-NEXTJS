@@ -133,10 +133,18 @@ function TaskTab({workspaceId} :{workspaceId : string}) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <EditTaskDialog />
+                              <EditTaskDialog
+                                workspaceId={workspaceId}
+                                taskId={todo.id}
+                                setTodos={setTodos}
+                              />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
-                              <DeleteTaskAlert workspaceId={workspaceId} taskId={todo.id} setTodos={setTodos} />
+                              <DeleteTaskAlert
+                                workspaceId={workspaceId}
+                                taskId={todo.id}
+                                setTodos={setTodos}
+                              />
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -174,7 +182,10 @@ function TaskTab({workspaceId} :{workspaceId : string}) {
                 ))}
                 <TableRow>
                   <TableCell colSpan={6}>
-                    <NewTaskDialog  workspaceId={workspaceId as string } setTodos={setTodos}/>
+                    <NewTaskDialog
+                      workspaceId={workspaceId as string}
+                      setTodos={setTodos}
+                    />
                   </TableCell>
                 </TableRow>
               </TableBody>

@@ -185,12 +185,12 @@ export const UpdateTask = async (req, res) => {
       error.name === "TokenExpiredError"
         ? "Token Expired"
         : error.name === "JsonWebTokenError"
-        ? "Invalid Token"
-        : "Token Decoding Error";
+          ? "Invalid Token"
+          : "Token Decoding Error";
     return res.status(403).json({ error: message, details: error.message });
   }
 
-  const { workspaceId, taskId, ...updateFields } = req.body;
+  const { workspaceId, taskId, assignees, ...updateFields } = req.body;
 
   if (!workspaceId || !taskId) {
     return res
@@ -206,19 +206,59 @@ export const UpdateTask = async (req, res) => {
   );
 
   // If no valid fields to update
-  if (Object.keys(filteredUpdates).length === 0) {
+  if (Object.keys(filteredUpdates).length === 0 && !assignees) {
     return res
       .status(400)
       .json({ error: "No valid fields provided for update." });
   }
 
   try {
+    // Handle assignees if provided
+    let assigneeUpdate = {};
+    if (assignees) {
+      assigneeUpdate = {
+        assignees: {
+          deleteMany: {}, //clear current
+          create: assignees.map((userId) => ({
+            userId: userId, // Correctly reference the userId field
+
+          })),
+        },
+      };
+    }
+
+    // Update the task
     const updatedTask = await prisma.task.update({
       where: {
         id: taskId,
         workspaceId: workspaceId,
       },
-      data: filteredUpdates,
+      data: {
+        ...filteredUpdates,
+        ...assigneeUpdate, // Merge assignee updates if any
+      },
+      include: {
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+            assignedBy: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     res.status(200).json({

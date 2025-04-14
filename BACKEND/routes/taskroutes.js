@@ -28,7 +28,7 @@ router.put("/updateTask",
     handleInputError,
     workspaceController.verifyworkspace,
     workspaceController.userMembershipCheck,
-    workspaceController.adminPrivileges,
+    /* workspaceController.adminPrivileges, */
     taskController.UpdateTask);
 router.put("/updateStatus",
     handleInputError,
