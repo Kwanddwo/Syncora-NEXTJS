@@ -50,3 +50,9 @@ export type TaskUpdateRequest = {
   dueDate: string;
   assignees: string[];
 };
+
+export type WorkspaceCreateRequest = {
+  name : string;
+  description : string;
+  priority : boolean;
+}
