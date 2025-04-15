@@ -54,5 +54,5 @@ export type TaskUpdateRequest = {
 export type WorkspaceCreateRequest = {
   name : string;
   description : string;
-  priority : boolean;
+  isPersonal : boolean;
 }
