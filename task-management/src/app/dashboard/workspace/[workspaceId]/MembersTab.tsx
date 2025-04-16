@@ -15,7 +15,7 @@ export default function MembersTab({ workspaceId }: { workspaceId: string }) {
 
   return (
     <TabsContent
-      value="tasks"
+      value="members"
       className="space-y-6 [&_td]:border-0 [&_th]:border-0"
     >
       <div>
