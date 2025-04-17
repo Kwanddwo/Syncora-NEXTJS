@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { WorkspaceMember } from "@/lib/types";
-import { fetchMembersFromWorkspace } from "@/app/_api/activeWorkspaces"; // Consider centralizing API calls
+import { fetchMembersFromWorkspace } from "@/app/_api/WorkspacesAPIs"; // Consider centralizing API calls
 
 export function useMembersByWorkspace(workspaceId: string) {
   return useQuery<WorkspaceMember[], Error>({
