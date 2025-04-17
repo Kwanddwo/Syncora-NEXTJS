@@ -4,21 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { TabsContent } from '@/components/ui/tabs';
 import { Task } from '@/lib/types';
-import axios from 'axios';
 import { MoreVertical } from 'lucide-react';
 import React from 'react'
+import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
 
 function TodoTab({workspaceId}:{workspaceId :string}) {
   const [todos,setTodos]=React.useState<Task[]>()
   React.useEffect(() => {
     const getTasks = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:3001/api/task/tasks",
-          { workspaceId }
-        );
-        console.log("Fetched tasks:", response.data);
-        setTodos(response.data);
+        const response = await getTasksByWorkspaceId(workspaceId);
+        setTodos(response);
       } catch (error) {
         console.error(
           `Error fetching tasks for workspace ${workspaceId}:`,

@@ -3,6 +3,7 @@ import { TaskRequest, TaskUpdateRequest } from "@/types";
 const CREATE_TASK_API = "http://localhost:3001/api/task/create";
 const DELETE_TASK_API = "http://localhost:3001/api/task/delete";
 const UPDATE_TASK_API = "http://localhost:3001/api/task/updateTask";
+const GET_TASKS_API = "http://localhost:3001/api/task/tasks"
 
 export const addTaskAPI = async (task: TaskRequest) => {
   const token = localStorage.getItem("token");
@@ -72,3 +73,15 @@ export const updateTaskAPI = async (workspaceId :string,taskId : string,task:Tas
       console.log("Update task Error :",error);
     }
 }
+
+export const getTasksByWorkspaceId =async(workspaceId :string) =>{
+    try{
+        const response = await axios.post(GET_TASKS_API,{workspaceId});
+        return response.data;
+    }catch(error){
+        console.error(
+            `Error fetching tasks for workspace ${workspaceId}:`,
+            error
+        );
+    }
+};

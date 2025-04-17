@@ -8,10 +8,10 @@ import React, { useEffect, useState } from 'react'
 import { NewTaskDialog } from './AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from './EditTaskForm';
-import axios from 'axios';
 import { cn } from '@/lib/utils';
 import {Task} from "@/lib/types"
 import DeleteTaskAlert from '@/components/DeleteTaskAlert';
+import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
 function TaskTab({workspaceId} :{workspaceId : string}) {
   const [todos, setTodos] = useState<Task[]>([]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
@@ -26,8 +26,8 @@ function TaskTab({workspaceId} :{workspaceId : string}) {
   useEffect(()=>{
       const getTasks =async() =>{
         try{
-          const response = await axios.post("http://localhost:3001/api/task/tasks",{workspaceId});
-          setTodos(response.data)
+          const response = await getTasksByWorkspaceId(workspaceId);
+          setTodos(response)
         }catch(error){
           console.error(
             `Error fetching tasks for workspace ${workspaceId}:`,
