@@ -17,14 +17,55 @@ import {
 } from "@/components/ui/dialog";
 import {ClipLoader} from "react-spinners"
 import {Plus} from "lucide-react";
+import {createWorkspaceAPI} from "@/app/_api/WorkspacesAPIs";
+import {useWorkspaces} from "@/context/WorkspaceContext";
+import {Workspace} from "@/types";
 
 export default function AddWorkspaceDialog() {
-    const titleRef = useRef<HTMLInputElement>(null);
+    const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
     const [error, setError] = useState("");
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [isPersonal, setIsPersonal] = useState(false)
+    const [isPersonal, setIsPersonal] = useState(false);
+    const {setWorkspaces} = useWorkspaces();
+
+    const handleSubmit =async(e:React.FormEvent)=>{
+        e.preventDefault();
+        setError("");
+        const name = nameRef.current?.value.trim();
+        const description = descriptionRef.current?.value.trim();
+        setLoading(true);
+        if (!name) {
+            setError("Name is required");
+            setLoading(false);
+            return;
+        }
+        const workspace ={
+            name,
+            description,
+            isPersonal : isPersonal
+        }
+        try{
+            const res = await createWorkspaceAPI(workspace);
+            if(res && res.message === "Workspace created successfully") {
+                const newWorkspace=res.workspace as Workspace;
+                setLoading(false);
+                setOpen(false);
+                setWorkspaces((prev) => [...prev, newWorkspace]);
+            }else {
+                throw new Error("Workspace creation failed.");
+            }
+        }catch(error){
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("An unknown error occurred.");
+            }
+            setLoading(false);
+        }
+
+    }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -44,8 +85,8 @@ export default function AddWorkspaceDialog() {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="title">Name</Label>
-                            <Input id="title" placeholder="Enter task title" ref={titleRef} />
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" placeholder="Enter task title" ref={nameRef} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="description">Description</Label>
@@ -68,7 +109,7 @@ export default function AddWorkspaceDialog() {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type="button" >
+                        <Button type="button" onClick={handleSubmit}>
                             Create
                         </Button>
                     </DialogFooter>
