@@ -57,7 +57,7 @@ export default function MembersTab({ workspaceId }: { workspaceId: string }) {
                           <div>
                             <div className="text-sm font-medium">
                               {member.user.name}
-                              {member.user.id === currentUser.id && " (You)"}
+                              {member.user.id === currentUser?.id && " (You)"}
                             </div>
                             <div className="text-xs text-muted-foreground">
                               {member.role}
