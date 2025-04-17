@@ -4,7 +4,6 @@ import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import * as React from "react";
 import Logo from "./Logo";
-import { Workspace } from "@/types";
 import {
   Building,
   Calendar,
@@ -20,8 +19,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { fetchActiveWorkspaces } from "@/app/_api/activeWorkspaces";
-
+import { useWorkspaces } from "@/context/WorkspaceContext";
 
 
 const data = {
@@ -123,18 +121,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [workspaces, setWorkspaces] = React.useState<Workspace[]>([]);
-  React.useEffect(() =>{
-        const getWorkspaces = async () => {
-              try {
-                const data = await fetchActiveWorkspaces();
-                setWorkspaces(data);
-              } catch (error) {
-                console.error("Failed to fetch workspaces:", error);
-              }
-            };
-          getWorkspaces();
-  },[])
+  const {workspaces} = useWorkspaces();
   const updatedNavMain = React.useMemo(() => {
     return data.navMain.map((item) => {
       if (item.hasDropdown) {
