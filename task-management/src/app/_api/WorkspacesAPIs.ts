@@ -17,6 +17,7 @@ const CREATE_WORKSPACE_API="http://localhost:3001/api/workspace/create";
 const WORKSPACES_API = "http://localhost:3001/api/workspace/workspaces";
 const MEMBERS_API = "http://localhost:3001/api/workspace/members";
 const TASKS_API = "http://localhost:3001/api/task/tasks";
+const DELETE_WORKSPACE_API = "http://localhost:3001/api/workspace/delete";
 
 export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
     const token = localStorage.getItem("token");
@@ -91,3 +92,16 @@ export const fetchMembersFromWorkspace = async (
         return [];
     }
 };
+
+export const deleteWorkspaceAPI =async(workspaceId :string) =>{
+    const token = localStorage.getItem("token");
+    try{
+        const response = await axios.delete(DELETE_WORKSPACE_API, {
+            headers : { Authorization: `Bearer ${token}` },
+            data :{workspaceId}
+        });
+        return response.data;
+    }catch(error){
+        console.error("Error deleting workspace:", error);
+    }
+}
