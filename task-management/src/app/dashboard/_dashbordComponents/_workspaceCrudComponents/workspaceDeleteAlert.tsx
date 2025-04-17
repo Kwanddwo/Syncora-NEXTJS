@@ -1,0 +1,67 @@
+"use client"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {Trash2} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {deleteWorkspaceAPI} from "@/app/_api/WorkspacesAPIs";
+import {useWorkspaces} from "@/context/WorkspaceContext";
+import React from "react";
+export default function DeleteWorkspaceAlert({workspaceId}: { workspaceId: string}) {
+    const {setWorkspaces} =useWorkspaces();
+    const handleDeleteClick = async () => {
+        try {
+            const res = await deleteWorkspaceAPI(workspaceId);
+            if(res && res.message == "Workspace deleted successfully"){
+                setWorkspaces(prev => prev.filter((workspace) => workspace.id != workspaceId))
+            }else {
+                throw new Error("Workspace delete failed.");
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log(error.message);
+            } else {
+                console.error(
+                    `Error Deleting Workspace ${workspaceId}:`,
+                    error
+                );
+            }
+
+        }
+    };
+    return (
+        <>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        className="justify-start text-[#ef4444] focus:text-[#ef4444] cursor-pointer w-full h-8"
+                    >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Do you want to delete this Workspace ?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteClick}>Continue</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
+    );
+}
