@@ -46,7 +46,8 @@ const data = {
       title: "Personal",
       url: "/dashboard/personal",
       icon: User,
-      badge: "10",
+      hasDropdown: true,
+      dropdownItems: [] as { name: string; url: string; active: boolean }[],
     },
   ],
   navSecondary: [
@@ -122,18 +123,27 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {workspaces} = useWorkspaces();
+  const publicWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == false);
+  const personalWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == true);
   const updatedNavMain = React.useMemo(() => {
     return data.navMain.map((item) => {
-      if (item.hasDropdown) {
-        item.dropdownItems = workspaces.map((workspace) => ({
+      if (item.hasDropdown && item.title == "My Workspaces") {
+        item.dropdownItems = publicWorkspaces.map((workspace) => ({
           name: workspace.name,
           url: `/dashboard/workspace/${workspace.id}`,
           active: workspace.id === "someDefaultWorkspaceId", 
         }));
       }
+      if (item.hasDropdown && item.title == "Personal") {
+        item.dropdownItems = personalWorkspaces.map((workspace) => ({
+          name: workspace.name,
+          url: `/dashboard/personal/${workspace.id}`,
+          active: workspace.id === "someDefaultWorkspaceId",
+        }));
+      }
       return item;
     });
-  }, [workspaces]);
+  }, [personalWorkspaces,publicWorkspaces]);
   
   return (
     <Sidebar className="border-r-0" {...props}>
