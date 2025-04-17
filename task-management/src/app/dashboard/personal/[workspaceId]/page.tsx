@@ -1,8 +1,8 @@
 import React from 'react'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import TodoTab from "./KanbanBoard";
-import TaskTab from "./TaskTab";
-import CalendarTab from "./CalendarTab";
+import TodoTab from "./PersonalKanbanBoard";
+import TaskTab from "./PersonalTaskTab";
+import CalendarTab from "./PersonalCalendarTab";
 
 async function page({ params }: { params: Promise<{ workspaceId: string }>}) {
   const {workspaceId} = await params
