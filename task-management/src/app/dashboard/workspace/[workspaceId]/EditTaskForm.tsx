@@ -119,7 +119,7 @@ export function EditTaskDialog({
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-start text-muted-foreground"
+          className="w-full h-8 justify-start text-muted-foreground"
         >
           <Edit className="mr-2 h-4 w-4" />
           Edit
