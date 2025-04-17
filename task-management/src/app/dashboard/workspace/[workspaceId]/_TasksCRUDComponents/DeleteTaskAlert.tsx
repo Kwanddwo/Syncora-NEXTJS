@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Delete } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { deleteTaskAPI } from "@/app/_api/TasksAPI";
 import { Task } from "@/lib/types";
 export default function DeleteTaskAlert({
