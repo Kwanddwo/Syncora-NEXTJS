@@ -40,7 +40,7 @@ export default function DeleteTaskAlert({
         <AlertDialogTrigger asChild>
           <Button
             variant="ghost"
-            className="text-[#ef4444] focus:text-[#ef4444] cursor-pointer"
+            className="w-full justify-start text-[#ef4444] focus:text-[#ef4444] cursor-pointer"
           >
             <Delete className="mr-2 h-2 w-4" />
             Delete
