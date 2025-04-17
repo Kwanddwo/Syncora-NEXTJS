@@ -14,24 +14,24 @@ export default function MembersTab({ workspaceId }: { workspaceId: string }) {
   const { data: members } = useMembersByWorkspace(workspaceId);
 
   return (
-      <TabsContent
-          value="members"
-          className="space-y-6 [&_td]:border-0 [&_th]:border-0"
-      >
-        <div>
-          <h2 className="mb-4 text-xl font-bold">Members</h2>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Filters</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Name:</span>
-                <Input className="h-8 w-24" placeholder="Text" />
-                <span className="text-sm text-muted-foreground">Role:</span>
-                <Input className="h-8 w-24" placeholder="Text" />
-              </div>
+    <TabsContent
+      value="members"
+      className="space-y-6 [&_td]:border-0 [&_th]:border-0"
+    >
+      <div>
+        <h2 className="mb-4 text-xl font-bold">Members</h2>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Filters</span>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Name:</span>
+              <Input className="h-8 w-24" placeholder="Text" />
+              <span className="text-sm text-muted-foreground">Role:</span>
+              <Input className="h-8 w-24" placeholder="Text" />
+            </div>
+          </div>
 
             <Button variant="outline" className="w-full justify-center">
               <Plus className="mr-2 h-4 w-4" />
