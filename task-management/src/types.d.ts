@@ -45,12 +45,12 @@ export type TaskRequest = {
 };
 
 export type TaskUpdateRequest = {
-  title: string;
-  description?: string;
-  priority: string;
+  title: string | undefined;
+  description?: string | undefined;
+  priority: string | undefined;
   workspaceId: string;
-  dueDate: string;
-  assignees: string[];
+  dueDate: string | undefined;
+  assignees: string[] | null;
 };
 
 export type WorkspaceCreateRequest = {
