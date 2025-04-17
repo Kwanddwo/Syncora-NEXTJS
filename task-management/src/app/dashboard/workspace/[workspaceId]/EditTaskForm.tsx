@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { Task, WorkspaceMember } from "@/lib/types";
-import { fetchMembersFromWorkspace } from "@/app/_api/activeWorkspaces";
+import { fetchMembersFromWorkspace } from "@/app/_api/WorkspacesAPIs";
 import {
   Dialog,
   DialogContent,
