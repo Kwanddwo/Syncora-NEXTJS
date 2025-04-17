@@ -5,40 +5,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronRight, ImageIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { fetchActiveWorkspaces } from "@/app/_api/activeWorkspaces";
+import React, { useState } from "react";
+import {useWorkspaces} from "@/context/WorkspaceContext";
+
 interface OpenStates {
   [key: string]: boolean;
 }
-interface Task {
-  id: string;
-  title: string;
-  dueDate?: string;
-}
-
-interface Workspace {
-  id: string;
-  name: string;
-  defaultOpen: boolean;
-  tasks: Task[];
-}
-
-
 function ActiveWorkspaces() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  useEffect(() => {
-    const getWorkspaces = async () => {
-      try {
-        const data = await fetchActiveWorkspaces();
-        setWorkspaces(data);
-      } catch (error) {
-        console.error("Failed to fetch workspaces:", error);
-      }
-    };
-
-    getWorkspaces();
-  }, []);
-
+  const {workspaces}= useWorkspaces();
   const [openStates, setOpenStates] = useState(
     workspaces.reduce((acc: OpenStates, workspace) => {
       acc[workspace.id] = workspace.defaultOpen;
@@ -79,9 +53,9 @@ function ActiveWorkspaces() {
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              {workspace.tasks.length > 0 ? (
+              {workspace.tasks?.length > 0 ? (
                 <div className="mt-2 space-y-2">
-                  {workspace.tasks.map((task, index) => (
+                  {workspace.tasks?.map((task, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between rounded-md border p-3"
