@@ -7,8 +7,10 @@ export interface Task {
 export interface Workspace {
   id: string;
   name: string;
+  description?: string;
   defaultOpen: boolean;
-  tasks: Task[];
+  isPersonal ?:boolean;
+  tasks : Task[];
 }
 interface User {
   id: string;
@@ -53,6 +55,6 @@ export type TaskUpdateRequest = {
 
 export type WorkspaceCreateRequest = {
   name : string;
-  description : string;
+  description? : string;
   isPersonal : boolean;
 }
