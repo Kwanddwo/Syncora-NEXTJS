@@ -4,16 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TabsContent } from '@/components/ui/tabs';
 import { ChevronRight, MoreHorizontal,User } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { NewTaskDialog } from './_TasksCRUDComponents/AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from './_TasksCRUDComponents/EditTaskForm';
 import { cn } from '@/lib/utils';
 import {Task} from "@/lib/types"
 import DeleteTaskAlert from './_TasksCRUDComponents/DeleteTaskAlert';
-import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
-function TaskTab({workspaceId} :{workspaceId : string}) {
-  const [todos, setTodos] = useState<Task[]>([]);
+function TaskTab({workspaceId,todos,setTodos}
+                 :{workspaceId : string,todos : Task[],setTodos :React.Dispatch<React.SetStateAction<Task[]>>}) {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   const toggleRowExpand = (id: string) => {
@@ -22,22 +21,6 @@ function TaskTab({workspaceId} :{workspaceId : string}) {
       [id]: !prev[id],
     }));
   };
- 
-  useEffect(()=>{
-      const getTasks =async() =>{
-        try{
-          const response = await getTasksByWorkspaceId(workspaceId);
-          setTodos(response)
-        }catch(error){
-          console.error(
-            `Error fetching tasks for workspace ${workspaceId}:`,
-            error
-          );
-        }
-      };
-      getTasks();
-  },[workspaceId]);
-
    const status = [
      { title: "pending", style: "bg-gray-100" },
      { title: "in_progress", style: "bg-green-100 text-green-800" },

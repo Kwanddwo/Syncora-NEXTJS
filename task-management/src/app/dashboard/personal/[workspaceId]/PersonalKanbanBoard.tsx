@@ -6,24 +6,8 @@ import { TabsContent } from '@/components/ui/tabs';
 import { Task } from '@/lib/types';
 import { MoreVertical } from 'lucide-react';
 import React from 'react'
-import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
 
-function TodoTab({workspaceId}:{workspaceId :string}) {
-  const [todos,setTodos]=React.useState<Task[]>()
-  React.useEffect(() => {
-    const getTasks = async () => {
-      try {
-        const response = await getTasksByWorkspaceId(workspaceId);
-        setTodos(response);
-      } catch (error) {
-        console.error(
-          `Error fetching tasks for workspace ${workspaceId}:`,
-          error
-        );
-      }
-    };
-    getTasks();
-  }, [workspaceId]);
+function TodoTab({todos}:{todos :Task[]}) {
   const todoTasks = todos?.filter((todo) => todo.status === "pending");
   const OngoingTasks=todos?.filter((todo) => todo.status == "in_progress")
   const doneTasks=todos?.filter((todo) => todo.status == "completed")
