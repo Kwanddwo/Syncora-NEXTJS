@@ -1,12 +1,31 @@
-import React from 'react'
+"use client"
+import React, {useEffect, useState} from 'react'
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useParams } from 'next/navigation';
 import TodoTab from "./KanbanBoard";
 import TaskTab from "./TaskTab";
 import CalendarTab from "./CalendarTab";
 import MembersTab from "./MembersTab";
-
-async function page({ params }: { params: Promise<{ workspaceId: string }>}) {
-  const {workspaceId} = await params
+import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
+import {Task} from "@/lib/types";
+function Page() {
+  const params = useParams();
+  const workspaceId = params.workspaceId as string;
+  const [todos, setTodos] = useState<Task[]>([]);
+  useEffect(()=>{
+    const getTasks =async() =>{
+      try{
+        const response = await getTasksByWorkspaceId(workspaceId);
+        setTodos(response)
+      }catch(error){
+        console.error(
+            `Error fetching tasks for workspace ${workspaceId}:`,
+            error
+        );
+      }
+    };
+    getTasks();
+  },[workspaceId]);
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <Tabs defaultValue="kanban">
@@ -16,13 +35,12 @@ async function page({ params }: { params: Promise<{ workspaceId: string }>}) {
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
         </TabsList>
-        <TodoTab workspaceId={workspaceId} />
-        <TaskTab workspaceId={workspaceId} />
+        <TodoTab todos={todos} />
+        <TaskTab workspaceId={workspaceId} todos={todos} setTodos={setTodos} />
         <MembersTab workspaceId={workspaceId} />
         <CalendarTab />
       </Tabs>
     </div>
   );
 }
-
-export default page
+export default Page
