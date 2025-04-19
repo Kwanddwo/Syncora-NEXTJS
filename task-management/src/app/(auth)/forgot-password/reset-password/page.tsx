@@ -1,7 +1,6 @@
 "use client";
 import React, { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import {  useSearchParams } from "next/navigation";
 import ResetAlert from "@/app/(auth)/forgot-password/reset-password/reset-dialog";
 import {
   Card,
@@ -17,8 +16,8 @@ export default function ResetPassowrd() {
   const passRef = useRef<HTMLInputElement>(null);
   const ConfirmpassRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
-   const searchParams = useSearchParams();
-   const token = searchParams.get("token");
+  const token = localStorage.getItem("resetToken")
+  console.log("RESET TOKEN :",token);
 
   return (
     <div className=" flex items-center justify-center min-h-screen ">
