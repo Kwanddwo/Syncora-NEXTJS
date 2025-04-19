@@ -1,9 +1,10 @@
 import axios from "axios";
 import { TaskRequest, TaskUpdateRequest } from "@/types";
-const CREATE_TASK_API = "http://localhost:3001/api/task/create";
-const DELETE_TASK_API = "http://localhost:3001/api/task/delete";
-const UPDATE_TASK_API = "http://localhost:3001/api/task/updateTask";
-const GET_TASKS_API = "http://localhost:3001/api/task/tasks"
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const CREATE_TASK_API = `${API_URL}/api/task/create`;
+const DELETE_TASK_API = `${API_URL}/api/task/delete`;
+const UPDATE_TASK_API = `${API_URL}/api/task/updateTask`;
+const GET_TASKS_API = `${API_URL}/api/task/tasks`;
 
 export const addTaskAPI = async (task: TaskRequest) => {
   const token = localStorage.getItem("token");

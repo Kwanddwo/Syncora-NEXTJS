@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import {  useSearchParams } from 'next/navigation';
 import React, { useRef, useState } from 'react'
-import axios from 'axios';
+import {codeVerificationAPI, resetPassAPI} from "@/app/_api/ResetPassAPIs";
 
 function EmailConfirmation() {
   const codeRef = useRef<HTMLInputElement>(null);
@@ -13,17 +13,18 @@ function EmailConfirmation() {
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     const code= codeRef.current?.value;
+    if(!code){
+      setError("Code Verification is required");
+      return;
+    }
+    if(!email){
+      setError("Error while sending email address");
+      return;
+    }
     try {
-     const verificationResponse = await axios.post(
-       "http://localhost:3001/api/emailverification/verify-code",
-       { email, code }
-     );
-
+     const verificationResponse = await codeVerificationAPI(email,code);
      if (verificationResponse.data.message) {
-       const resetResponse = await axios.post(
-         "http://localhost:3001/api/auth/reset-pass",
-         { email }
-       );
+       const resetResponse = await resetPassAPI(email);
        const token = resetResponse.data.token;
 
        window.location.href = `/forgot-password/reset-password?token=${token}`;
