@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import axios from "axios";
 import {Dispatch, RefObject, SetStateAction, useState} from "react";
 import {DialogSuccessAlert} from "@/components/SuccessAlert";
+import {resetPasswordTokenAPI} from "@/app/_api/ResetPassAPIs";
 
 interface ResetAlertProps {
   passRef: RefObject<HTMLInputElement | null>;
@@ -38,12 +39,12 @@ export default function ResetAlert(
             setError("Passwords do not match.");
             return;
         }
-
+        if(!token) {
+            setError("Error while trying to reset password");
+            return;
+        }
         try {
-            await axios.post(
-                "http://localhost:3001/api/auth/reset-password",
-                { token, password }
-            );
+            await resetPasswordTokenAPI(token,password)
             setOpen(true);
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
