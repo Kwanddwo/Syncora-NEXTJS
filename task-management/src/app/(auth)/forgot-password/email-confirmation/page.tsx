@@ -26,8 +26,8 @@ function EmailConfirmation() {
      if (verificationResponse.data.message) {
        const resetResponse = await resetPassAPI(email);
        const token = resetResponse.data.token;
-
-       window.location.href = `/forgot-password/reset-password?token=${token}`;
+       localStorage.setItem("resetToken", token);
+       window.location.href = "/forgot-password/reset-password/";
      } else {
        setError("Failed to verify the code. Please try again.");
      }
