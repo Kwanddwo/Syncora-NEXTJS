@@ -26,7 +26,8 @@ export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
             const response=await axios.post(CREATE_WORKSPACE_API,{
                 name : workspace.name,
                 description : workspace.description,
-                isPersonal : workspace.isPersonal
+                isPersonal : workspace.isPersonal,
+                icon : workspace.icon,
             },{
                 headers : {
                     Authorization: `Bearer ${token}`

@@ -8,10 +8,12 @@ import CalendarTab from "./CalendarTab";
 import MembersTab from "./MembersTab";
 import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
 import {Task} from "@/lib/types";
+import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
 function Page() {
   const params = useParams();
   const workspaceId = params.workspaceId as string;
   const [todos, setTodos] = useState<Task[]>([]);
+  const {addRecentWorkspace} =useRecentWorkspaces();
   useEffect(()=>{
     const getTasks =async() =>{
       try{
@@ -25,6 +27,7 @@ function Page() {
       }
     };
     getTasks();
+    addRecentWorkspace(workspaceId);
   },[workspaceId]);
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">

@@ -11,6 +11,7 @@ export interface Workspace {
   ownerId ?: string;
   defaultOpen: boolean;
   isPersonal ?:boolean;
+  icon ?:string;
   tasks : Task[];
 }
 interface User {
@@ -58,4 +59,5 @@ export type WorkspaceCreateRequest = {
   name : string;
   description? : string;
   isPersonal : boolean;
+  icon ?: string;
 }
