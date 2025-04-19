@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 export const createWorkspace = async (req, res) => {
-    const { name, description, isPersonal } = req.body;
+    const { name, description, isPersonal,icon } = req.body;
     const currentUserId = req.userId;
     try {
         const workspace = await prisma.workspace.create({
@@ -15,6 +15,7 @@ export const createWorkspace = async (req, res) => {
                 isPersonal,
                 ownerId: currentUserId,
                 createdAt: new Date(),
+                icon,
             },
         });
         await prisma.workspaceMember.create(
