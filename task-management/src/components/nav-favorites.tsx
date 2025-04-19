@@ -24,15 +24,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import {Workspace} from "@/types";
 
 export function NavFavorites({
-  favorites,
+  recent,
 }: {
-  favorites: {
-    name: string
-    url: string
-    emoji: string
-  }[]
+  recent: Workspace[]
 }) {
   const { isMobile } = useSidebar()
 
@@ -40,11 +37,11 @@ export function NavFavorites({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Recent</SidebarGroupLabel>
       <SidebarMenu>
-        {favorites.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {recent.map((item) => (
+          <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild>
-              <a href={item.url} title={item.name}>
-                <span>{item.emoji}</span>
+              <a href={`/dashboard/workspace/${item.id}`} title={item.name}>
+                <span>{item.icon}</span> {/*Icon placeholder*/}
                 <span>{item.name}</span>
               </a>
             </SidebarMenuButton>
@@ -85,7 +82,7 @@ export function NavFavorites({
         <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal />
-            <span>More</span>
+            <span>Clear</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
