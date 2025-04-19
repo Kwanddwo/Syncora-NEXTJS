@@ -20,6 +20,7 @@ import {Plus} from "lucide-react";
 import {createWorkspaceAPI} from "@/app/_api/WorkspacesAPIs";
 import {useWorkspaces} from "@/context/WorkspaceContext";
 import {Workspace} from "@/types";
+import EmojiSelector from "@/components/EmojiPicker";
 
 export default function AddWorkspaceDialog() {
     const nameRef = useRef<HTMLInputElement>(null);
@@ -29,6 +30,7 @@ export default function AddWorkspaceDialog() {
     const [loading, setLoading] = useState(false);
     const [isPersonal, setIsPersonal] = useState(false);
     const {setWorkspaces} = useWorkspaces();
+    const [emoji, setEmoji] = useState("");
 
     const handleSubmit =async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -44,7 +46,8 @@ export default function AddWorkspaceDialog() {
         const workspace ={
             name,
             description,
-            isPersonal : isPersonal
+            isPersonal : isPersonal,
+            icon : emoji,
         }
         try{
             const res = await createWorkspaceAPI(workspace);
@@ -101,6 +104,9 @@ export default function AddWorkspaceDialog() {
                                 Personal {" "}
                             </Label>
                             <Switch id="personal" checked={isPersonal} onCheckedChange={setIsPersonal} />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <EmojiSelector onSelectAction={setEmoji} />
                         </div>
                     </div>
                     <DialogFooter className="flex justify-between sm:justify-end">
