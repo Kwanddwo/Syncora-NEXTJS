@@ -13,11 +13,12 @@ interface Workspace {
     defaultOpen: boolean;
     tasks: Task[];
 }
-const CREATE_WORKSPACE_API="http://localhost:3001/api/workspace/create";
-const WORKSPACES_API = "http://localhost:3001/api/workspace/workspaces";
-const MEMBERS_API = "http://localhost:3001/api/workspace/members";
-const TASKS_API = "http://localhost:3001/api/task/tasks";
-const DELETE_WORKSPACE_API = "http://localhost:3001/api/workspace/delete";
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL ;
+const CREATE_WORKSPACE_API=`${API_URL}/api/workspace/create`;
+const WORKSPACES_API = `${API_URL}/api/workspace/workspaces`;
+const MEMBERS_API = `${API_URL}/api/workspace/members`;
+const TASKS_API = `${API_URL}/api/task/tasks`;
+const DELETE_WORKSPACE_API = `${API_URL}/api/workspace/delete`;
 
 export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
     const token = localStorage.getItem("token");
