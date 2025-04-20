@@ -18,7 +18,7 @@ export function useRecentWorkspaces() {
             const updated = [
                 workspace,
                 ...prev.filter((w) => w.id !== workspace.id),
-            ].slice(0, 5);
+            ].slice(0, 10);
 
             localStorage.setItem("recentWorkspaces", JSON.stringify(updated));
             return updated;
