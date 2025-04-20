@@ -7,11 +7,13 @@ import CalendarTab from "./PersonalCalendarTab";
 import { useParams } from 'next/navigation';
 import { Task } from '@/lib/types';
 import { getTasksByWorkspaceId } from '@/app/_api/TasksAPI';
+import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
 
 function Page() {
    const params = useParams();
     const workspaceId = params.workspaceId as string;
     const [todos, setTodos] = useState<Task[]>([]);
+    const {addRecentWorkspace} =useRecentWorkspaces();
     useEffect(()=>{
       const getTasks =async() =>{
         try{
@@ -25,7 +27,8 @@ function Page() {
         }
       };
       getTasks();
-    },[workspaceId]);
+      addRecentWorkspace(workspaceId);
+    },[workspaceId,addRecentWorkspace]);
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <Tabs defaultValue="kanban">
