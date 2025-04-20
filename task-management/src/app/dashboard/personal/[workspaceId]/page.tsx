@@ -7,13 +7,13 @@ import CalendarTab from "./PersonalCalendarTab";
 import { useParams } from 'next/navigation';
 import { Task } from '@/lib/types';
 import { getTasksByWorkspaceId } from '@/app/_api/TasksAPI';
-import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
+import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
 
 function Page() {
    const params = useParams();
     const workspaceId = params.workspaceId as string;
     const [todos, setTodos] = useState<Task[]>([]);
-    const {addRecentWorkspace} =useRecentWorkspaces();
+    const {addRecentWorkspace} =useRecentWorkspacesContext();
     useEffect(()=>{
       const getTasks =async() =>{
         try{

@@ -8,12 +8,12 @@ import CalendarTab from "./CalendarTab";
 import MembersTab from "./MembersTab";
 import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
 import {Task} from "@/lib/types";
-import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
+import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
 function Page() {
   const params = useParams();
   const workspaceId = params.workspaceId as string;
   const [todos, setTodos] = useState<Task[]>([]);
-  const {addRecentWorkspace} =useRecentWorkspaces();
+  const {addRecentWorkspace} =useRecentWorkspacesContext();
   useEffect(()=>{
     const getTasks =async() =>{
       try{
