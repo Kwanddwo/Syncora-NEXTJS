@@ -15,13 +15,16 @@ import { Button } from "@/components/ui/button";
 import {deleteWorkspaceAPI} from "@/app/_api/WorkspacesAPIs";
 import {useWorkspaces} from "@/context/WorkspaceContext";
 import React from "react";
+import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
 export default function DeleteWorkspaceAlert({workspaceId}: { workspaceId: string}) {
     const {setWorkspaces} =useWorkspaces();
+    const {deleteRecentWorkspace} = useRecentWorkspaces();
     const handleDeleteClick = async () => {
         try {
             const res = await deleteWorkspaceAPI(workspaceId);
             if(res && res.message == "Workspace deleted successfully"){
                 setWorkspaces(prev => prev.filter((workspace) => workspace.id != workspaceId))
+                deleteRecentWorkspace(workspaceId);
             }else {
                 throw new Error("Workspace delete failed.");
             }
