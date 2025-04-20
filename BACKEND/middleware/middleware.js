@@ -37,7 +37,7 @@ export const addUserIdToBody = (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, SECRET);
-    req.body.userId = decoded.id; // Assuming the token contains a field `id` for the user
+    req.body.userId = decoded.id; 
     next();
   } catch (error) {
     res.status(403).json({ message: "Invalid Token" });

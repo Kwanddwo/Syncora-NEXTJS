@@ -6,6 +6,10 @@ dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 export const verifyworkspace = async (req, res, next) => {
     const { workspaceId } = req.body;
+    if (!workspaceId) {
+      return res.status(400).json({ error: "Workspace ID is required" });
+    }
+  
     try {
         const workspace = await prisma.workspace.findUnique({
             where: {
@@ -16,35 +20,14 @@ export const verifyworkspace = async (req, res, next) => {
             return res.status(404).json({ message: "Workspace not found" });
         }
         console.log("Workspace verified successfully:");
-        next();
+        
     } catch (error) {
         res.status(500).json({ message: "Error verifying workspace" });
     }
     next();
 }
 export const userMembershipCheck = async (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-        console.error("Authorization header missing or malformed");
-        return res.status(401).json({ error: "No Token Provided" });
-    }
-
-    let decoded;
-    try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-        if (error.name === "TokenExpiredError") {
-            console.error("Token has expired:", error);
-            return res.status(403).json({ error: "Token Expired" });
-        } else if (error.name === "JsonWebTokenError") {
-            console.error("Invalid token:", error);
-            return res.status(403).json({ error: "Invalid Token" });
-        } else {
-            console.error("Error decoding token:", error);
-            return res.status(500).json({ error: "Token Decoding Error", details: error.message });
-        }
-    }
-    const userId = decoded.id;
+  const userId = req.userId;
     try {
         const workspaceId = req.body.workspaceId;
         console.log("workspaceId:", workspaceId);
@@ -70,26 +53,17 @@ export const userMembershipCheck = async (req, res, next) => {
 
 export const adminPrivileges = async (req, res, next) => {
     const userId = req.userId;
-    const { workspaceId } = req.body;
-  
-    if (!workspaceId) {
-      return res.status(400).json({ error: "Workspace ID is required" });
-    }
-  
+    console.log("userId:", userId);
+    const { workspaceId } = req.body.workspaceId;
     try {
-      const membership = await prisma.workspaceMember.findFirst({
+      const member = await prisma.workspaceMember.findFirst({
         where: { userId, workspaceId },
       });
-  
-      if (!membership) {
-        return res.status(404).json({ message: "User is not a member of the workspace" });
+      if (member.role !== "admin") {
+        return res.status(403).json({ message: "Admin privileges required"});
       }
   
-      if (membership.role !== "admin") {
-        return res.status(403).json({ message: "Admin privileges required" });
-      }
-  
-      console.log("User has admin privileges");
+      console.log("User is admin");
       next();
     } catch (error) {
       console.error("Error checking admin privileges:", error);
@@ -97,7 +71,6 @@ export const adminPrivileges = async (req, res, next) => {
     }
   };
   
-
 export const checkIsOwner = async (req, res, next) => {
   try {
     const { workspaceId } = req.body;
