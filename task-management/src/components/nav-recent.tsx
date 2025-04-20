@@ -24,11 +24,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
+import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
 
 export function NavRecent() {
   const { isMobile } = useSidebar()
-  const {recent,deleteRecentWorkspace} =useRecentWorkspaces();
+  const { recent, deleteRecentWorkspace,clearRecent} = useRecentWorkspacesContext();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -84,9 +84,9 @@ export function NavRecent() {
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal />
-            <span>Clear</span>
+          <SidebarMenuButton className="text-sidebar-foreground/70 cursor-pointer" onClick={() => clearRecent()}>
+            <Trash2 />
+            <span>Clear Recent</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
