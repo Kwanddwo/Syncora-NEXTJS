@@ -38,7 +38,7 @@ function Page() {
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
         </TabsList>
-        <TodoTab todos={todos} />
+        <TodoTab workspaceId={workspaceId} todos={todos} setTodos={setTodos}/>
         <TaskTab workspaceId={workspaceId} todos={todos} setTodos={setTodos} />
         <MembersTab workspaceId={workspaceId} />
         <CalendarTab />
