@@ -5,6 +5,7 @@ import ReactQueryProvider from "@/components/providers/react-query-provider";
 import DashbordHeader from "./DashbordHeader";
 import ProtectedPage from "@/components/ProtectedPage";
 import { WorkspacesProvider } from "@/context/WorkspaceContext";
+import { RecentWorkspacesProvider } from '@/context/RecentWorkspacesContext';
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -12,11 +13,13 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <ReactQueryProvider>
           <SidebarProvider>
             <WorkspacesProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <DashbordHeader />
-              {children}
-            </SidebarInset>
+              <RecentWorkspacesProvider>
+                <AppSidebar />
+                <SidebarInset>
+                  <DashbordHeader />
+                  {children}
+                </SidebarInset>
+              </RecentWorkspacesProvider>
             </WorkspacesProvider>
           </SidebarProvider>
         </ReactQueryProvider>
