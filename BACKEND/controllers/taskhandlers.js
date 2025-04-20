@@ -308,7 +308,7 @@ export const updateTaskStatus = async (req, res) => {
       }
     });
 
-    if (!isAssignee && !isAdmin) {
+    if (!isAssignee || !isAdmin) {
       return res.status(403).json({ error: "Unauthorized: Not an assignee or workspace admin" });
     }
 

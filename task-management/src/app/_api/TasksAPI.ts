@@ -5,6 +5,7 @@ const CREATE_TASK_API = `${API_URL}/api/task/create`;
 const DELETE_TASK_API = `${API_URL}/api/task/delete`;
 const UPDATE_TASK_API = `${API_URL}/api/task/updateTask`;
 const GET_TASKS_API = `${API_URL}/api/task/tasks`;
+const UPDATE_STATUS_API = `${API_URL}/api/task/updateStatus`;
 
 export const addTaskAPI = async (task: TaskRequest) => {
   const token = localStorage.getItem("token");
@@ -86,3 +87,22 @@ export const getTasksByWorkspaceId =async(workspaceId :string) =>{
         );
     }
 };
+
+export const updateStatusAPI =async(workspaceId :string,taskId :string,status:string) =>{
+    const token = localStorage.getItem("token");
+    try{
+        const response = await axios.put(UPDATE_STATUS_API,{
+            workspaceId,
+            taskId,
+            status
+        },{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        return response.data;
+    }catch(error){
+        console.log("Update status Error :",error);
+    }
+
+}
