@@ -1,5 +1,5 @@
 "use client";
-import { NavFavorites } from "@/components/nav-favorites";
+import { NavRecent } from "@/components/nav-recent";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import * as React from "react";
@@ -20,8 +20,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useWorkspaces } from "@/context/WorkspaceContext";
-import {useRecentWorkspaces} from "@/hooks/useRecentWorkspaces";
-
 
 const data = {
   navMain: [
@@ -72,7 +70,6 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {workspaces} = useWorkspaces();
-  const {recent} =useRecentWorkspaces();
   const publicWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == false);
   const personalWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == true);
   const updatedNavMain = React.useMemo(() => {
@@ -106,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={updatedNavMain} />
       </SidebarHeader>
       <SidebarContent>
-        <NavFavorites recent={recent} />
+        <NavRecent />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />
