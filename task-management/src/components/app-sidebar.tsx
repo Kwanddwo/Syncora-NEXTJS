@@ -41,14 +41,14 @@ const data = {
       url: "/dashboard/workspace",
       icon: Building,
       hasDropdown: true,
-      dropdownItems: [] as { name: string; url: string; active: boolean }[],
+      dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string}[],
     },
     {
       title: "Personal",
       url: "/dashboard/personal",
       icon: User,
       hasDropdown: true,
-      dropdownItems: [] as { name: string; url: string; active: boolean }[],
+      dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string }[],
     },
   ],
   navSecondary: [
@@ -81,7 +81,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         item.dropdownItems = publicWorkspaces.map((workspace) => ({
           name: workspace.name,
           url: `/dashboard/workspace/${workspace.id}`,
-          active: workspace.id === "someDefaultWorkspaceId", 
+          active: workspace.id === "someDefaultWorkspaceId",
+          icon:workspace.icon,
         }));
       }
       if (item.hasDropdown && item.title == "Personal") {
@@ -89,6 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           name: workspace.name,
           url: `/dashboard/personal/${workspace.id}`,
           active: workspace.id === "someDefaultWorkspaceId",
+          icon:workspace.icon,
         }));
       }
       return item;
