@@ -3,7 +3,8 @@ import { validationResult } from "express-validator";
 const SECRET = process.env.JWT_SECRET || "secret";
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.token || req.headers["authorization"];
+  const token = req.headers.authorization?.split(" ")[1];
+  console.log("Token:", token);
 
   if (!token) {
     return res
@@ -13,9 +14,11 @@ export const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, SECRET);
+    console.log("Decoded Token:", decoded);
     req.user = decoded;
     next();
   } catch (error) {
+    console.error("Token verification error:", error);
     res.status(403).json({ message: "Invalid Token" });
   }
 };
@@ -28,7 +31,7 @@ export const handleInputError = (req, res, next) => {
   next();
 };
 export const addUserIdToBody = (req, res, next) => {
-  const token = req.cookies.token || req.headers["authorization"];
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res
