@@ -224,13 +224,13 @@ model UserActivity {
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 model RecentWorkspace {
+  id          String   @id @default(cuid()) // Unique ID for each recent workspace
   userId      String
   workspaceId String
   viewedAt    DateTime @default(now())
 
-  user        User      @relation(fields: [userId], references: [id])
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  @@id([userId, workspaceId]) 
   @@index([viewedAt])
 }
