@@ -4,19 +4,25 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {ChevronRight, ImageIcon, MoreVertical} from "lucide-react";
+import { ChevronRight, ImageIcon, MoreVertical } from "lucide-react";
 import React, { useState } from "react";
-import {useWorkspaces} from "@/context/WorkspaceContext";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import { useWorkspaces } from "@/context/WorkspaceContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import DeleteWorkspaceAlert from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceDeleteAlert";
+
+import { useAuth } from "@/hooks/use-auth";
 
 interface OpenStates {
   [key: string]: boolean;
 }
 function ActiveWorkspaces() {
-  const {workspaces}= useWorkspaces();
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
+  const { workspaces } = useWorkspaces();
+  const { currentUser: user } = useAuth();
   const [openStates, setOpenStates] = useState(
     workspaces.reduce((acc: OpenStates, workspace) => {
       acc[workspace.id] = workspace.defaultOpen;
@@ -31,7 +37,7 @@ function ActiveWorkspaces() {
     }));
   };
 
-    return (
+  return (
     <section>
       <h2 className="mb-4 text-xl font-bold">Active Workspaces</h2>
       <div className="space-y-2">
@@ -55,21 +61,25 @@ function ActiveWorkspaces() {
                 <ImageIcon className="h-5 w-5" />
                 <span>{workspace.name}</span>
               </div>
-              {workspace.ownerId === user.id && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <div onClick={(e) => e.stopPropagation()} className="focus:outline-none">
-                        <MoreVertical className="h-4 w-4" />
-                      </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                          className="text-red-500 focus:text-red-500" asChild
-                      >
-                        <DeleteWorkspaceAlert workspaceId={workspace.id} />
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+              {workspace.ownerId === user?.id && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="focus:outline-none"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      className="text-red-500 focus:text-red-500"
+                      asChild
+                    >
+                      <DeleteWorkspaceAlert workspaceId={workspace.id} />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </CollapsibleTrigger>
             <CollapsibleContent>
