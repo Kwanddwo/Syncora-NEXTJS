@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Task } from '@/lib/types';
 import { getTasksByWorkspaceId } from '@/app/_api/TasksAPI';
 import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
+import {toast} from "sonner";
 
 function Page() {
    const params = useParams();
@@ -24,6 +25,7 @@ function Page() {
               `Error fetching tasks for workspace ${workspaceId}:`,
               error
           );
+          toast.error("Error fetching tasks for workspace");
         }
       };
       getTasks();

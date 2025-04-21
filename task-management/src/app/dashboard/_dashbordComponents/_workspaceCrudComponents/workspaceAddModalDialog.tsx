@@ -21,11 +21,11 @@ import {createWorkspaceAPI} from "@/app/_api/WorkspacesAPIs";
 import {useWorkspaces} from "@/context/WorkspaceContext";
 import {Workspace} from "@/types";
 import EmojiSelector from "@/components/EmojiPicker";
+import {toast} from "sonner";
 
 export default function AddWorkspaceDialog() {
     const nameRef = useRef<HTMLInputElement>(null);
     const descriptionRef = useRef<HTMLTextAreaElement>(null);
-    const [error, setError] = useState("");
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isPersonal, setIsPersonal] = useState(false);
@@ -34,12 +34,11 @@ export default function AddWorkspaceDialog() {
 
     const handleSubmit =async(e:React.FormEvent)=>{
         e.preventDefault();
-        setError("");
         const name = nameRef.current?.value.trim();
         const description = descriptionRef.current?.value.trim();
         setLoading(true);
         if (!name) {
-            setError("Name is required");
+            toast.error("Name is required");
             setLoading(false);
             return;
         }
@@ -56,14 +55,15 @@ export default function AddWorkspaceDialog() {
                 setLoading(false);
                 setOpen(false);
                 setWorkspaces((prev) => [...prev, newWorkspace]);
+                toast.success("Workspace created successfully");
             }else {
                 throw new Error("Workspace creation failed.");
             }
         }catch(error){
             if (error instanceof Error) {
-                setError(error.message);
+                toast.error(error.message);
             } else {
-                setError("An unknown error occurred.");
+                toast.error("An unknown error occurred.");
             }
             setLoading(false);
         }
@@ -82,9 +82,6 @@ export default function AddWorkspaceDialog() {
                         <DialogDescription>
                             Create or join a Workspace by filling out the form below.
                         </DialogDescription>
-                        {error && (
-                            <div className="text-red-500 text-sm text-center">{error}</div>
-                        )}
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">

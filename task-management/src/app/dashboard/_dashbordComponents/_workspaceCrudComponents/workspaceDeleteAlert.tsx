@@ -16,6 +16,7 @@ import {deleteWorkspaceAPI} from "@/app/_api/WorkspacesAPIs";
 import {useWorkspaces} from "@/context/WorkspaceContext";
 import React from "react";
 import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
+import {toast} from "sonner";
 export default function DeleteWorkspaceAlert({workspaceId}: { workspaceId: string}) {
     const {setWorkspaces} =useWorkspaces();
     const {deleteRecentWorkspace} =useRecentWorkspacesContext();
@@ -25,17 +26,19 @@ export default function DeleteWorkspaceAlert({workspaceId}: { workspaceId: strin
             if(res && res.message == "Workspace deleted successfully"){
                 setWorkspaces(prev => prev.filter((workspace) => workspace.id != workspaceId))
                 deleteRecentWorkspace(workspaceId);
+                toast.success("Workspace deleted successfully");
             }else {
                 throw new Error("Workspace delete failed.");
             }
         } catch (error) {
             if (error instanceof Error) {
-                console.log(error.message);
+                toast.error(error.message);
             } else {
                 console.error(
                     `Error Deleting Workspace ${workspaceId}:`,
                     error
                 );
+                toast.error(`Error Deleting Workspace ${workspaceId}:`)
             }
 
         }

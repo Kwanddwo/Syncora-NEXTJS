@@ -14,6 +14,7 @@ import { Delete } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteTaskAPI } from "@/app/_api/TasksAPI";
 import { Task } from "@/lib/types";
+import {toast} from "sonner";
 export default function DeleteTaskAlert({
   workspaceId,
   taskId,
@@ -27,11 +28,13 @@ export default function DeleteTaskAlert({
     try {
       const res = await deleteTaskAPI(workspaceId, taskId);
       setTodos(prev => prev.filter((todo) => todo.id != res.deletedTask.id))
+      toast.success("Task deleted successfully");
     } catch (error) {
         console.error(
           `Error Deleting task ${taskId}:`,
           error
         );
+      toast.error("Error deleting task");
     }
   };
   return (

@@ -8,6 +8,7 @@ import { MoreVertical } from 'lucide-react';
 import React from 'react'
 import {DragDropContext, Draggable, Droppable, DropResult} from "@hello-pangea/dnd";
 import {updateStatusAPI} from "@/app/_api/TasksAPI";
+import {toast} from "sonner";
 
 function TodoTab({workspaceId,todos,setTodos}:
                  {workspaceId : string,todos : Task[],setTodos :React.Dispatch<React.SetStateAction<Task[]>>}) {
@@ -58,6 +59,7 @@ function TodoTab({workspaceId,todos,setTodos}:
           setTodos((prev) => prev.map((todo) =>
               todo.id === draggedTask.id ? {...todo, status: newStatus as TaskStatus} : todo
           ));
+          toast.success("Task status updated successfully");
         } else {
           throw new Error("An error occurred while updating task");
         }
@@ -65,7 +67,7 @@ function TodoTab({workspaceId,todos,setTodos}:
         if (e instanceof Error) {
           console.error(e);
         }
-        console.error("Error Updating Status", e);
+        toast.error("Error Updating Status");
       }
     }
     // Here you would typically also update the backend
