@@ -80,6 +80,18 @@ enum theme {
   dark
 }
 
+enum InboxType {
+  workspace_invite
+  task_alert
+  generic
+}
+
+enum InviteStatus {
+  pending
+  accepted
+  declined
+}
+
 model User {
   id                  String              @id @default(uuid())
   role                GlobalUserRoles     @default(Regular)
@@ -97,8 +109,13 @@ model User {
   workspaceActivities WorkspaceActivity[]
   userActivities      UserActivity[]
   taskAssignees       TaskAssignee[]
+  Inboxmentions        Inbox[]
+  inboxEntries         Inbox[]             @relation("UserInboxRelation")
   invitedBy           WorkspaceMember[]   @relation("InvitedBy")
   assignedBy          TaskAssignee[]      @relation("AssignedBy")
+  workspaceInvites     WorkspaceInvite[]   @relation("InvitedUserRelation")
+  workspaceInvitesSent WorkspaceInvite[]   @relation("InviteSenderRelation")
+
   recentWorkspaces RecentWorkspace[]
   // The tasks where the user is assigned
   // Tasks assigned to the user (or tasks where user is assigned)
@@ -135,6 +152,7 @@ model Workspace {
   tasks      Task[]
   recTasks   RecurringTask[]
   activities WorkspaceActivity[]
+  invites    WorkspaceInvite[]
   recentWorkspaces RecentWorkspace[]
 }
 
@@ -233,4 +251,29 @@ model RecentWorkspace {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([viewedAt])
+}
+
+model Inbox {
+  id        String    @id @default(uuid())
+  userId    String // Who this inbox entry is for
+  type      InboxType @default(generic)
+  message   String?
+  senderId  String?
+  createdAt DateTime  @default(now())
+  read      Boolean   @default(false)
+  user      User      @relation("UserInboxRelation", fields: [userId], references: [id], onDelete: Cascade)
+  sender    User?     @relation(fields: [senderId], references: [id], onDelete: SetNull)
+}
+
+model WorkspaceInvite {
+  id             String       @id @default(uuid())
+  workspaceId    String
+  invitedUserId  String
+  inviteSenderId String
+  status         InviteStatus @default(pending)
+  createdAt      DateTime     @default(now())
+
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedUser  User      @relation("InvitedUserRelation", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  inviteSender User      @relation("InviteSenderRelation", fields: [inviteSenderId], references: [id], onDelete: Cascade)
 }

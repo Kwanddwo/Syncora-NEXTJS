@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef} from "react";
 import { Input } from "@/components/ui/input";
 import ResetAlert from "@/app/(auth)/forgot-password/reset-password/reset-dialog";
 import {
@@ -15,7 +15,6 @@ import {
 export default function ResetPassowrd() {
   const passRef = useRef<HTMLInputElement>(null);
   const ConfirmpassRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState("");
   const token = localStorage.getItem("resetToken")
   console.log("RESET TOKEN :",token);
 
@@ -28,9 +27,6 @@ export default function ResetPassowrd() {
             <CardDescription>
               <p>Enter your New Password</p>
             </CardDescription>
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
           </CardHeader>
           <CardContent>
             <label>New Password</label>
@@ -55,7 +51,7 @@ export default function ResetPassowrd() {
           <CardFooter className="mt-auto flex justify-center">
             <div className="cursor-pointer">
               <br />
-              <ResetAlert passRef={passRef} ConfirmpassRef={ConfirmpassRef} setError={setError} token={token} />
+              <ResetAlert passRef={passRef} ConfirmpassRef={ConfirmpassRef} token={token} />
             </div>
           </CardFooter>
         </Card>

@@ -4,6 +4,7 @@ export const prisma = new PrismaClient();
 import jwt from "jsonwebtoken";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
+
 export const createWorkspace = async (req, res) => {
     const { name, description, isPersonal,icon } = req.body;
     const currentUserId = req.userId;
@@ -53,6 +54,7 @@ export const deleteWorkspace = async (req, res) => {
         return res.status(500).json({ message: 'Failed to delete workspace', error: error.message });
     }
 };
+
 export const getWorkspacesByuserId = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -118,35 +120,38 @@ export const getMembersByWorkspaceId = async (req, res) => {
 
 
 export const addMemberToWorkspace = async (req, res) => {
-    const { workspaceId, memberId, role } = req.body;
+  const { workspaceId, memberId, role } = req.body;
+  console.log("Adding member to workspace:", { workspaceId, memberId, role });
+ 
+  try {
+    const existingMember = await prisma.workspaceMember.findFirst({
+      where: {
+        workspaceId: workspaceId,
+        userId: memberId,
+      },
+    });
 
-    try {
-        const existingMember = await prisma.workspaceMember.findFirst({
-            where: {
-                workspaceId: workspaceId,
-                userId: memberId,
-            },
-        });
-
-        if (existingMember) {
-            return res.status(400).json({ message: 'User is already a member of this workspace.' });
-        }
-
-        await prisma.workspaceMember.create({
-            data: {
-                workspaceId,
-                userId: memberId,
-                role: role ?? 'member',
-            },
-        });
-
-        return res.status(201).json({ message: 'Member added to workspace successfully.' });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'An error occurred while adding the member.' });
+    if (existingMember) {
+      return res.status(400).json({ message: 'User is already a member of this workspace.' });
     }
-};
 
+    await prisma.workspaceMember.create({
+      data: {
+        workspaceId,
+        userId: memberId,
+        role: role ?? 'member',
+      },
+    });
+    if (req.AcceptInvite){
+      return res.status(201).json({ message: '${AcceptInvite} and Member added to workspace successfully.' });
+    }else{
+      return res.status(201).json({message: "Member added to workspace successfully."});
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'An error occurred while adding the member.' });
+  }
+};
 
 
 export const removeMemberFromWorkspace = async (req, res) => {
@@ -189,6 +194,7 @@ export const exitWorkspace = async (req, res) => {
         where: { workspaceId, userId },
     });
     return res.status(200).json({ message: 'You have left the workspace.' });
+
 };
 
 
