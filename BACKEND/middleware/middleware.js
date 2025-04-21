@@ -26,7 +26,7 @@ export const handleInputError = (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
   next();
-}
+};
 export const addUserIdToBody = (req, res, next) => {
   const token = req.cookies.token || req.headers["authorization"];
 
@@ -53,7 +53,7 @@ export const authenticateUser = (req, res, next) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = jwt.verify(token, SECRET);
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         console.error("Token has expired:", error);
@@ -63,7 +63,9 @@ export const authenticateUser = (req, res, next) => {
         return res.status(403).json({ error: "Invalid Token" });
       } else {
         console.error("Error decoding token:", error);
-        return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+        return res
+          .status(500)
+          .json({ error: "Token Decoding Error", details: error.message });
       }
     }
 
@@ -77,6 +79,8 @@ export const authenticateUser = (req, res, next) => {
     next();
   } catch (err) {
     console.error("Unexpected error in authentication middleware:", err);
-    res.status(500).json({ error: "Internal Server Error", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", details: err.message });
   }
 };
