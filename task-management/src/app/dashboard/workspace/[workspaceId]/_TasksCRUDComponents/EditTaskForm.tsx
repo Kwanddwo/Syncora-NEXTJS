@@ -34,6 +34,7 @@ import {
 import { updateTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
 import { ClipLoader } from "react-spinners";
+import {toast} from "sonner";
 
 export function EditTaskDialog({
   workspaceId,
@@ -50,13 +51,11 @@ export function EditTaskDialog({
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [priority, setPriority] = useState("");
-  const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     const title = titleRef.current?.value.trim();
     const description = descriptionRef.current?.value.trim();
     setLoading(true);
@@ -81,14 +80,15 @@ export function EditTaskDialog({
           );
         setLoading(false);
         setOpen(false);
+        toast.success("Task updated successfully.");
       } else {
         throw new Error("Task update failed.");
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        toast.error(error.message);
       } else {
-        setError("An unknown error occurred.");
+        toast.error("An unknown error occurred.");
       }
       setLoading(false);
     }
@@ -132,9 +132,6 @@ export function EditTaskDialog({
             <DialogDescription>
               Update a task by filling out the form below.
             </DialogDescription>
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">

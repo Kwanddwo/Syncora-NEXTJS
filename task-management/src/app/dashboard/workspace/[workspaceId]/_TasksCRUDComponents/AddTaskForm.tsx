@@ -39,6 +39,7 @@ import {
 import { addTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
 import {ClipLoader} from "react-spinners"
+import {toast} from "sonner";
 
 export function NewTaskDialog({
   workspaceId,
@@ -53,33 +54,31 @@ export function NewTaskDialog({
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [priority, setPriority] = useState("");
-  const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     const title = titleRef.current?.value.trim();
     const description = descriptionRef.current?.value.trim();
     setLoading(true);
     if (!title) {
-      setError("Title is required");
+      toast.error("Title is required");
       setLoading(false);
       return;
     }
     if (!priority) {
-      setError("Priority is required");
+      toast.error("Priority is required");
       setLoading(false);
       return;
     }
     if (!dueDate) {
-      setError("Due date is required");
+      toast.error("Due date is required");
       setLoading(false);
       return;
     }
     if (selectedAssignees.length === 0) {
-      setError("At least one assignee is required");
+      toast.error("At least one assignee is required");
       setLoading(false);
       return;
     }
@@ -99,14 +98,15 @@ export function NewTaskDialog({
         setLoading(false);
         setOpen(false);
         setTodos((prev) => [res.task,...prev])
+        toast.success("Task created successfully");
       } else {
         throw new Error("Task creation failed.");
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        toast.error(error.message);
       } else {
-        setError("An unknown error occurred.");
+        toast.error("An unknown error occurred.");
       }
       setLoading(false);
     }
@@ -150,9 +150,6 @@ export function NewTaskDialog({
             <DialogDescription>
               Create a new task by filling out the form below.
             </DialogDescription>
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">

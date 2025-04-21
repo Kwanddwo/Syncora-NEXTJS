@@ -9,6 +9,7 @@ import MembersTab from "./MembersTab";
 import {getTasksByWorkspaceId} from "@/app/_api/TasksAPI";
 import {Task} from "@/lib/types";
 import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
+import {toast} from "sonner";
 function Page() {
   const params = useParams();
   const workspaceId = params.workspaceId as string;
@@ -24,6 +25,7 @@ function Page() {
             `Error fetching tasks for workspace ${workspaceId}:`,
             error
         );
+        toast.error("Error fetching tasks for workspace:")
       }
     };
     getTasks();
