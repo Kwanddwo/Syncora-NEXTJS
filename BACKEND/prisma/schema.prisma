@@ -99,6 +99,7 @@ model User {
   taskAssignees       TaskAssignee[]
   invitedBy           WorkspaceMember[]   @relation("InvitedBy")
   assignedBy          TaskAssignee[]      @relation("AssignedBy")
+  recentWorkspaces RecentWorkspace[]
   // The tasks where the user is assigned
   // Tasks assigned to the user (or tasks where user is assigned)
 }
@@ -134,6 +135,7 @@ model Workspace {
   tasks      Task[]
   recTasks   RecurringTask[]
   activities WorkspaceActivity[]
+  recentWorkspaces RecentWorkspace[]
 }
 
 model WorkspaceMember {
@@ -220,4 +222,15 @@ model UserActivity {
   details   Json?
   createdAt DateTime         @default(now())
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+model RecentWorkspace {
+  id          String   @id @default(cuid()) // Unique ID for each recent workspace
+  userId      String
+  workspaceId String
+  viewedAt    DateTime @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([viewedAt])
 }

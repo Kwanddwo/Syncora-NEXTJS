@@ -35,17 +35,17 @@ export function NavRecent() {
       <SidebarGroupLabel>Recent</SidebarGroupLabel>
       <SidebarMenu>
         {recent.map((item) => (
-          <SidebarMenuItem key={item.id}>
+          <SidebarMenuItem key={item.workspaceId}>
             <SidebarMenuButton asChild>
-              {item.isPersonal ? (
-                  <a href={`/dashboard/personal/${item.id}`} title={item.name}>
-                    <span>{item.icon}</span>
-                    <span>{item.name}</span>
+              {item.workspace.isPersonal ? (
+                  <a href={`/dashboard/personal/${item.workspaceId}`} title={item.workspace.name}>
+                    <span>{item.workspace.icon}</span>
+                    <span>{item.workspace.name}</span>
                   </a>
               ) : (
-                  <a href={`/dashboard/workspace/${item.id}`} title={item.name}>
-                    <span>{item.icon}</span>
-                    <span>{item.name}</span>
+                  <a href={`/dashboard/workspace/${item.workspaceId}`} title={item.workspace.name}>
+                    <span>{item.workspace.icon}</span>
+                    <span>{item.workspace.name}</span>
                   </a>
               )}
             </SidebarMenuButton>
@@ -61,7 +61,7 @@ export function NavRecent() {
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem onClick={() => deleteRecentWorkspace(item.id)}>
+                <DropdownMenuItem onClick={() => deleteRecentWorkspace(item.workspaceId)}>
                   <StarOff className="text-muted-foreground" />
                   <span>Remove from Recent</span>
                 </DropdownMenuItem>
@@ -75,10 +75,6 @@ export function NavRecent() {
                   <span>Open in New Tab</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

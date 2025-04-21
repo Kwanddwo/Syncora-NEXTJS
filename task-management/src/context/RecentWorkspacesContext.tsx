@@ -1,10 +1,10 @@
 "use client"
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useRecentWorkspaces } from '@/hooks/useRecentWorkspaces';
-import { Workspace } from '@/types';
+import { RecentWorkspace } from '@/types';
 
 interface RecentWorkspacesContextType {
-    recent: Workspace[];
+    recent: RecentWorkspace[];
     addRecentWorkspace: (workspaceId: string) => void;
     deleteRecentWorkspace: (workspaceId: string) => void;
     clearRecent: () => void;
@@ -16,7 +16,12 @@ export function RecentWorkspacesProvider({ children }: { children: ReactNode }) 
     const recentWorkspacesHook = useRecentWorkspaces();
 
     return (
-        <RecentWorkspacesContext.Provider value={recentWorkspacesHook}>
+        <RecentWorkspacesContext.Provider value={{
+            recent: recentWorkspacesHook.recent ?? [],
+            addRecentWorkspace: recentWorkspacesHook.addRecentWorkspace,
+            deleteRecentWorkspace: recentWorkspacesHook.deleteRecentWorkspace,
+            clearRecent: recentWorkspacesHook.clearRecent,
+        }}>
             {children}
         </RecentWorkspacesContext.Provider>
     );

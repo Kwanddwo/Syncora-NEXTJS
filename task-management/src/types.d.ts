@@ -61,3 +61,10 @@ export type WorkspaceCreateRequest = {
   isPersonal : boolean;
   icon ?: string;
 }
+
+export type RecentWorkspace = {
+  userId: string;
+  workspaceId: string;
+  viewedAt: string;
+  workspace: Workspace;
+};
