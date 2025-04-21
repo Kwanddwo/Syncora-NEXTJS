@@ -11,18 +11,19 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import axios from "axios";
-import {Dispatch, RefObject, SetStateAction, useState} from "react";
+import { RefObject, useState} from "react";
 import {DialogSuccessAlert} from "@/components/SuccessAlert";
+import {resetPasswordTokenAPI} from "@/app/_api/ResetPassAPIs";
+import {toast} from "sonner";
 
 interface ResetAlertProps {
   passRef: RefObject<HTMLInputElement | null>;
   ConfirmpassRef: RefObject<HTMLInputElement | null>;
-  setError: Dispatch<SetStateAction<string>>;
   token: string | null;
 }
 
 export default function ResetAlert(
-    {passRef,ConfirmpassRef,setError,token} :ResetAlertProps
+    {passRef,ConfirmpassRef,token} :ResetAlertProps
 ) {
     const [open, setOpen] = useState(false);
     const handleClick = async () => {
@@ -30,32 +31,32 @@ export default function ResetAlert(
         const confirmpass = ConfirmpassRef.current?.value.trim();
 
         if (!password || !confirmpass) {
-            setError("Both fields are required.");
+            toast.error("Both fields are required.");
             return;
         }
 
         if (password !== confirmpass) {
-            setError("Passwords do not match.");
+            toast.error("Passwords do not match.");
             return;
         }
-
+        if(!token) {
+            toast.error("Error while trying to reset password");
+            return;
+        }
         try {
-            await axios.post(
-                "http://localhost:3001/api/auth/reset-password",
-                { token, password }
-            );
+            await resetPasswordTokenAPI(token,password)
             setOpen(true);
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {
                 if (err.response) {
-                    setError(err.response.data?.message || "An error occurred.");
+                    toast.error(err.response.data?.message || "An error occurred.");
                 } else if (err.request) {
-                    setError("Server did not respond. Please try again later.");
+                    toast.error("Server did not respond. Please try again later.");
                 } else {
-                    setError("An unexpected error occurred. Please try again.");
+                    toast.error("An unexpected error occurred. Please try again.");
                 }
             } else {
-                setError("An unexpected error occurred.");
+                toast.error("An unexpected error occurred.");
             }
         }
     };

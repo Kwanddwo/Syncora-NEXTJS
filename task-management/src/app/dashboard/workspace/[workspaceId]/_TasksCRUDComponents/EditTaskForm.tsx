@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { WorkspaceMember } from "@/lib/types";
-import { fetchMembersByWorkspaceId } from "@/app/_api/activeWorkspaces";
+import { Task, WorkspaceMember } from "@/lib/types";
+import { fetchMembersFromWorkspace } from "@/app/_api/WorkspacesAPIs";
 import {
   Dialog,
   DialogContent,
@@ -25,93 +25,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Plus,
-  ChevronDown,
-  Check,
-  User,
-} from "lucide-react";
+import { ChevronDown, Check, User, Edit } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { addTaskAPI } from "@/app/_api/addTaskAPI";
+import { updateTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
-import {ClipLoader} from "react-spinners"
+import { ClipLoader } from "react-spinners";
+import {toast} from "sonner";
 
-export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
+export function EditTaskDialog({
+  workspaceId,
+  taskId,
+  setTodos,
+}: {
+  workspaceId: string;
+  taskId :string
+  setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+}) {
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState<string>("");
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [priority, setPriority] = useState("");
-  const [error, setError] = useState("");
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     const title = titleRef.current?.value.trim();
     const description = descriptionRef.current?.value.trim();
     setLoading(true);
-    if (!title) {
-      setError("Title is required");
-      setLoading(false);
-      return;
-    }
-    if (!priority) {
-      setError("Priority is required");
-      setLoading(false);
-      return;
-    }
-    if (!dueDate) {
-      setError("Due date is required");
-      setLoading(false);
-      return;
-    }
-    if (selectedAssignees.length === 0) {
-      setError("At least one assignee is required");
-      setLoading(false);
-      return;
-    }
-    console.log("dueDate before API call: ", dueDate);
-    const task = {
-      title,
-      description,
-      priority,
-      workspaceId: workspaceId,
-      dueDate: dueDate,
-      assigneesIds: selectedAssignees,
-    };
-    console.log("Task object to send:", task); 
+    
+  const task = {
+    title: title === "" ? undefined : title,
+    description: description === "" ? undefined : description,
+    priority:priority === "" ? undefined : priority,
+    workspaceId,
+    dueDate:dueDate === "" ? undefined  :dueDate,
+    assignees:selectedAssignees.length >0 ?selectedAssignees : null,
+  };
 
+    console.log("Task object to send:", task);
     try {
-      const res = await addTaskAPI(task);
-      if (res && res.message === "Task created successfully") {
-        console.log("✅ Task added successfully!");
+      const res = await updateTaskAPI(workspaceId,taskId,task);
+      if (res && res.message === "Task updated successfully.") {
+        console.log("Task to updaate",res.updatedTask);
+        
+        setTodos((prev) =>
+            prev.map((t) => (t.id === res.updatedTask.id ? res.updatedTask : t))
+          );
         setLoading(false);
-        setOpen(false); 
-        window.location.reload(); 
+        setOpen(false);
+        toast.success("Task updated successfully.");
       } else {
-        throw new Error("Task creation failed.");
+        throw new Error("Task update failed.");
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        toast.error(error.message);
       } else {
-        setError("An unknown error occurred.");
+        toast.error("An unknown error occurred.");
       }
       setLoading(false);
     }
-  }; 
+  };
   useEffect(() => {
     const getWorkspaceMembers = async () => {
-      const response = await fetchMembersByWorkspaceId(workspaceId);
+      const response = await fetchMembersFromWorkspace(workspaceId);
       setMembers(response);
     };
     getWorkspaceMembers();
@@ -129,28 +113,25 @@ export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
       .filter((member) => selectedAssignees.includes(member.user.id))
       .map((member) => member.user.name);
   };
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-start text-muted-foreground"
+          className="w-full h-8 justify-start text-muted-foreground"
         >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Task...
+          <Edit className="mr-2 h-4 w-4" />
+          Edit
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form>
           <DialogHeader>
-            <DialogTitle>New Task</DialogTitle>
+            <DialogTitle>Edit Task</DialogTitle>
             <DialogDescription>
-              Create a new task by filling out the form below.
+              Update a task by filling out the form below.
             </DialogDescription>
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -264,7 +245,7 @@ export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
               </Button>
             </DialogClose>
             <Button type="button" onClick={handleSubmit}>
-              Create
+              Update
             </Button>
           </DialogFooter>
         </form>

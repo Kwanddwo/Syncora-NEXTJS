@@ -3,10 +3,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
+import {toast} from "sonner";
 export function SignUpForm({
   className,
   ...props
@@ -15,7 +16,6 @@ export function SignUpForm({
   const passwordRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const lastnameRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState("");
   const router = useRouter();
   const { register, checkEmail } = useAuth();
 
@@ -28,20 +28,20 @@ export function SignUpForm({
     const password = passwordRef.current?.value;
 
     if (!name || !lastName || !email || !password) {
-      setError("All fields are required.");
+      toast.error("All fields are required.");
       return;
     }
     try {
       const res = await checkEmail(email);
 
       if (res.data.user) {
-        setError("Email is already in use");
+        toast.error("Email is already in use");
         return;
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error("Email check error:", err);
-      setError("Failed to verify email. Please try again.");
+      console.log("Email check error:", err);
+      toast.error("Failed to verify email. Please try again.");
       return;
     }
 
@@ -49,12 +49,12 @@ export function SignUpForm({
       const response = await register(email, name, lastName, password);
 
       console.log("User registered:", response.data);
-      alert("User created successfully");
+      toast.success("Registered successfully");
       router.push("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Registration error:", err);
-      setError(
+      toast.error(
         err.response ? err.response.data.message : "Registration failed."
       );
     }
@@ -72,7 +72,6 @@ export function SignUpForm({
           Enter your information below to create your account
         </p>
       </div>
-      {error && <div className="text-red-500 text-sm text-center">{error}</div>}
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="name">Name</Label>

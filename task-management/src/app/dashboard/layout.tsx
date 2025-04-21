@@ -4,18 +4,23 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import ReactQueryProvider from "@/components/providers/react-query-provider";
 import DashbordHeader from "./DashbordHeader";
 import ProtectedPage from "@/components/ProtectedPage";
-
+import { WorkspacesProvider } from "@/context/WorkspaceContext";
+import { RecentWorkspacesProvider } from '@/context/RecentWorkspacesContext';
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ProtectedPage>
         <ReactQueryProvider>
           <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <DashbordHeader />
-              {children}
-            </SidebarInset>
+            <WorkspacesProvider>
+              <RecentWorkspacesProvider>
+                <AppSidebar />
+                <SidebarInset>
+                  <DashbordHeader />
+                  {children}
+                </SidebarInset>
+              </RecentWorkspacesProvider>
+            </WorkspacesProvider>
           </SidebarProvider>
         </ReactQueryProvider>
       </ProtectedPage>

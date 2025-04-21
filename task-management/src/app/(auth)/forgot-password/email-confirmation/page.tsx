@@ -1,49 +1,49 @@
 "use client"
 import { Button } from '@/components/ui/button';
 import {  useSearchParams } from 'next/navigation';
-import React, { useRef, useState } from 'react'
-import axios from 'axios';
-
+import React, { useRef} from 'react'
+import {codeVerificationAPI, resetPassAPI} from "@/app/_api/ResetPassAPIs";
+import { toast } from 'sonner';
 function EmailConfirmation() {
   const codeRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState("");
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     const code= codeRef.current?.value;
+    if(!code){
+      toast.error("Code Verification is required");
+      return;
+    }
+    if(!email){
+      toast.error("Error while sending email address");
+      return;
+    }
     try {
-     const verificationResponse = await axios.post(
-       "http://localhost:3001/api/emailverification/verify-code",
-       { email, code }
-     );
-
+     const verificationResponse = await codeVerificationAPI(email,code);
      if (verificationResponse.data.message) {
-       const resetResponse = await axios.post(
-         "http://localhost:3001/api/auth/reset-pass",
-         { email }
-       );
+       const resetResponse = await resetPassAPI(email);
        const token = resetResponse.data.token;
-
-       window.location.href = `/forgot-password/reset-password?token=${token}`;
+       localStorage.setItem("resetToken", token);
+       window.location.href = "/forgot-password/reset-password/";
      } else {
-       setError("Failed to verify the code. Please try again.");
+       toast.error("Failed to verify the code. Please try again.");
      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err.response) {
-        setError(
+        toast.error(
           err.response?.data?.error ||
             "Failed to verify the code. Please try again."
         );
       } else if (err.request) {
-        setError("Network error. Please check your connection and try again.");
+        toast.error("Network error. Please check your connection and try again.");
       } else {
-        setError("An unexpected error occurred. Please try again.");
+        toast.error("An unexpected error occurred. Please try again.");
       }
 
-      console.error("Verification or reset error:", err);
+      toast.error("Verification or reset error:", err);
     }
     
   };
@@ -66,7 +66,6 @@ function EmailConfirmation() {
               placeholder="Enter 6-digit code"
             />
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button
             type="submit"
           >

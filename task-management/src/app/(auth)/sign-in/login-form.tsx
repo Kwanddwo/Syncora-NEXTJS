@@ -3,16 +3,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useRef, useState } from "react";
+import React, { useRef} from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
+import { toast } from 'sonner';
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState("");
   const router = useRouter();
   const { login } = useAuth(); // Assuming you have a useAuth hook to manage authentication
 
@@ -22,16 +22,17 @@ export function LoginForm({
     const password = passwordRef.current?.value;
 
     if (!email || !password) {
-      setError("Email and password are required");
+      toast.error("Email and password are required");
       return;
     }
 
     try {
       await login(email, password);
+      toast.success("Login successful");
       router.push("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.response ? err.response.data.message : "An error occurred");
+      toast.error(err.response ? err.response.data.message : "An error occurred");
     }
   };
 
@@ -43,7 +44,6 @@ export function LoginForm({
           Enter your email below to login to your account
         </p>
       </div>
-      {error && <div className="text-red-500 text-sm text-center">{error}</div>}
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>

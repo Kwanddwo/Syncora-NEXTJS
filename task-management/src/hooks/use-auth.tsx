@@ -1,6 +1,4 @@
 "use client";
-
-import axios from "axios";
 import React, {
   createContext,
   useState,
@@ -8,6 +6,7 @@ import React, {
   useContext,
   ReactNode,
 } from "react";
+import {checkEmailAPI, loginAPI, registerAPI} from "@/app/_api/AuthAPIs";
 
 interface User {
   // Define the user data structure here
@@ -46,6 +45,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  console.log("🔁 AuthProvider mounted");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,19 +54,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const storedToken = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
 
-    if (storedToken && userData) {
-      setToken(storedToken);
-      setCurrentUser(JSON.parse(userData));
+    try {
+      if (storedToken && userData) {
+        setToken(storedToken);
+        setCurrentUser(JSON.parse(userData));
+      } else {
+        // If only one exists, clean both to prevent partial auth state
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    } catch (err) {
+      console.error("Corrupted auth data:", err);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
 
     setLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<any> => {
-    const response = await axios.post("http://localhost:3001/api/auth/login", {
-      email: email,
-      password: password,
-    });
+    const response = await loginAPI(email,password);
     const token = response.data.token;
     const user = JSON.stringify(response.data.user);
     localStorage.setItem("token", token);
@@ -79,9 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const checkEmail = async (email: string): Promise<any> => {
-    const res = await axios.post("http://localhost:3001/api/auth/emailCheck", {
-      email,
-    });
+    const res = await checkEmailAPI(email);
 
     return res;
   };
@@ -91,20 +96,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     lastName: string,
     password: string
   ): Promise<any> => {
-    const res = await axios.post("http://localhost:3001/api/auth/register", {
-      name,
-      lastName,
-      email,
-      password,
-    });
+    const res = await registerAPI(email,name,lastName,password);
     console.log(res.data);
-
     localStorage.setItem("token", res.data.token);
     localStorage.setItem("user", JSON.stringify(res.data.user));
-
     setToken(res.data.token);
     setCurrentUser(res.data.user);
-
     return res;
   };
 

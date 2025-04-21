@@ -7,8 +7,12 @@ export interface Task {
 export interface Workspace {
   id: string;
   name: string;
+  description?: string;
+  ownerId ?: string;
   defaultOpen: boolean;
-  tasks: Task[];
+  isPersonal ?:boolean;
+  icon ?:string;
+  tasks : Task[];
 }
 interface User {
   id: string;
@@ -40,4 +44,27 @@ export type TaskRequest = {
   workspaceId: string;
   dueDate: string;
   assigneesIds: string[];
+};
+
+export type TaskUpdateRequest = {
+  title: string | undefined;
+  description?: string | undefined;
+  priority: string | undefined;
+  workspaceId: string;
+  dueDate: string | undefined;
+  assignees: string[] | null;
+};
+
+export type WorkspaceCreateRequest = {
+  name : string;
+  description? : string;
+  isPersonal : boolean;
+  icon ?: string;
+}
+
+export type RecentWorkspace = {
+  userId: string;
+  workspaceId: string;
+  viewedAt: string;
+  workspace: Workspace;
 };

@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
+const SECRET = process.env.JWT_SECRET || "secret";
 const prisma = new PrismaClient();
 
 export const CreateTask = async (req, res) => {
@@ -15,7 +16,7 @@ export const CreateTask = async (req, res) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = jwt.verify(token, SECRET);
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         console.error("Token has expired:", error);
@@ -25,57 +26,102 @@ export const CreateTask = async (req, res) => {
         return res.status(403).json({ error: "Invalid Token" });
       } else {
         console.error("Error decoding token:", error);
-        return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+        return res
+          .status(500)
+          .json({ error: "Token Decoding Error", details: error.message });
       }
     }
 
     const userId = decoded.id;
-    console.log("Decoded userId:", userId);
+    console.log("user id", userId);
     if (!userId) {
       console.error("Decoded token does not contain a user ID");
       return res.status(401).json({ error: "Unauthorized: User ID Missing" });
     }
-    const {
-      title,
-      description,
-      priority,
-      workspaceId,
-      dueDate,
-      assigneeIds,
-    } = req.body;
-    console.log("Raw dueDate received:",dueDate);
-    console.log("Type of dueDate:", typeof dueDate);
-    // Create a new task
+
+    const { title, description, priority, workspaceId, dueDate, assigneeIds } =
+      req.body;
+
     const newTask = await prisma.task.create({
       data: {
         title,
         description,
         priority,
         workspaceId,
-        dueDate:new Date(dueDate),
+        dueDate: new Date(dueDate),
         createdById: userId,
-        status: 'pending',
+        status: "pending",
         priorityOrder: 0,
       },
     });
-    let ownerId = userId;
+
     if (assigneeIds && assigneeIds.length > 0) {
-      const taskAssignees = assigneeIds.map(userId => ({
+      const taskAssignees = assigneeIds.map((userId) => ({
         taskId: newTask.id,
         userId,
-        assignedById: ownerId,
+        assignedById: userId,
       }));
 
       await prisma.taskAssignee.createMany({
         data: taskAssignees,
       });
     }
-    res.status(201).json({ message: "Task created successfully" });
+
+    const fullTask = await prisma.task.findUnique({
+      where: { id: newTask.id },
+      include: {
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+            assignedBy: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+          },
+        },
+      },
+    });
+
+    return res.status(201).json({
+      message: "Task created successfully",
+      task: fullTask,
+    });
   } catch (error) {
-    console.error('Error creating task:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    console.error("Error creating task:", error);
+    if (!res.headersSent) {
+      return res
+        .status(500)
+        .json({ error: "Internal server error", details: error.message });
+    }
   }
 };
+
 export const DeleteTask = async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
@@ -85,7 +131,7 @@ export const DeleteTask = async (req, res) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    decoded = jwt.verify(token, SECRET);
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       console.error("Token has expired:", error);
@@ -95,7 +141,9 @@ export const DeleteTask = async (req, res) => {
       return res.status(403).json({ error: "Invalid Token" });
     } else {
       console.error("Error decoding token:", error);
-      return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+      return res
+        .status(500)
+        .json({ error: "Token Decoding Error", details: error.message });
     }
   }
 
@@ -120,7 +168,9 @@ export const DeleteTask = async (req, res) => {
     res.status(200).json({ message: "Task deleted successfully", deletedTask });
   } catch (error) {
     console.error("Error deleting task:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
 export const UpdateTask = async (req, res) => {
@@ -131,7 +181,7 @@ export const UpdateTask = async (req, res) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    decoded = jwt.verify(token, SECRET);
   } catch (error) {
     const message =
       error.name === "TokenExpiredError"
@@ -142,7 +192,7 @@ export const UpdateTask = async (req, res) => {
     return res.status(403).json({ error: message, details: error.message });
   }
 
-  const { workspaceId, taskId, ...updateFields } = req.body;
+  const { workspaceId, taskId, assignees, ...updateFields } = req.body;
 
   if (!workspaceId || !taskId) {
     return res
@@ -158,19 +208,58 @@ export const UpdateTask = async (req, res) => {
   );
 
   // If no valid fields to update
-  if (Object.keys(filteredUpdates).length === 0) {
+  if (Object.keys(filteredUpdates).length === 0 && !assignees) {
     return res
       .status(400)
       .json({ error: "No valid fields provided for update." });
   }
 
   try {
+    // Handle assignees if provided
+    let assigneeUpdate = {};
+    if (assignees) {
+      assigneeUpdate = {
+        assignees: {
+          deleteMany: {}, //clear current
+          create: assignees.map((userId) => ({
+            userId: userId, // Correctly reference the userId field
+          })),
+        },
+      };
+    }
+
+    // Update the task
     const updatedTask = await prisma.task.update({
       where: {
         id: taskId,
         workspaceId: workspaceId,
       },
-      data: filteredUpdates,
+      data: {
+        ...filteredUpdates,
+        ...assigneeUpdate, // Merge assignee updates if any
+      },
+      include: {
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+            assignedBy: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     res.status(200).json({
@@ -179,7 +268,9 @@ export const UpdateTask = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating task:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
 export const updateTaskStatus = async (req, res) => {
@@ -190,7 +281,7 @@ export const updateTaskStatus = async (req, res) => {
 
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    decoded = jwt.verify(token, SECRET);
   } catch (error) {
     return res.status(403).json({ error: "Invalid or expired token" });
   }
@@ -199,7 +290,9 @@ export const updateTaskStatus = async (req, res) => {
   const { taskId, workspaceId, status } = req.body;
 
   if (!taskId || !workspaceId || !status) {
-    return res.status(400).json({ error: "taskId, workspaceId, and status are required" });
+    return res
+      .status(400)
+      .json({ error: "taskId, workspaceId, and status are required" });
   }
 
   try {
@@ -207,8 +300,8 @@ export const updateTaskStatus = async (req, res) => {
     const isAssignee = await prisma.taskAssignee.findFirst({
       where: {
         taskId,
-        userId
-      }
+        userId,
+      },
     });
 
     // Check if user is admin in the workspace
@@ -216,18 +309,20 @@ export const updateTaskStatus = async (req, res) => {
       where: {
         workspaceId,
         userId,
-        role: 'admin'
-      }
+        role: "admin",
+      },
     });
 
-    if (!isAssignee && !isAdmin) {
-      return res.status(403).json({ error: "Unauthorized: Not an assignee or workspace admin" });
+    if (!isAssignee || !isAdmin) {
+      return res
+        .status(403)
+        .json({ error: "Unauthorized: Not an assignee or workspace admin" });
     }
 
     // Update task status
     const updatedTask = await prisma.task.update({
       where: { id: taskId },
-      data: { status }
+      data: { status },
     });
 
     // Optionally log this activity
@@ -235,15 +330,17 @@ export const updateTaskStatus = async (req, res) => {
       data: {
         taskId,
         userId,
-        action: 'status_changed',
-        details: { newStatus: status }
-      }
+        action: "status_changed",
+        details: { newStatus: status },
+      },
     });
 
     return res.status(200).json({ message: "Task status updated" });
   } catch (error) {
     console.error("Error updating task status:", error);
-    return res.status(500).json({ error: "Internal server error", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
 
@@ -367,7 +464,7 @@ export const getTasksByUserId = async (req, res) => {
     // Decode token to extract user ID
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = jwt.verify(token, SECRET);
     } catch (error) {
       if (error.name === "TokenExpiredError") {
         console.error("Token has expired:", error);
@@ -377,7 +474,9 @@ export const getTasksByUserId = async (req, res) => {
         return res.status(403).json({ error: "Invalid Token" });
       } else {
         console.error("Error decoding token:", error);
-        return res.status(500).json({ error: "Token Decoding Error", details: error.message });
+        return res
+          .status(500)
+          .json({ error: "Token Decoding Error", details: error.message });
       }
     }
 
@@ -394,9 +493,9 @@ export const getTasksByUserId = async (req, res) => {
       where: {
         assignees: {
           some: {
-            userId: userId
-          }
-        }
+            userId: userId,
+          },
+        },
       },
       include: {
         assignees: {
@@ -407,37 +506,37 @@ export const getTasksByUserId = async (req, res) => {
                 name: true,
                 lastName: true,
                 email: true,
-                avatarUrl: true
-              }
+                avatarUrl: true,
+              },
             },
             assignedBy: {
               select: {
                 id: true,
                 name: true,
-                lastName: true 
-              }
-            }
-          }
+                lastName: true,
+              },
+            },
+          },
         },
         createdBy: {
           select: {
             id: true,
             name: true,
             lastName: true,
-            email: true
-          }
+            email: true,
+          },
         },
         workspace: {
           select: {
             id: true,
             name: true,
-            icon: true 
-          }
-        }
+            icon: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     console.log("tasks:", tasks);
@@ -448,6 +547,5 @@ export const getTasksByUserId = async (req, res) => {
     console.error("Error fetching tasks for user:", error);
     res.status(500).json({ error: "Internal server error" });
     console.log(error);
-
   }
 };

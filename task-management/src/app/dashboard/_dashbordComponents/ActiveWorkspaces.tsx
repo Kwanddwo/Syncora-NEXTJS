@@ -4,41 +4,19 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronRight, ImageIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { fetchActiveWorkspaces } from "@/app/_api/activeWorkspaces";
+import {ChevronRight, ImageIcon, MoreVertical} from "lucide-react";
+import React, { useState } from "react";
+import {useWorkspaces} from "@/context/WorkspaceContext";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import DeleteWorkspaceAlert from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceDeleteAlert";
+
 interface OpenStates {
   [key: string]: boolean;
 }
-interface Task {
-  id: string;
-  title: string;
-  dueDate?: string;
-}
-
-interface Workspace {
-  id: string;
-  name: string;
-  defaultOpen: boolean;
-  tasks: Task[];
-}
-
-
 function ActiveWorkspaces() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  useEffect(() => {
-    const getWorkspaces = async () => {
-      try {
-        const data = await fetchActiveWorkspaces();
-        setWorkspaces(data);
-      } catch (error) {
-        console.error("Failed to fetch workspaces:", error);
-      }
-    };
-
-    getWorkspaces();
-  }, []);
-
+  const {workspaces}= useWorkspaces();
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
   const [openStates, setOpenStates] = useState(
     workspaces.reduce((acc: OpenStates, workspace) => {
       acc[workspace.id] = workspace.defaultOpen;
@@ -53,7 +31,7 @@ function ActiveWorkspaces() {
     }));
   };
 
-  return (
+    return (
     <section>
       <h2 className="mb-4 text-xl font-bold">Active Workspaces</h2>
       <div className="space-y-2">
@@ -77,11 +55,27 @@ function ActiveWorkspaces() {
                 <ImageIcon className="h-5 w-5" />
                 <span>{workspace.name}</span>
               </div>
+              {workspace.ownerId === user.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <div onClick={(e) => e.stopPropagation()} className="focus:outline-none">
+                        <MoreVertical className="h-4 w-4" />
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                          className="text-red-500 focus:text-red-500" asChild
+                      >
+                        <DeleteWorkspaceAlert workspaceId={workspace.id} />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+              )}
             </CollapsibleTrigger>
             <CollapsibleContent>
-              {workspace.tasks.length > 0 ? (
+              {workspace.tasks?.length > 0 ? (
                 <div className="mt-2 space-y-2">
-                  {workspace.tasks.map((task, index) => (
+                  {workspace.tasks?.map((task, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between rounded-md border p-3"

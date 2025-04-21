@@ -26,7 +26,9 @@ export const handleInputError = (req, res, next) => {
     return res.status(400).json({ errors: errors.array() });
   }
   next();
-}
+
+};
+
 export const addUserIdToBody = (req, res, next) => {
   const token = req.cookies.token || req.headers["authorization"];
 
@@ -37,7 +39,9 @@ export const addUserIdToBody = (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, SECRET);
+
     req.body.userId = decoded.id; 
+
     next();
   } catch (error) {
     res.status(403).json({ message: "Invalid Token" });
