@@ -21,7 +21,7 @@ function RecentWorkspaces() {
           <div className="mt-2 text-center">Add/Join...</div>
         </Card>
         {personalWorkspaces.map(item => (
-            <Link key={item.id} href={`/dashboard/personal/${item.workspaceId}`} className="hover:no-underline">
+            <Link key={item.id} href={`/dashboard/workspace/${item.workspaceId}`} className="hover:no-underline">
                 <Card className="flex h-36 w-36 flex-col items-center justify-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 cursor-pointer">
                         <User className="h-10 w-10 text-gray-500" />
