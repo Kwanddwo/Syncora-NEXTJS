@@ -11,8 +11,8 @@ import { EditTaskDialog } from './_TasksCRUDComponents/EditTaskForm';
 import { cn } from '@/lib/utils';
 import {Task} from "@/lib/types"
 import DeleteTaskAlert from './_TasksCRUDComponents/DeleteTaskAlert';
-function TaskTab({workspaceId,todos,setTodos}
-                 :{workspaceId : string,todos : Task[],setTodos :React.Dispatch<React.SetStateAction<Task[]>>}) {
+function TaskTab({workspaceId,todos,setTodos,isPersonal}
+                 :{workspaceId : string,todos : Task[],setTodos :React.Dispatch<React.SetStateAction<Task[]>>,isPersonal : boolean}) {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   const toggleRowExpand = (id: string) => {
@@ -56,7 +56,7 @@ function TaskTab({workspaceId,todos,setTodos}
                   <TableHead>Status</TableHead>
                   <TableHead>Priority</TableHead>
                   <TableHead>Due Date</TableHead>
-                  <TableHead>Assignee</TableHead>
+                  {!isPersonal && (<TableHead>Assignee</TableHead>)}
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
@@ -83,29 +83,31 @@ function TaskTab({workspaceId,todos,setTodos}
                       <TableCell>
                         {new Date(todo.dueDate).toISOString().split("T")[0]}
                       </TableCell>
-                      <TableCell className="flex items-center pt-3">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center">
-                            <User className="h-4 w-4 mr-1" />
-                            {todo.assignees?.[0]?.user?.name}
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={() => toggleRowExpand(todo.id)}
-                          >
-                            <ChevronRight
-                              className={cn(
-                                "h-4 w-4 transition-transform",
-                                expandedRows[todo.id]
-                                  ? "transform rotate-90"
-                                  : ""
-                              )}
-                            />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      { !isPersonal && (
+                          <TableCell className="flex items-center pt-3">
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center">
+                                <User className="h-4 w-4 mr-1" />
+                                {todo.assignees?.[0]?.user?.name}
+                              </div>
+                              <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => toggleRowExpand(todo.id)}
+                              >
+                                <ChevronRight
+                                    className={cn(
+                                        "h-4 w-4 transition-transform",
+                                        expandedRows[todo.id]
+                                            ? "transform rotate-90"
+                                            : ""
+                                    )}
+                                />
+                              </Button>
+                            </div>
+                          </TableCell>
+                      )}
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -120,6 +122,7 @@ function TaskTab({workspaceId,todos,setTodos}
                                 workspaceId={workspaceId}
                                 taskId={todo.id}
                                 setTodos={setTodos}
+                                isPersonal={isPersonal}
                               />
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
@@ -168,6 +171,7 @@ function TaskTab({workspaceId,todos,setTodos}
                     <NewTaskDialog
                       workspaceId={workspaceId as string}
                       setTodos={setTodos}
+                      isPersonal={isPersonal}
                     />
                   </TableCell>
                 </TableRow>

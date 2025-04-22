@@ -43,7 +43,7 @@ const data = {
     },
     {
       title: "Personal",
-      url: "/dashboard/personal",
+      url: "/dashboard/workspace",
       icon: User,
       hasDropdown: true,
       dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string }[],
@@ -85,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.hasDropdown && item.title == "Personal") {
         item.dropdownItems = personalWorkspaces.map((workspace) => ({
           name: workspace.name,
-          url: `/dashboard/personal/${workspace.id}`,
+          url: `/dashboard/workspace/${workspace.id}`,
           active: workspace.id === "someDefaultWorkspaceId",
           icon:workspace.icon,
         }));

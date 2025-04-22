@@ -8,8 +8,8 @@ import { MoreVertical } from 'lucide-react';
 import React from 'react'
 import {DragDropContext, Droppable, Draggable, DropResult} from "@hello-pangea/dnd"
 import {updateStatusAPI} from "@/app/_api/TasksAPI";
-function TodoTab({workspaceId,todos,setTodos}:
-                 {workspaceId : string,todos : Task[],setTodos :React.Dispatch<React.SetStateAction<Task[]>>}) {
+function TodoTab({workspaceId,todos,setTodos,isPersonal}:
+                 {workspaceId : string,todos : Task[],setTodos :React.Dispatch<React.SetStateAction<Task[]>>,isPersonal :boolean}) {
   const todoTasks = todos?.filter((todo) => todo.status === "pending");
   const OngoingTasks=todos?.filter((todo) => todo.status == "in_progress")
   const doneTasks=todos?.filter((todo) => todo.status == "completed")
@@ -86,19 +86,21 @@ function TodoTab({workspaceId,todos,setTodos}:
                   <div className="text-xs text-muted-foreground">
                     Due: {new Date(task.dueDate).toISOString().split("T")[0]}
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Assignee:{" "}
-                    <div className="flex space-x-2">
-                      {task.assignees?.map((assigne:TaskAssignee) => (
-                          <div
-                              key={assigne.id}
-                              className="flex items-center space-x-1"
-                          >
-                            <span>{assigne.user.name}</span>
-                          </div>
-                      ))}
-                    </div>
-                  </div>
+                  {!isPersonal && (
+                      <div className="text-xs text-muted-foreground">
+                        Assignee:{" "}
+                        <div className="flex space-x-2">
+                          {task.assignees?.map((assigne:TaskAssignee) => (
+                              <div
+                                  key={assigne.id}
+                                  className="flex items-center space-x-1"
+                              >
+                                <span>{assigne.user.name}</span>
+                              </div>
+                          ))}
+                        </div>
+                      </div>
+                  )}
                 </div>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <MoreVertical className="h-4 w-4" />
