@@ -3,13 +3,13 @@ import { Card } from '@/components/ui/card';
 import { ImageIcon, User } from 'lucide-react';
 import React from 'react'
 import AddWorkspaceDialog from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceAddModalDialog";
-import {useWorkspaces} from "@/context/WorkspaceContext";
+import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
 import Link from "next/link";
 
 function RecentWorkspaces() {
-  const {workspaces} =useWorkspaces();
-  const personalWorkspaces= workspaces.filter((workspace) => workspace.isPersonal == true)
-  const publicWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == false)
+  const { recent} = useRecentWorkspacesContext();
+  const personalWorkspaces= recent.filter((item) => item.workspace.isPersonal == true)
+  const publicWorkspaces = recent.filter((item) => item.workspace.isPersonal == false)
   return (
     <section>
       <h2 className="mb-4 text-xl font-bold">Recent Workspaces</h2>
@@ -20,26 +20,26 @@ function RecentWorkspaces() {
           </div>
           <div className="mt-2 text-center">Add/Join...</div>
         </Card>
-        {personalWorkspaces.map(workspace => (
-            <Link key={workspace.id} href={`/dashboard/personal/${workspace.id}`} className="hover:no-underline">
+        {personalWorkspaces.map(item => (
+            <Link key={item.id} href={`/dashboard/personal/${item.workspaceId}`} className="hover:no-underline">
                 <Card className="flex h-36 w-36 flex-col items-center justify-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 cursor-pointer">
                         <User className="h-10 w-10 text-gray-500" />
                     </div>
-                    <div className="mt-2 text-center text-gray-500">{workspace.name}</div>
+                    <div className="mt-2 text-center text-gray-500">{item.workspace.name}</div>
                 </Card>
             </Link>
 
         ))}
-        {publicWorkspaces.map((workspace) => (
-            <Link key={workspace.id} href={`/dashboard/workspace/${workspace.id}`} className="hover:no-underline">
+        {publicWorkspaces.map((item) => (
+            <Link key={item.id} href={`/dashboard/workspace/${item.workspaceId}`} className="hover:no-underline">
                 <Card
                     className="flex h-36 w-36 flex-col items-center justify-center"
                 >
                     <div className="flex h-16 w-16 items-center justify-center rounded-md bg-gray-300 cursor-pointer">
                         <ImageIcon className="h-10 w-10 text-gray-500" />
                     </div>
-                    <div className="mt-2 text-center text-gray-500">{workspace.name}</div>
+                    <div className="mt-2 text-center text-gray-500">{item.workspace.name}</div>
                 </Card>
             </Link>
 
