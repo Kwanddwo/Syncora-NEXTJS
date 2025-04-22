@@ -3,35 +3,28 @@ export const prisma = new PrismaClient();
 
 export const addRecentWorkspace = async (req, res) => {
     const { userId, workspaceId } = req.body;
-    console.log(`User Id ${userId} , Workspace Id ${workspaceId}`);
+
     if (!userId || !workspaceId) {
         return res.status(400).json({ error: 'userId and workspaceId are required' });
     }
 
     try {
-        const existingWorkspace = await prisma.recentWorkspace.findFirst({
-            where: {
-                userId: userId.trim(),
-                workspaceId: workspaceId.trim(),
-            },
-        });
-        console.log("🔍 existingWorkspace:", existingWorkspace);
-        if (existingWorkspace) {
-            return res.status(200).json({ message: 'Workspace already added to recent workspaces' });
-        }
-
         const recentWorkspace = await prisma.recentWorkspace.create({
             data: {
                 userId,
                 workspaceId,
             },
             include: {
-                workspace: true, 
+                workspace: true,
             },
         });
 
         return res.status(201).json(recentWorkspace);
     } catch (error) {
+        if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            return res.status(200).json({ message: 'Recent workspace already exists' });
+        }
+
         console.error(error);
         return res.status(500).json({ error: 'Failed to store recent workspace' });
     }
