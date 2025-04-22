@@ -4,7 +4,6 @@ export const prisma = new PrismaClient();
 export const addRecentWorkspace = async (req, res) => {
     const { userId, workspaceId } = req.body;
     console.log(`User Id ${userId} , Workspace Id ${workspaceId}`);
-
     if (!userId || !workspaceId) {
         return res.status(400).json({ error: 'userId and workspaceId are required' });
     }
@@ -12,11 +11,11 @@ export const addRecentWorkspace = async (req, res) => {
     try {
         const existingWorkspace = await prisma.recentWorkspace.findFirst({
             where: {
-                userId,
-                workspaceId,
+                userId: userId.trim(),
+                workspaceId: workspaceId.trim(),
             },
         });
-
+        console.log("🔍 existingWorkspace:", existingWorkspace);
         if (existingWorkspace) {
             return res.status(200).json({ message: 'Workspace already added to recent workspaces' });
         }
