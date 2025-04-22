@@ -2,7 +2,7 @@
 
 import {
   ArrowUpRight,
-  Link,
+  Link as LinkIcon,
   MoreHorizontal,
   StarOff,
   Trash2,
@@ -25,6 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
+import Link from "next/link";
 
 export function NavRecent() {
   const { isMobile } = useSidebar()
@@ -38,15 +39,15 @@ export function NavRecent() {
           <SidebarMenuItem key={item.workspaceId}>
             <SidebarMenuButton asChild>
               {item.workspace.isPersonal ? (
-                  <a href={`/dashboard/personal/${item.workspaceId}`} title={item.workspace.name}>
+                  <Link href={`/dashboard/personal/${item.workspaceId}`} title={item.workspace.name}>
                     <span>{item.workspace.icon}</span>
                     <span>{item.workspace.name}</span>
-                  </a>
+                  </Link>
               ) : (
-                  <a href={`/dashboard/workspace/${item.workspaceId}`} title={item.workspace.name}>
+                  <Link href={`/dashboard/workspace/${item.workspaceId}`} title={item.workspace.name}>
                     <span>{item.workspace.icon}</span>
                     <span>{item.workspace.name}</span>
-                  </a>
+                  </Link>
               )}
             </SidebarMenuButton>
             <DropdownMenu>
@@ -67,7 +68,7 @@ export function NavRecent() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Link className="text-muted-foreground" />
+                  <LinkIcon className="text-muted-foreground" />
                   <span>Copy Link</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
