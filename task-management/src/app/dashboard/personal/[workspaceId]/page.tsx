@@ -30,7 +30,7 @@ function Page() {
       };
       getTasks();
       addRecentWorkspace(workspaceId);
-    },[workspaceId,addRecentWorkspace]);
+    },[workspaceId]);
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <Tabs defaultValue="kanban">

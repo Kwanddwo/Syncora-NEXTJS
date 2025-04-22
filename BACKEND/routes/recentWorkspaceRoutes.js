@@ -1,8 +1,9 @@
 import * as recentWorkspaceController from '../controllers/recentWorspacehandler.js';
+import { checkRecentWorkspaceExists } from '../middleware/RecentWorkspaceMiddleware.js'
 import express from 'express';
 const router = express.Router();
 
-router.post('/create', recentWorkspaceController.addRecentWorkspace);
+router.post('/create',checkRecentWorkspaceExists, recentWorkspaceController.addRecentWorkspace);
 router.post('/recent', recentWorkspaceController.getRecentWorkspaces);
 router.delete('/delete', recentWorkspaceController.removeRecentWorkspace);
 router.delete('/clear', recentWorkspaceController.clearRecentWorkspaces);
