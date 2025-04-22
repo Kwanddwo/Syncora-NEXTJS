@@ -63,6 +63,7 @@ export type WorkspaceCreateRequest = {
 }
 
 export type RecentWorkspace = {
+  id: string;
   userId: string;
   workspaceId: string;
   viewedAt: string;
