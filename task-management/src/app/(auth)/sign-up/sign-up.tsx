@@ -7,7 +7,7 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
-import {toast} from "sonner";
+import { toast } from "sonner";
 export function SignUpForm({
   className,
   ...props
@@ -50,7 +50,7 @@ export function SignUpForm({
 
       console.log("User registered:", response.data);
       toast.success("Registered successfully");
-      router.push("/dashboard");
+      router.push("/sign-in");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Registration error:", err);

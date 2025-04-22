@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Task} from "@/lib/types";
+import { Task } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -22,13 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Plus,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { addTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
-import {ClipLoader} from "react-spinners"
-import {toast} from "sonner";
+import { ClipLoader } from "react-spinners";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 export function NewTaskDialog({
   workspaceId,
@@ -43,8 +42,7 @@ export function NewTaskDialog({
   const [priority, setPriority] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
+  const { currentUser: user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +70,7 @@ export function NewTaskDialog({
       priority,
       workspaceId: workspaceId,
       dueDate: dueDate,
-      assigneesIds: [user.id],
+      assigneesIds: [user ? user.id : ""],
     };
     console.log("Task object to send:", task);
 
@@ -81,7 +79,7 @@ export function NewTaskDialog({
       if (res && res.message === "Task created successfully") {
         setLoading(false);
         setOpen(false);
-        setTodos((prev) => [res.task,...prev])
+        setTodos((prev) => [res.task, ...prev]);
         toast.success("Task created successfully");
       } else {
         throw new Error("Task creation failed.");
