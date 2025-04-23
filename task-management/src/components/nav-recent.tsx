@@ -2,7 +2,7 @@
 
 import {
   ArrowUpRight,
-  Link,
+  Link as LinkIcon,
   MoreHorizontal,
   StarOff,
   Trash2,
@@ -24,29 +24,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
+import Link from "next/link";
 
-export function NavFavorites({
-  favorites,
-}: {
-  favorites: {
-    name: string
-    url: string
-    emoji: string
-  }[]
-}) {
+export function NavRecent() {
   const { isMobile } = useSidebar()
+  const { recent, deleteRecentWorkspace,clearRecent} = useRecentWorkspacesContext();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Recent</SidebarGroupLabel>
       <SidebarMenu>
-        {favorites.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {recent.map((item) => (
+          <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild>
-              <a href={item.url} title={item.name}>
-                <span>{item.emoji}</span>
-                <span>{item.name}</span>
-              </a>
+                  <Link href={`/dashboard/workspace/${item.workspaceId}`} title={item.workspace.name}>
+                    <span>{item.workspace.icon}</span>
+                    <span>{item.workspace.name}</span>
+                  </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -60,13 +55,13 @@ export function NavFavorites({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => deleteRecentWorkspace(item.workspaceId)}>
                   <StarOff className="text-muted-foreground" />
-                  <span>Remove from Favorites</span>
+                  <span>Remove from Recent</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Link className="text-muted-foreground" />
+                  <LinkIcon className="text-muted-foreground" />
                   <span>Copy Link</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -74,18 +69,14 @@ export function NavFavorites({
                   <span>Open in New Tab</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontal />
-            <span>More</span>
+          <SidebarMenuButton className="text-sidebar-foreground/70 cursor-pointer" onClick={() => clearRecent()}>
+            <Trash2 />
+            <span>Clear Recent</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

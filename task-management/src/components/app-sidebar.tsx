@@ -1,10 +1,9 @@
 "use client";
-import { NavFavorites } from "@/components/nav-favorites";
+import { NavRecent } from "@/components/nav-recent";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import * as React from "react";
 import Logo from "./Logo";
-import { Workspace } from "@/types";
 import {
   Building,
   Calendar,
@@ -20,9 +19,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { fetchActiveWorkspaces } from "@/app/_api/activeWorkspaces";
-
-
+import { useWorkspaces } from "@/context/WorkspaceContext";
 
 const data = {
   navMain: [
@@ -42,13 +39,14 @@ const data = {
       url: "/dashboard/workspace",
       icon: Building,
       hasDropdown: true,
-      dropdownItems: [] as { name: string; url: string; active: boolean }[],
+      dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string}[],
     },
     {
       title: "Personal",
-      url: "/dashboard/personal",
+      url: "/dashboard/workspace",
       icon: User,
-      badge: "10",
+      hasDropdown: true,
+      dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string }[],
     },
   ],
   navSecondary: [
@@ -68,85 +66,33 @@ const data = {
       icon: LogOut,
     },
   ],
-  favorites: [
-    {
-      name: "Project Management & Task Tracking",
-      url: "#",
-      emoji: "📊",
-    },
-    {
-      name: "Family Recipe Collection & Meal Planning",
-      url: "#",
-      emoji: "🍳",
-    },
-    {
-      name: "Fitness Tracker & Workout Routines",
-      url: "#",
-      emoji: "💪",
-    },
-    {
-      name: "Book Notes & Reading List",
-      url: "#",
-      emoji: "📚",
-    },
-    {
-      name: "Sustainable Gardening Tips & Plant Care",
-      url: "#",
-      emoji: "🌱",
-    },
-    {
-      name: "Language Learning Progress & Resources",
-      url: "#",
-      emoji: "🗣️",
-    },
-    {
-      name: "Home Renovation Ideas & Budget Tracker",
-      url: "#",
-      emoji: "🏠",
-    },
-    {
-      name: "Personal Finance & Investment Portfolio",
-      url: "#",
-      emoji: "💰",
-    },
-    {
-      name: "Movie & TV Show Watchlist with Reviews",
-      url: "#",
-      emoji: "🎬",
-    },
-    {
-      name: "Daily Habit Tracker & Goal Setting",
-      url: "#",
-      emoji: "✅",
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [workspaces, setWorkspaces] = React.useState<Workspace[]>([]);
-  React.useEffect(() =>{
-        const getWorkspaces = async () => {
-              try {
-                const data = await fetchActiveWorkspaces();
-                setWorkspaces(data);
-              } catch (error) {
-                console.error("Failed to fetch workspaces:", error);
-              }
-            };
-          getWorkspaces();
-  },[])
+  const {workspaces} = useWorkspaces();
+  const publicWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == false);
+  const personalWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == true);
   const updatedNavMain = React.useMemo(() => {
     return data.navMain.map((item) => {
-      if (item.hasDropdown) {
-        item.dropdownItems = workspaces.map((workspace) => ({
+      if (item.hasDropdown && item.title == "My Workspaces") {
+        item.dropdownItems = publicWorkspaces.map((workspace) => ({
           name: workspace.name,
-          url: `/dashboard/workspace?id=${workspace.id}`,
-          active: workspace.id === "someDefaultWorkspaceId", 
+          url: `/dashboard/workspace/${workspace.id}`,
+          active: workspace.id === "someDefaultWorkspaceId",
+          icon:workspace.icon,
+        }));
+      }
+      if (item.hasDropdown && item.title == "Personal") {
+        item.dropdownItems = personalWorkspaces.map((workspace) => ({
+          name: workspace.name,
+          url: `/dashboard/workspace/${workspace.id}`,
+          active: workspace.id === "someDefaultWorkspaceId",
+          icon:workspace.icon,
         }));
       }
       return item;
     });
-  }, [workspaces]);
+  }, [personalWorkspaces,publicWorkspaces]);
   
   return (
     <Sidebar className="border-r-0" {...props}>
@@ -157,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={updatedNavMain} />
       </SidebarHeader>
       <SidebarContent>
-        <NavFavorites favorites={data.favorites} />
+        <NavRecent />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarRail />

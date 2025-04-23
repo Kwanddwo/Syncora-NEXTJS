@@ -9,42 +9,42 @@ export const routerr = express.Router();
 
 routerr.get('/workspaces', workspaceHandlers.getWorkspacesByuserId); 
 
-routerr.post('/create', 
+routerr.post('/create',
     handleInputError,
-    authenticateUser, 
+    authenticateUser,
     workspaceHandlers.createWorkspace);
 
-routerr.delete('/delete', 
-    handleInputError, 
+routerr.delete('/delete',
+    handleInputError,
     authenticateUser,
     workspaceHandlers.deleteWorkspace);
 
-routerr.post('/add-member', 
-    handleInputError, 
+routerr.post('/add-member',
+    handleInputError,
     authenticateUser,
-    
+
     workspaceHandlers.addMemberToWorkspace);
 
-routerr.delete('/remove-member', 
-    handleInputError, 
+routerr.delete('/remove-member',
+    handleInputError,
     authenticateUser,
     workspaceMiddleware.checkIsOwner,
     workspaceHandlers.removeMemberFromWorkspace);
 
-routerr.post('/change-role', 
-    handleInputError, 
+routerr.post('/change-role',
+    handleInputError,
     authenticateUser,
-    workspaceMiddleware.checkIsOwner, 
+    workspaceMiddleware.checkIsOwner,
     workspaceHandlers.changeUserRole);
 
-routerr.delete('/leave', 
-    handleInputError, 
-    authenticateUser, 
+routerr.delete('/leave',
+    handleInputError,
+    authenticateUser,
     workspaceMiddleware.checkIsOwner,
     workspaceHandlers.exitWorkspace);
 
-routerr.post('/members', 
-    handleInputError,workspaceHandlers.getMembersByWorkspaceId); 
+routerr.post('/members',
+     handleInputError,workspaceHandlers.getMembersByWorkspaceId); 
 
-
+     
 export default routerr;

@@ -6,62 +6,55 @@ dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 
 export const createWorkspace = async (req, res) => {
-    const { name, description, isPersonal } = req.body;
-
+    const { name, description, isPersonal,icon } = req.body;
     const currentUserId = req.userId;
-  
     try {
-      // Step 1: Create the workspace
-      const workspace = await prisma.workspace.create({
-        data: {
-          name,
-          description,
-          isPersonal,
-          ownerId: currentUserId,
-          createdAt: new Date(),
-        },
-      });
-      await prisma.workspaceMember.create(
-        {
-        data: {
-          workspaceId: workspace.id,
-          userId: currentUserId,
-          role: 'admin', 
-        },
+        const workspace = await prisma.workspace.create({
+            data: {
+                name,
+                description,
+                isPersonal,
+                ownerId: currentUserId,
+                createdAt: new Date(),
+                icon,
+            },
+        });
+        await prisma.workspaceMember.create(
+            {
+                data: {
+                    workspaceId: workspace.id,
+                    userId: currentUserId,
+                    role: 'admin',
+                },
+            });
 
-      });
-  
-      // Step 3: Return the newly created workspace and member data
-      return res.status(201).json({
-        message: 'Workspace created successfully',
-        workspace,
-      });
+        return res.status(201).json({
+            message: 'Workspace created successfully',
+            workspace,
+        });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        message: 'Error creating workspace',
-        error: error.message,
-      });
+        console.error(error);
+        return res.status(500).json({
+            message: 'Error creating workspace',
+            error: error.message,
+        });
     }
-  }
- export  const deleteWorkspace = async (req, res) => {
+}
+export const deleteWorkspace = async (req, res) => {
     const { workspaceId } = req.body
-  
     try {
-      // Delete all members (optional, if ON DELETE CASCADE isn't set)
-  
-      // Delete the workspace
-      await prisma.workspace.delete({
-        where: { id: workspaceId },
-      });
-  
-      return res.status(200).json({ message: 'Workspace deleted successfully' });
+        await prisma.workspace.delete({
+            where: { id: workspaceId },
+        });
+
+        return res.status(200).json({ message: 'Workspace deleted successfully' });
     } catch (error) {
-      console.error(error);
-      console.log("Error deleting workspace:", error);
-      return res.status(500).json({ message: 'Failed to delete workspace', error: error.message });
+        console.error(error);
+        console.log("Error deleting workspace:", error);
+        return res.status(500).json({ message: 'Failed to delete workspace', error: error.message });
     }
-  };
+};
+
 export const getWorkspacesByuserId = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -78,42 +71,39 @@ export const getWorkspacesByuserId = async (req, res) => {
         const userId = decoded.id;
 
         if (!userId) {
-       
+
             return res.status(401).json({ error: "Unauthorized" });
         }
-
-        // Fetch all workspaces where the user is a member
         const workspaces = await prisma.workspace.findMany({
             where: {
                 members: {
                     some: {
-                        userId: userId, // Match workspaces where the user is a member
+                        userId: userId,
                     },
                 },
             },
             include: {
                 members: {
                     include: {
-                        user: true, // Include user details for each member
+                        user: true,
                     },
                 },
             },
         });
 
-        // Return the fetched workspaces in the response
         res.status(200).json(workspaces);
     } catch (error) {
-        // Log the error and return an internal server error response
+
         console.error("Error fetching workspaces:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 };
 export const getMembersByWorkspaceId = async (req, res) => {
     try {
-        const { workspaceId } =req.body; 
+        const { workspaceId } = req.body;
         const members = await prisma.workspaceMember.findMany({
             where: {
-                workspaceId: workspaceId, 
+                workspaceId: workspaceId,
             },
             include: {
                 user: true,
@@ -122,19 +112,17 @@ export const getMembersByWorkspaceId = async (req, res) => {
         res.status(200).json(members);
     } catch (error) {
         console.error("Error fetching members:", error);
-        res.status(500).json({ error: "Internal server error" }); 
+        res.status(500).json({ error: "Internal server error" });
         console.log("Error fetching members:", error);
     }
 }
 
 
 
-
-
-// ✅ Add a member to the workspace
 export const addMemberToWorkspace = async (req, res) => {
   const { workspaceId, memberId, role } = req.body;
-
+  console.log("Adding member to workspace:", { workspaceId, memberId, role });
+ 
   try {
     const existingMember = await prisma.workspaceMember.findFirst({
       where: {
@@ -154,8 +142,11 @@ export const addMemberToWorkspace = async (req, res) => {
         role: role ?? 'member',
       },
     });
-
-    return res.status(201).json({ message: 'Member added to workspace successfully.' });
+    if (req.AcceptInvite){
+      return res.status(201).json({ message: '${AcceptInvite} and Member added to workspace successfully.' });
+    }else{
+      return res.status(201).json({message: "Member added to workspace successfully."});
+    }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'An error occurred while adding the member.' });
@@ -163,47 +154,47 @@ export const addMemberToWorkspace = async (req, res) => {
 };
 
 
-
 export const removeMemberFromWorkspace = async (req, res) => {
-  const { workspaceId, memberId } = req.body;
-  const currentUserId = req.userId;
-  if (currentUserId === memberId) {
-    return res.status(400).json({ message: 'You cannot remove yourself. Use /leave instead.' });
-  }
+    const { workspaceId, memberId } = req.body;
+    const currentUserId = req.userId;
+    if (currentUserId === memberId) {
+        return res.status(400).json({ message: 'You cannot remove yourself. Use /leave instead.' });
+    }
 
-  const member = await prisma.workspaceMember.findFirst({
-    where: {
-      workspaceId,
-      userId: memberId,
-    },
-    select: { role: true },
-  });
-  if (member.role === 'admin' && !req.is_owner) {
-    return res.status(403).json({ message: 'Only the workspace owner can remove an admin.' });
-  }
-  await prisma.workspaceMember.deleteMany({
-    where: { workspaceId, userId: memberId },
-  });
-  return res.status(200).json({ message: 'Member removed from workspace.' });
+    const member = await prisma.workspaceMember.findFirst({
+        where: {
+            workspaceId,
+            userId: memberId,
+        },
+        select: { role: true },
+    });
+    if (member.role === 'admin' && !req.is_owner) {
+        return res.status(403).json({ message: 'Only the workspace owner can remove an admin.' });
+    }
+    await prisma.workspaceMember.deleteMany({
+        where: { workspaceId, userId: memberId },
+    });
+    return res.status(200).json({ message: 'Member removed from workspace.' });
 };
 export const exitWorkspace = async (req, res) => {
-  const { workspaceId } = req.body;
-  
-  const userId = req.userId;
-  const userRole = await prisma.workspaceMember.findFirst({
-    where: {
-      workspaceId,
-      userId
-    },
-    select: { role: true },
-  });
-  if (req.is_owner) {
-    return res.status(400).json({ message: 'Workspace owner cannot leave the workspace.' });
-  }
-  await prisma.workspaceMember.deleteMany({
-    where: { workspaceId, userId },
-  });
-  return res.status(200).json({ message: 'You have left the workspace.' });
+    const { workspaceId } = req.body;
+
+    const userId = req.userId;
+    const userRole = await prisma.workspaceMember.findFirst({
+        where: {
+            workspaceId,
+            userId
+        },
+        select: { role: true },
+    });
+    if (req.is_owner) {
+        return res.status(400).json({ message: 'Workspace owner cannot leave the workspace.' });
+    }
+    await prisma.workspaceMember.deleteMany({
+        where: { workspaceId, userId },
+    });
+    return res.status(200).json({ message: 'You have left the workspace.' });
+
 };
 
 
@@ -227,44 +218,45 @@ export const exitWorkspace = async (req, res) => {
 
 
 export const changeUserRole = async (req, res) => {
-  const { workspaceId, memberId, newRole } = req.body;
-  const currentUserId = req.userId;
+    const { workspaceId, memberId, newRole } = req.body;
+    const currentUserId = req.userId;
 
-  const allowedRoles = ['member', 'viewer','admin'];
-  if (!allowedRoles.includes(newRole)) {
-    return res.status(400).json({ message: 'Invalid role provided.' });
-  }
+    const allowedRoles = ['member', 'viewer', 'admin'];
+    if (!allowedRoles.includes(newRole)) {
+        return res.status(400).json({ message: 'Invalid role provided.' });
+    }
 
-  // Prevent changing your own role
-  if (memberId === currentUserId) {
-    return res.status(400).json({ message: 'You cannot change your own role.' });
-  }
+    if (memberId === currentUserId) {
+        return res.status(400).json({ message: 'You cannot change your own role.' });
+    }
 
-  const targetUser = await prisma.workspaceMember.findFirst({
-    where: 
-      { workspaceId, 
-        userId: memberId },
-    
-    select: { role: true },
-  });
+    const targetUser = await prisma.workspaceMember.findFirst({
+        where:
+        {
+            workspaceId,
+            userId: memberId
+        },
 
-  if (!targetUser) {
-    return res.status(404).json({ message: 'Target user not found in the workspace.' });
-  }
+        select: { role: true },
+    });
 
-  // Only owner can change role of an admin
-  if (targetUser.role === 'admin' && !req.is_owner) {
-    return res.status(403).json({ message: 'Only the workspace owner can change the role of an admin.' });
-  }
-  await prisma.workspaceMember.updateMany({
-    where: {
-      workspaceId,
-      userId: memberId,
-    },
-    data: {
-      role: newRole,
-    },
-  });
+    if (!targetUser) {
+        return res.status(404).json({ message: 'Target user not found in the workspace.' });
+    }
 
-  return res.status(200).json({ message: 'User role updated successfully.' });
+
+    if (targetUser.role === 'admin' && !req.is_owner) {
+        return res.status(403).json({ message: 'Only the workspace owner can change the role of an admin.' });
+    }
+    await prisma.workspaceMember.updateMany({
+        where: {
+            workspaceId,
+            userId: memberId,
+        },
+        data: {
+            role: newRole,
+        },
+    });
+
+    return res.status(200).json({ message: 'User role updated successfully.' });
 };

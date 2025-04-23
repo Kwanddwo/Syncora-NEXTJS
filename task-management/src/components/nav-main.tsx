@@ -23,6 +23,7 @@ type WorkspaceItem = {
   name: string;
   url: string;
   active?: boolean;
+  icon ?:string;
 };
 
 type NavItem = {
@@ -107,6 +108,7 @@ export function NavMain({ items }: { items: NavItem[] }) {
                         onClick={() => handleWorkspaceClick(workspace.name)}
                       >
                         <a href={workspace.url}>
+                          <span>{workspace.icon}</span>
                           <span>{workspace.name}</span>
                         </a>
                       </SidebarMenuSubButton>

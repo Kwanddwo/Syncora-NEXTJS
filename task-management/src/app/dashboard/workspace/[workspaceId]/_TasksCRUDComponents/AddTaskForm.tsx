@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { WorkspaceMember } from "@/lib/types";
-import { fetchMembersByWorkspaceId } from "@/app/_api/activeWorkspaces";
+import { Task, WorkspaceMember } from "@/lib/types";
+import { fetchMembersFromWorkspace } from "@/app/_api/WorkspacesAPIs";
 import {
   Dialog,
   DialogContent,
@@ -36,82 +36,89 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { addTaskAPI } from "@/app/_api/addTaskAPI";
+import { addTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
 import {ClipLoader} from "react-spinners"
+import {toast} from "sonner";
+import {useAuth} from "@/hooks/use-auth";
 
-export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
+export function NewTaskDialog({
+  workspaceId,
+  setTodos,
+    isPersonal
+}: {
+  workspaceId: string;
+  setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+  isPersonal: boolean;
+}) {
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState<string>("");
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const [priority, setPriority] = useState("");
-  const [error, setError] = useState("");
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  
-
+  const { currentUser: user } = useAuth();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     const title = titleRef.current?.value.trim();
     const description = descriptionRef.current?.value.trim();
     setLoading(true);
     if (!title) {
-      setError("Title is required");
+      toast.error("Title is required");
       setLoading(false);
       return;
     }
     if (!priority) {
-      setError("Priority is required");
+      toast.error("Priority is required");
       setLoading(false);
       return;
     }
     if (!dueDate) {
-      setError("Due date is required");
+      toast.error("Due date is required");
       setLoading(false);
       return;
     }
-    if (selectedAssignees.length === 0) {
-      setError("At least one assignee is required");
-      setLoading(false);
-      return;
+    if(!isPersonal){
+      if (selectedAssignees.length === 0) {
+        toast.error("At least one assignee is required");
+        setLoading(false);
+        return;
+      }
     }
-    console.log("dueDate before API call: ", dueDate);
     const task = {
       title,
       description,
       priority,
       workspaceId: workspaceId,
       dueDate: dueDate,
-      assigneesIds: selectedAssignees,
+      assigneesIds: (isPersonal ? [user ? user.id : ""] : selectedAssignees),
     };
-    console.log("Task object to send:", task); 
+    console.log("Task object to send:", task);
 
     try {
       const res = await addTaskAPI(task);
       if (res && res.message === "Task created successfully") {
-        console.log("✅ Task added successfully!");
         setLoading(false);
-        setOpen(false); 
-        window.location.reload(); 
+        setOpen(false);
+        setTodos((prev) => [res.task,...prev])
+        toast.success("Task created successfully");
       } else {
         throw new Error("Task creation failed.");
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        toast.error(error.message);
       } else {
-        setError("An unknown error occurred.");
+        toast.error("An unknown error occurred.");
       }
       setLoading(false);
     }
-  }; 
+  };
   useEffect(() => {
     const getWorkspaceMembers = async () => {
-      const response = await fetchMembersByWorkspaceId(workspaceId);
+      const response = await fetchMembersFromWorkspace(workspaceId);
       setMembers(response);
     };
     getWorkspaceMembers();
@@ -129,7 +136,7 @@ export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
       .filter((member) => selectedAssignees.includes(member.user.id))
       .map((member) => member.user.name);
   };
-  
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -148,9 +155,6 @@ export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
             <DialogDescription>
               Create a new task by filling out the form below.
             </DialogDescription>
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
@@ -186,76 +190,77 @@ export function NewTaskDialog({ workspaceId }: { workspaceId: string }) {
                 </Select>
               </div>
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="assignee">Assignees</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "w-full justify-between",
-                      !selectedAssignees.length && "text-muted-foreground"
-                    )}
-                  >
-                    {selectedAssignees.length > 0 ? (
-                      <div className="flex items-center gap-1 truncate">
+            {!isPersonal && (
+                <div className="grid gap-2">
+                  <Label htmlFor="assignee">Assignees</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                              "w-full justify-between",
+                              !selectedAssignees.length && "text-muted-foreground"
+                          )}
+                      >
+                        {selectedAssignees.length > 0 ? (
+                            <div className="flex items-center gap-1 truncate">
                         <span className="truncate">
                           {selectedAssignees.length === 1
-                            ? getSelectedNames()[0]
-                            : `${getSelectedNames()[0]} +${selectedAssignees.length - 1}`}
+                              ? getSelectedNames()[0]
+                              : `${getSelectedNames()[0]} +${selectedAssignees.length - 1}`}
                         </span>
-                      </div>
-                    ) : (
-                      "Select assignees"
-                    )}
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0" align="start">
-                  <div className="max-h-[200px] overflow-auto p-1">
-                    {members.map((member) => (
-                      <div
-                        key={member.user.id}
-                        className="flex items-center space-x-2 rounded-sm px-2 py-1.5 hover:bg-muted cursor-pointer"
-                        onClick={() => toggleAssignee(member.user.id)}
-                      >
-                        <Checkbox
-                          id={`assignee-${member.user.id}`}
-                          checked={selectedAssignees.includes(member.user.id)}
-                          onCheckedChange={() => toggleAssignee(member.user.id)}
-                        />
-                        <label
-                          htmlFor={`assignee-${member.user.id}`}
-                          className="flex-grow cursor-pointer text-sm"
-                        >
-                          {member.user.name}
-                        </label>
-                        {selectedAssignees.includes(member.user.id) && (
-                          <Check className="h-4 w-4" />
+                            </div>
+                        ) : (
+                            "Select assignees"
                         )}
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0" align="start">
+                      <div className="max-h-[200px] overflow-auto p-1">
+                        {members.map((member) => (
+                            <div
+                                key={member.user.id}
+                                className="flex items-center space-x-2 rounded-sm px-2 py-1.5 hover:bg-muted cursor-pointer"
+                                onClick={() => toggleAssignee(member.user.id)}
+                            >
+                              <Checkbox
+                                  id={`assignee-${member.user.id}`}
+                                  checked={selectedAssignees.includes(member.user.id)}
+                                  onCheckedChange={() => toggleAssignee(member.user.id)}
+                              />
+                              <label
+                                  htmlFor={`assignee-${member.user.id}`}
+                                  className="flex-grow cursor-pointer text-sm"
+                              >
+                                {member.user.name}
+                              </label>
+                              {selectedAssignees.includes(member.user.id) && (
+                                  <Check className="h-4 w-4" />
+                              )}
+                            </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                    </PopoverContent>
+                  </Popover>
 
-              {/* Display selected assignees */}
-              {selectedAssignees.length > 0 && (
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {getSelectedNames().map((name, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
-                    >
-                      <User className="h-3 w-3" />
-                      {name}
-                    </div>
-                  ))}
+                  {/* Display selected assignees */}
+                  {selectedAssignees.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {getSelectedNames().map((name, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            >
+                              <User className="h-3 w-3" />
+                              {name}
+                            </div>
+                        ))}
+                      </div>
+                  )}
                 </div>
-              )}
-            </div>
+            )}
           </div>
           <DialogFooter className="flex justify-between sm:justify-end">
             <DialogClose asChild>

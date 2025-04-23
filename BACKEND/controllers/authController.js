@@ -18,9 +18,17 @@ export const login = async (req, res) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) return res.status(401).json({ message: "Invalid Information" });
 
-  const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
-    expiresIn: "30d",
-  });
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      name: user.name + " " + user.lastName,
+    },
+    SECRET,
+    {
+      expiresIn: "30d",
+    }
+  );
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -29,7 +37,6 @@ export const login = async (req, res) => {
     maxAge: 3600 * 1000,
   });
   res.json({
-    user: { id: user.id, email: user.email, name: user.name },
     token,
   });
 };
