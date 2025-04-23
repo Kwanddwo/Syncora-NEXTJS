@@ -164,6 +164,7 @@ model Inbox {
   type      InboxType @default(generic)
   message   String?
   senderId  String?
+  details  Json?
   createdAt DateTime  @default(now())
   read      Boolean   @default(false)
   sender    User?     @relation(fields: [senderId], references: [id])
@@ -250,9 +251,20 @@ enum theme {
 }
 
 enum InboxType {
-  workspace_invite
-  task_alert
-  generic
+  workspace_invite          
+  workspace_role_updated     
+  removed_from_workspace
+  workspace_deleted     
+
+  task_assigned              
+  task_updated               
+  task_status_changed        
+  task_due_soon              
+  task_overdue               
+  task_comment_added         
+
+  admin_announcement        
+  generic                    
 }
 
 enum InviteStatus {
