@@ -598,3 +598,46 @@ export const assignTask = async (req, res) => {
 
  
 }
+
+
+export const unassignTask = async (req, res) => {
+  const userId = req.userId
+  const { taskId, usersToUnassign } = req.body;
+  
+  try {
+    await prisma.taskAssignee.deleteMany({
+      where: {
+        taskId: taskId,
+        userId: {
+          in:usersToUnassign,
+        },
+      },
+    });
+
+    const task = await prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    // Adding this to the inbox table
+ 
+    for (const assigneeId of usersToUnassign) {
+      await prisma.inbox.create({
+        data: {
+          userId: assigneeId,
+          type: "generic",
+          message: "You have been unassigned from a  task!",
+          senderId: userId,
+          details: {
+            task
+          },
+          read: false,
+        },
+      });
+    }
+    res.status(200).json({ message: "Task unassigned successfully" });
+  } catch (error) {
+    console.error("Error unassigning task:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+}
