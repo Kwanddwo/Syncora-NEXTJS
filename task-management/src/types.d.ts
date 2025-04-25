@@ -8,16 +8,16 @@ export interface Workspace {
   id: string;
   name: string;
   description?: string;
-  ownerId ?: string;
+  ownerId?: string;
   defaultOpen: boolean;
-  isPersonal ?:boolean;
-  icon ?:string;
-  tasks : Task[];
+  isPersonal?: boolean;
+  icon?: string;
+  tasks: Task[];
 }
 interface User {
   id: string;
-  name: string;
-  lastName: string;
+  name?: string;
+  lastName?: string;
   email?: string;
   avatarUrl?: string | null;
 }
@@ -56,11 +56,11 @@ export type TaskUpdateRequest = {
 };
 
 export type WorkspaceCreateRequest = {
-  name : string;
-  description? : string;
-  isPersonal : boolean;
-  icon ?: string;
-}
+  name: string;
+  description?: string;
+  isPersonal: boolean;
+  icon?: string;
+};
 
 export type RecentWorkspace = {
   id: string;
@@ -69,3 +69,30 @@ export type RecentWorkspace = {
   viewedAt: string;
   workspace: Workspace;
 };
+
+export type InboxType =
+  | "workspace_invite"
+  | "workspace_role_updated"
+  | "removed_from_workspace"
+  | "workspace_deleted"
+  | "task_assigned"
+  | "task_updated"
+  | "task_status_changed"
+  | "task_due_soon"
+  | "task_overdue"
+  | "task_comment_added"
+  | "admin_announcement"
+  | "generic";
+
+// Inbox model as an interface
+export interface Inbox {
+  id: string;
+  userId: string;
+  type: InboxType;
+  message?: string | null;
+  senderId?: string | null;
+  details?: Record<string, any> | null; // Represents JSON type
+  createdAt: Date;
+  read: boolean;
+  sender?: User | null; // Optional sender field for messages with a sender
+}
