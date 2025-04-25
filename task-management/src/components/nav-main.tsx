@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Plus, type LucideIcon } from "lucide-react";
+import { ChevronRight,type LucideIcon } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/collapsible";
 import {
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -95,9 +94,6 @@ export function NavMain({ items }: { items: NavItem[] }) {
                   />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <SidebarMenuAction showOnHover>
-                <Plus />
-              </SidebarMenuAction>
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.dropdownItems?.map((workspace) => (

@@ -22,6 +22,8 @@ import {useWorkspaces} from "@/context/WorkspaceContext";
 import {Workspace} from "@/types";
 import EmojiSelector from "@/components/EmojiPicker";
 import {toast} from "sonner";
+import {useRouter} from "next/navigation";
+
 
 export default function AddWorkspaceDialog() {
     const nameRef = useRef<HTMLInputElement>(null);
@@ -31,6 +33,7 @@ export default function AddWorkspaceDialog() {
     const [isPersonal, setIsPersonal] = useState(false);
     const {setWorkspaces} = useWorkspaces();
     const [emoji, setEmoji] = useState("");
+    const router = useRouter();
 
     const handleSubmit =async(e:React.FormEvent)=>{
         e.preventDefault();
@@ -56,6 +59,7 @@ export default function AddWorkspaceDialog() {
                 setOpen(false);
                 setWorkspaces((prev) => [...prev, newWorkspace]);
                 toast.success("Workspace created successfully");
+                router.push(`/dashboard/workspace/${newWorkspace.id}`);
             }else {
                 throw new Error("Workspace creation failed.");
             }
@@ -86,13 +90,13 @@ export default function AddWorkspaceDialog() {
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
-                            <Input id="name" placeholder="Enter task title" ref={nameRef} />
+                            <Input id="name" placeholder="Enter workspace title" ref={nameRef} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="description">Description</Label>
                             <Textarea
                                 id="description"
-                                placeholder="Enter task description"
+                                placeholder="Enter workspace description"
                                 ref={descriptionRef}
                             />
                         </div>
