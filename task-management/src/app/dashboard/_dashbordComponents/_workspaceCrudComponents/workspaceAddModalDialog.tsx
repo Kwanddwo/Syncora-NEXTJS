@@ -86,13 +86,13 @@ export default function AddWorkspaceDialog() {
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
-                            <Input id="name" placeholder="Enter task title" ref={nameRef} />
+                            <Input id="name" placeholder="Enter workspace title" ref={nameRef} />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="description">Description</Label>
                             <Textarea
                                 id="description"
-                                placeholder="Enter task description"
+                                placeholder="Enter workspace description"
                                 ref={descriptionRef}
                             />
                         </div>
