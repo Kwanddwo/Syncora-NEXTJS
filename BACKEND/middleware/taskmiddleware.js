@@ -26,7 +26,7 @@ export const extractWorkspaceMemberUserIds = async (req, res, next) => {
  export  const filterAlreadyAssignedUsers = async (req, res, next) => {
     console.log(req.body.memberUserIds)
     try {
-      const { memberUserIds } = req;
+      const { memberUserIds } = req.body;
       const { taskId } = req.body;
   
       const existingAssignees = await prisma.taskAssignee.findMany({
