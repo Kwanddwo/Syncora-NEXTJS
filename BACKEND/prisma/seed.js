@@ -1,50 +1,50 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Starting database seeding...');
+  console.log("Starting database seeding...");
 
   // Clean existing data if needed
   await cleanDatabase();
-  
+
   // Create users with hashed passwords
   const users = await createUsers();
-  
+
   // Create user preferences
   await createUserPreferences(users);
-  
+
   // Create workspaces
   const workspaces = await createWorkspaces(users);
-  
+
   // Create workspace members
   await createWorkspaceMembers(users, workspaces);
-  
+
   // Create tasks
   const tasks = await createTasks(users, workspaces);
-  
+
   // Create task assignees
   await createTaskAssignees(users, tasks);
-  
+
   // Create activity logs
   await createActivityLogs(users, workspaces, tasks);
-  
+
   // Create recent workspaces
   await createRecentWorkspaces(users, workspaces);
-  
+
   // Create inbox notifications
   await createInboxNotifications(users, workspaces);
-  
+
   // Create workspace invites
   await createWorkspaceInvites(users, workspaces);
 
-  console.log('Seeding completed successfully!');
+  console.log("Seeding completed successfully!");
 }
 
 async function cleanDatabase() {
   // Delete in the correct order to respect foreign key constraints
-  console.log('Cleaning existing data...');
-  
+  console.log("Cleaning existing data...");
+
   await prisma.workspaceInvite.deleteMany({});
   await prisma.inbox.deleteMany({});
   await prisma.RecentWorkspace.deleteMany({}); // Corrected to uppercase R
@@ -61,48 +61,48 @@ async function cleanDatabase() {
 }
 
 async function createUsers() {
-  console.log('Creating users...');
-  
+  console.log("Creating users...");
+
   // Create a super admin
   const adminUser = await prisma.user.create({
     data: {
-      email: 'admin@example.com',
-      password: await bcrypt.hash('admin123', 10),
-      name: 'Admin',
-      lastName: 'User',
-      role: 'Super',
-      avatarUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
+      email: "admin@example.com",
+      password: await bcrypt.hash("admin123", 10),
+      name: "Admin",
+      lastName: "User",
+      role: "Super",
+      avatarUrl: "https://randomuser.me/api/portraits/men/1.jpg",
     },
   });
-  
+
   // Create regular users
   const regularUsers = await Promise.all(
     Array.from({ length: 5 }).map(async (_, index) => {
       return prisma.user.create({
         data: {
           email: `user${index + 1}@example.com`,
-          password: await bcrypt.hash('password123', 10),
+          password: await bcrypt.hash("password123", 10),
           name: `User${index + 1}`,
           lastName: `LastName${index + 1}`,
-          role: 'Regular',
+          role: "Regular",
           avatarUrl: `https://randomuser.me/api/portraits/men/${index + 2}.jpg`,
         },
       });
     })
   );
-  
+
   return [adminUser, ...regularUsers];
 }
 
 async function createUserPreferences(users) {
-  console.log('Creating user preferences...');
-  
+  console.log("Creating user preferences...");
+
   return await Promise.all(
     users.map((user, index) => {
       return prisma.userPreferences.create({
         data: {
           userId: user.id,
-          theme: index % 2 === 0 ? 'light' : 'dark',
+          theme: index % 2 === 0 ? "light" : "dark",
           notifications: true,
           emailNotifications: index % 3 === 0,
           taskReminders: true,
@@ -110,7 +110,7 @@ async function createUserPreferences(users) {
           privacyProfileVisibility: true,
           privacyLastSeen: index % 2 === 0,
           taskAutoAccept: index === 0, // Only admin auto-accepts tasks
-          defaultTaskPriority: ['low', 'medium', 'high'][index % 3],
+          defaultTaskPriority: ["low", "medium", "high"][index % 3],
         },
       });
     })
@@ -118,128 +118,128 @@ async function createUserPreferences(users) {
 }
 
 async function createWorkspaces(users) {
-  console.log('Creating workspaces...');
-  
+  console.log("Creating workspaces...");
+
   // Create personal workspace for each user
   const personalWorkspaces = await Promise.all(
     users.map((user) => {
       return prisma.workspace.create({
         data: {
           name: `${user.name}'s Personal Workspace`,
-          description: 'Personal workspace for individual tasks',
+          description: "Personal workspace for individual tasks",
           ownerId: user.id,
           isPersonal: true,
-          icon: '👤',
+          icon: "👤",
         },
       });
     })
   );
-  
+
   // Create shared workspaces
   const sharedWorkspaces = await Promise.all([
     prisma.workspace.create({
       data: {
-        name: 'Marketing Team',
-        description: 'Workspace for marketing team projects',
+        name: "Marketing Team",
+        description: "Workspace for marketing team projects",
         ownerId: users[0].id,
-        icon: '📈',
+        icon: "📈",
       },
     }),
     prisma.workspace.create({
       data: {
-        name: 'Development Team',
-        description: 'Workspace for development projects',
+        name: "Development Team",
+        description: "Workspace for development projects",
         ownerId: users[1].id,
-        icon: '💻',
+        icon: "💻",
       },
     }),
     prisma.workspace.create({
       data: {
-        name: 'Design Team',
-        description: 'Workspace for design projects',
+        name: "Design Team",
+        description: "Workspace for design projects",
         ownerId: users[2].id,
-        icon: '🎨',
+        icon: "🎨",
       },
     }),
   ]);
-  
+
   return [...personalWorkspaces, ...sharedWorkspaces];
 }
 
 async function createWorkspaceMembers(users, workspaces) {
-  console.log('Creating workspace members...');
-  
+  console.log("Creating workspace members...");
+
   const memberships = [];
-  
+
   // For personal workspaces, only add the owner
   for (let i = 0; i < users.length; i++) {
     memberships.push({
       workspaceId: workspaces[i].id,
       userId: users[i].id,
-      role: 'admin',
+      role: "admin",
     });
   }
-  
+
   // For shared workspaces, add multiple members with different roles
   const sharedWorkspaceStartIdx = users.length;
-  
+
   // Marketing Team (first shared workspace)
   memberships.push(
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx].id,
       userId: users[0].id,
-      role: 'admin',
+      role: "admin",
     },
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx].id,
       userId: users[1].id,
-      role: 'member',
+      role: "member",
       invitedById: users[0].id,
     },
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx].id,
       userId: users[2].id,
-      role: 'viewer',
+      role: "viewer",
       invitedById: users[0].id,
     }
   );
-  
+
   // Development Team (second shared workspace)
   memberships.push(
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx + 1].id,
       userId: users[1].id,
-      role: 'admin',
+      role: "admin",
     },
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx + 1].id,
       userId: users[0].id,
-      role: 'member',
+      role: "member",
       invitedById: users[1].id,
     },
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx + 1].id,
       userId: users[3].id,
-      role: 'member',
+      role: "member",
       invitedById: users[1].id,
     }
   );
-  
+
   // Design Team (third shared workspace)
   memberships.push(
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx + 2].id,
       userId: users[2].id,
-      role: 'admin',
+      role: "admin",
     },
     {
       workspaceId: workspaces[sharedWorkspaceStartIdx + 2].id,
       userId: users[4].id,
-      role: 'member',
+      role: "member",
       invitedById: users[2].id,
     }
   );
-  
+
   // Create all memberships
   await Promise.all(
     memberships.map((membership) => {
@@ -251,12 +251,12 @@ async function createWorkspaceMembers(users, workspaces) {
 }
 
 async function createTasks(users, workspaces) {
-  console.log('Creating tasks...');
-  
+  console.log("Creating tasks...");
+
   const tasks = [];
   // Using enum values directly instead of strings
-  const statuses = ['pending', 'in_progress', 'completed'];
-  const priorities = ['low', 'medium', 'high'];
+  const statuses = ["pending", "in_progress", "completed"];
+  const priorities = ["low", "medium", "high"];
 
   // Helper function to generate a date offset from today
   const dateOffset = (days) => {
@@ -264,19 +264,21 @@ async function createTasks(users, workspaces) {
     date.setDate(date.getDate() + days);
     return date;
   };
-  
+
   // Create tasks for each workspace
   for (let i = 0; i < workspaces.length; i++) {
     const workspace = workspaces[i];
-    const owner = users.find(u => u.id === workspace.ownerId) || users[0];
-    
+    const owner = users.find((u) => u.id === workspace.ownerId) || users[0];
+
     // Create 3 tasks per workspace
     for (let j = 0; j < 3; j++) {
       tasks.push(
         await prisma.task.create({
           data: {
             title: `Task ${j + 1} for ${workspace.name}`,
-            description: `This is a ${priorities[j % 3]} priority task for ${workspace.name}`,
+            description: `This is a ${priorities[j % 3]} priority task for ${
+              workspace.name
+            }`,
             // Use the proper enum values
             status: statuses[j % 3],
             priority: priorities[j % 3],
@@ -288,32 +290,32 @@ async function createTasks(users, workspaces) {
         })
       );
     }
-    
+
     // Create a recurring task for each workspace
     await prisma.recurringTask.create({
       data: {
         title: `Weekly Update for ${workspace.name}`,
-        description: 'Regular team update meeting and status report',
+        description: "Regular team update meeting and status report",
         workspaceId: workspace.id,
-        frequency: 'weekly',
+        frequency: "weekly",
       },
     });
   }
-  
+
   return tasks;
 }
 
 async function createTaskAssignees(users, tasks) {
-  console.log('Creating task assignees...');
-  
+  console.log("Creating task assignees...");
+
   const assignees = [];
-  
+
   // Assign tasks to different users
   for (let i = 0; i < tasks.length; i++) {
     // Assign to the task creator and one more user
     const taskCreatorId = tasks[i].createdById;
-    const otherUserId = users.find(u => u.id !== taskCreatorId)?.id;
-    
+    const otherUserId = users.find((u) => u.id !== taskCreatorId)?.id;
+
     if (otherUserId) {
       assignees.push(
         await prisma.taskAssignee.create({
@@ -325,7 +327,7 @@ async function createTaskAssignees(users, tasks) {
         })
       );
     }
-    
+
     // Also self-assign some tasks (only even-numbered tasks)
     if (i % 2 === 0) {
       assignees.push(
@@ -339,110 +341,112 @@ async function createTaskAssignees(users, tasks) {
       );
     }
   }
-  
+
   return assignees;
 }
 
 async function createActivityLogs(users, workspaces, tasks) {
-  console.log('Creating activity logs...');
-  
+  console.log("Creating activity logs...");
+
   // Create user activities
   for (const user of users) {
     await prisma.userActivity.create({
       data: {
         userId: user.id,
-        action: 'logged_in',
-        details: { ip: '192.168.1.1', device: 'Web Browser' },
+        action: "logged_in",
+        details: { ip: "192.168.1.1", device: "Web Browser" },
         createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       },
     });
-    
+
     await prisma.userActivity.create({
       data: {
         userId: user.id,
-        action: 'profile_updated',
-        details: { fields: ['name', 'avatarUrl'] },
+        action: "profile_updated",
+        details: { fields: ["name", "avatarUrl"] },
         createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
       },
     });
   }
-  
+
   // Create workspace activities
   for (const workspace of workspaces) {
     await prisma.workspaceActivity.create({
       data: {
         workspaceId: workspace.id,
         userId: workspace.ownerId,
-        action: 'created',
+        action: "created",
         details: { initialMembers: 1 },
       },
     });
-    
+
     // Only for shared workspaces
     if (!workspace.isPersonal) {
       await prisma.workspaceActivity.create({
         data: {
           workspaceId: workspace.id,
           userId: workspace.ownerId,
-          action: 'member_added',
+          action: "member_added",
           details: { count: 2 },
         },
       });
     }
   }
-  
+
   // Create task activities
   for (const task of tasks) {
     await prisma.taskActivity.create({
       data: {
         taskId: task.id,
         userId: task.createdById,
-        action: 'created',
+        action: "created",
         details: { priority: task.priority },
       },
     });
-    
-    if (task.status === 'in_progress') {
+
+    if (task.status === "in_progress") {
       await prisma.taskActivity.create({
         data: {
           taskId: task.id,
           userId: task.createdById,
-          action: 'status_changed',
-          details: { from: 'pending', to: 'in_progress' },
+          action: "status_changed",
+          details: { from: "pending", to: "in_progress" },
           createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
         },
       });
-    } else if (task.status === 'completed') {
+    } else if (task.status === "completed") {
       await prisma.taskActivity.create({
         data: {
           taskId: task.id,
           userId: task.createdById,
-          action: 'status_changed',
-          details: { from: 'pending', to: 'in_progress' },
+          action: "status_changed",
+          details: { from: "pending", to: "in_progress" },
           createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
         },
       });
-      
+
       await prisma.taskActivity.create({
         data: {
           taskId: task.id,
           userId: task.createdById,
-          action: 'status_changed',
-          details: { from: 'in_progress', to: 'completed' },
+          action: "status_changed",
+          details: { from: "in_progress", to: "completed" },
           createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
         },
       });
     }
-    
+
     // Add a comment to some tasks
-    if (task.id.charAt(0) < 'f') { // Just a way to select some tasks randomly
+    if (task.id.charAt(0) < "f") {
+      // Just a way to select some tasks randomly
       await prisma.taskActivity.create({
         data: {
           taskId: task.id,
           userId: task.createdById,
-          action: 'commented',
-          details: { 
-            comment: 'This is a comment on the task. We should discuss this further.',
+          action: "commented",
+          details: {
+            comment:
+              "This is a comment on the task. We should discuss this further.",
           },
           createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
         },
@@ -452,14 +456,16 @@ async function createActivityLogs(users, workspaces, tasks) {
 }
 
 async function createRecentWorkspaces(users, workspaces) {
-  console.log('Creating recent workspaces...');
-  
+  console.log("Creating recent workspaces...");
+
   const recentEntries = [];
-  
+
   // Each user has viewed some workspaces recently
   for (const user of users) {
     // User's personal workspace
-    const personalWorkspace = workspaces.find(w => w.ownerId === user.id && w.isPersonal);
+    const personalWorkspace = workspaces.find(
+      (w) => w.ownerId === user.id && w.isPersonal
+    );
     if (personalWorkspace) {
       recentEntries.push({
         userId: user.id,
@@ -467,9 +473,11 @@ async function createRecentWorkspaces(users, workspaces) {
         viewedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
       });
     }
-    
+
     // Some shared workspaces
-    const sharedWorkspaces = workspaces.filter(w => !w.isPersonal).slice(0, 2);
+    const sharedWorkspaces = workspaces
+      .filter((w) => !w.isPersonal)
+      .slice(0, 2);
     for (let i = 0; i < sharedWorkspaces.length; i++) {
       recentEntries.push({
         userId: user.id,
@@ -478,11 +486,12 @@ async function createRecentWorkspaces(users, workspaces) {
       });
     }
   }
-  
+
   // Create all recent workspace entries
   await Promise.all(
-    recentEntries.map(entry => {
-      return prisma.RecentWorkspace.create({ // Corrected to uppercase R
+    recentEntries.map((entry) => {
+      return prisma.RecentWorkspace.create({
+        // Corrected to uppercase R
         data: entry,
       });
     })
@@ -490,41 +499,44 @@ async function createRecentWorkspaces(users, workspaces) {
 }
 
 async function createInboxNotifications(users, workspaces) {
-  console.log('Creating inbox notifications...');
-  
+  console.log("Creating inbox notifications...");
+
   // Task assigned notifications
   for (const user of users) {
     await prisma.inbox.create({
       data: {
         userId: user.id,
-        type: 'task_assigned',
-        message: 'You have been assigned a new task',
+        type: "task_assigned",
+        message: "You have been assigned a new task",
         senderId: users[0].id, // Admin user as sender
-        details: { taskId: 'some-task-id', taskTitle: 'Important Task' },
+        details: { taskId: "some-task-id", taskTitle: "Important Task" },
         read: false,
       },
     });
-    
+
     // Task due soon notification
     await prisma.inbox.create({
       data: {
         userId: user.id,
-        type: 'task_due_soon',
+        type: "task_due_soon",
         message: 'Task "Quarterly Report" is due in 2 days',
-        details: { taskId: 'some-task-id', dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString() },
+        details: {
+          taskId: "some-task-id",
+          dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        },
         read: user.id === users[0].id, // Only read for admin
       },
     });
-    
+
     // Admin announcement (only for non-admin users)
-    if (user.role !== 'Super') {
+    if (user.role !== "Super") {
       await prisma.inbox.create({
         data: {
           userId: user.id,
-          type: 'admin_announcement',
-          message: 'System maintenance scheduled for this weekend',
+          type: "admin_announcement",
+          message: "System maintenance scheduled for this weekend",
           senderId: users[0].id, // Admin user
-          details: { importance: 'medium' },
+          details: { importance: "medium" },
           read: false,
         },
       });
@@ -533,53 +545,50 @@ async function createInboxNotifications(users, workspaces) {
 }
 
 async function createWorkspaceInvites(users, workspaces) {
-  console.log('Creating workspace invites...');
-  
+  console.log("Creating workspace invites...");
+
   // Get shared workspaces
-  const sharedWorkspaces = workspaces.filter(w => !w.isPersonal);
-  
+  const sharedWorkspaces = workspaces.filter((w) => !w.isPersonal);
+
   // Create some pending invites
   await prisma.workspaceInvite.create({
     data: {
       workspaceId: sharedWorkspaces[0].id,
       invitedUserId: users[5].id, // Last user
       inviteSenderId: users[0].id, // Admin
-      status: 'pending',
+      status: "pending",
     },
   });
-  
+
   // Create an accepted invite
   await prisma.workspaceInvite.create({
     data: {
       workspaceId: sharedWorkspaces[1].id,
       invitedUserId: users[4].id,
       inviteSenderId: users[1].id,
-      status: 'accepted',
+      status: "accepted",
     },
   });
-  
+
   // Create a declined invite
   await prisma.workspaceInvite.create({
     data: {
       workspaceId: sharedWorkspaces[2].id,
       invitedUserId: users[3].id,
       inviteSenderId: users[2].id,
-      status: 'declined',
+      status: "declined",
     },
   });
 }
 
 main()
   .catch((e) => {
-    console.error('Error during seeding:', e);
+    console.error("Error during seeding:", e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-
-
 
 /*
 import { PrismaClient } from '@prisma/client';
