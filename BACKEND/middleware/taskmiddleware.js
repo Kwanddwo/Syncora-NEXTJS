@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 export const extractWorkspaceMemberUserIds = async (req, res, next) => {
     try {
       const { workspaceMemberIds } = req.body;
-  
       const memberUserIds = await prisma.workspaceMember.findMany({
         where: {
           id: {
@@ -15,18 +14,17 @@ export const extractWorkspaceMemberUserIds = async (req, res, next) => {
           userId: true,
         },
       });
-  
-      req.memberUserIds = memberUserIds.map(m => m.userId);
-  
+      req.body.memberUserIds = memberUserIds.map(m => m.userId);
+
       next();
     } catch (error) {
       console.error("Error extracting user ids:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   };
-  
+
  export  const filterAlreadyAssignedUsers = async (req, res, next) => {
-    console.log(req.memberUserIds)
+    console.log(req.body.memberUserIds)
     try {
       const { memberUserIds } = req;
       const { taskId } = req.body;
@@ -50,6 +48,32 @@ export const extractWorkspaceMemberUserIds = async (req, res, next) => {
       next();
     } catch (error) {
       console.error("Error filtering assigned users:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+ export  const filterUnassignedUsers = async (req, res, next) => {
+    try {
+      const { memberUserIds, taskId } = req.body;
+      if (!memberUserIds || !Array.isArray(memberUserIds) || !taskId) {
+        return res.status(400).json({ message: 'userIds and taskId are required.' });
+      }
+      const assignedUsers = await prisma.taskAssignee.findMany({
+        where: {
+          taskId: taskId,
+        },
+        select: {
+          userId: true,
+        },
+      });
+
+      const assignedUserIds = assignedUsers.map(a => a.userId);
+      const usersToUnassign = memberUserIds.filter(id => assignedUserIds.includes(id));
+      console.log("users to kick : ",usersToUnassign)
+      req.body.usersToUnassign = usersToUnassign;
+      
+      next();
+    } catch (error) {
+      console.error("Error filtering unassigned users:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   };
