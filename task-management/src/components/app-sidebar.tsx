@@ -6,10 +6,9 @@ import * as React from "react";
 import Logo from "./Logo";
 import {
   Building,
-  Calendar,
+  Calendar, Inbox,
   LayoutDashboard,
   LogOut,
-  Search,
   Settings2,
   User,
 } from "lucide-react";
@@ -23,11 +22,7 @@ import { useWorkspaces } from "@/context/WorkspaceContext";
 
 const data = {
   navMain: [
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
+
     {
       title: "Dashbord",
       url: "/dashboard",
@@ -47,6 +42,11 @@ const data = {
       icon: User,
       hasDropdown: true,
       dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string }[],
+    },
+    {
+      title: "Inbox",
+      url: "#",
+      icon: Inbox,
     },
   ],
   navSecondary: [
