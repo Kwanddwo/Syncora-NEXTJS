@@ -47,3 +47,11 @@ router.post("/assign",
     taskmiddleware.extractWorkspaceMemberUserIds,
     taskmiddleware.filterAlreadyAssignedUsers,
     taskController.assignTask);
+router.delete("/unassign",
+    handleInputError,
+    authenticateUser,
+    workspaceMiddleware.verifyworkspace,
+    workspaceMiddleware.userMembershipCheck,
+    taskmiddleware.extractWorkspaceMemberUserIds,
+    taskmiddleware.filterUnassignedUsers,
+    taskController.unassignTask);
