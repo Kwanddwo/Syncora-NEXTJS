@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || "secret";
 
 export const verifyToken = async (req, res, next) => {
