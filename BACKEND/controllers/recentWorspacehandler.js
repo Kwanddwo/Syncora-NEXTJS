@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
+
 export const prisma = new PrismaClient();
 
 export const addRecentWorkspace = async (req, res) => {
@@ -21,10 +23,9 @@ export const addRecentWorkspace = async (req, res) => {
 
         return res.status(201).json(recentWorkspace);
     } catch (error) {
-        if (error instanceof prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
             return res.status(200).json({ message: 'Recent workspace already exists' });
         }
-
         console.error(error);
         return res.status(500).json({ error: 'Failed to store recent workspace' });
     }
