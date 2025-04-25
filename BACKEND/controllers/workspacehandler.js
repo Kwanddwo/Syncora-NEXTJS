@@ -54,7 +54,6 @@ export const deleteWorkspace = async (req, res) => {
         return res.status(500).json({ message: 'Failed to delete workspace', error: error.message });
     }
 };
-
 export const getWorkspacesByuserId = async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -116,13 +115,13 @@ export const getMembersByWorkspaceId = async (req, res) => {
         console.log("Error fetching members:", error);
     }
 }
-
-
-
 export const addMemberToWorkspace = async (req, res) => {
+   if (req.is_personal){
+    return res.status(400).json({ message: 'You cannot add members to a personal workspace.' });
+   }
   const { workspaceId, memberId, role } = req.body;
   console.log("Adding member to workspace:", { workspaceId, memberId, role });
- 
+  
   try {
     const existingMember = await prisma.workspaceMember.findFirst({
       where: {
@@ -152,8 +151,6 @@ export const addMemberToWorkspace = async (req, res) => {
     return res.status(500).json({ message: 'An error occurred while adding the member.' });
   }
 };
-
-
 export const removeMemberFromWorkspace = async (req, res) => {
     const { workspaceId, memberId } = req.body;
     const currentUserId = req.userId;
@@ -186,37 +183,25 @@ export const exitWorkspace = async (req, res) => {
             userId
         },
         select: { role: true },
+     
     });
-    if (req.is_owner) {
-        return res.status(400).json({ message: 'Workspace owner cannot leave the workspace.' });
+  
+    if (req.is_owner && !req.is_personal) {
+        return res.status(400).json({ message: 'Workspace owner cannot leave the workspace.'});
+    }else if (req.is_owner && req.is_personal) {
+        // If the owner is leaving a personal workspace, delete the workspace
+        await prisma.workspace.delete({
+            where: { id: workspaceId },
+        });
+        return res.status(200).json({ message: 'You have left the workspace and it has been deleted.' });
     }
-    await prisma.workspaceMember.deleteMany({
-        where: { workspaceId, userId },
-    });
-    return res.status(200).json({ message: 'You have left the workspace.' });
-
+    else{
+        await prisma.workspaceMember.deleteMany({
+            where: { workspaceId, userId },
+        });
+        return res.status(200).json({ message: 'You have left the workspace.' });
+    }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const changeUserRole = async (req, res) => {
     const { workspaceId, memberId, newRole } = req.body;
     const currentUserId = req.userId;

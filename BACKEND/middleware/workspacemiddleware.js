@@ -1,9 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 export const prisma = new PrismaClient();
-import jwt from "jsonwebtoken";
 dotenv.config();
-const SECRET = process.env.JWT_SECRET || "secret";
 export const verifyworkspace = async (req, res, next) => {
     const { workspaceId } = req.body;
     if (!workspaceId) {
@@ -41,6 +39,7 @@ export const userMembershipCheck = async (req, res, next) => {
             console.error("User is not a member of the specified workspace");
 
         }
+        req.workspacemember = workspaceMembership;
         console.log("User verified successfully in workspace:");
 
 
@@ -55,10 +54,9 @@ export const adminPrivileges = async (req, res, next) => {
     const userId = req.userId;
     console.log("userId:", userId);
     const { workspaceId } = req.body.workspaceId;
+    const member = req.workspacemember;
     try {
-      const member = await prisma.workspaceMember.findFirst({
-        where: { userId, workspaceId },
-      });
+    
       if (member.role !== "admin") {
         return res.status(403).json({ message: "Admin privileges required"});
       }
@@ -97,3 +95,18 @@ export const checkIsOwner = async (req, res, next) => {
     res.status(500).json({ message: 'Server error checking ownership.' });
   }
 };
+export const checkIsPersonal = async (req, res, next) => {
+  const workspaceId = req.body.workspaceId;
+  try {
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: workspaceId },
+      select: { isPersonal: true },
+    });
+    req.is_personal = workspace.isPersonal;
+    next();
+
+  } catch (error) {
+    console.error('checkIsPersonal middleware error:', error);
+    res.status(500).json({ message: 'Server error checking personal workspace.' });
+  }
+}
