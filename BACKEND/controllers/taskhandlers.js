@@ -549,3 +549,52 @@ export const getTasksByUserId = async (req, res) => {
     console.log(error);
   }
 };
+
+
+
+export const assignTask = async (req, res) => {
+  const userId = req.userId;
+  const { taskId, assigneeIds } = req.body;
+
+  if (!taskId || !assigneeIds || assigneeIds.length === 0) {
+    return res.status(400).json({ error: "taskId and assigneeIds are required" });
+  }
+  try {
+   
+    const taskAssignees = assigneeIds.map((assigneeId) => ({
+      taskId,
+      userId: assigneeId,
+      assignedById: userId,
+    }));
+
+    await prisma.taskAssignee.createMany({
+      data: taskAssignees,
+    });
+    res.status(200).json({ message: "Task assigned successfully" });
+  } catch (error) {
+    console.error("Error assigning task:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+  const task = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+    },
+  });
+  // Adding this to the inbox table
+  for (const assigneeId of assigneeIds) {
+    await prisma.inbox.create({
+      data: {
+        userId: assigneeId,
+        type: "task_assigned",
+        message: "You have been assigned a new task",
+        senderId: userId,
+        details: {
+          task
+        },
+        read: false,
+      },
+    });
+  }
+
+ 
+}
