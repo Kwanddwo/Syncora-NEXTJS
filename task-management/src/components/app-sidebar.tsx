@@ -6,10 +6,9 @@ import * as React from "react";
 import Logo from "./Logo";
 import {
   Building,
-  Calendar,
+  Calendar, Inbox,
   LayoutDashboard,
   LogOut,
-  Search,
   Settings2,
   User,
 } from "lucide-react";
@@ -23,13 +22,9 @@ import { useWorkspaces } from "@/context/WorkspaceContext";
 
 const data = {
   navMain: [
+
     {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-    {
-      title: "Dashbord",
+      title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
       isActive: true,
@@ -43,10 +38,15 @@ const data = {
     },
     {
       title: "Personal",
-      url: "/dashboard/personal",
+      url: "/dashboard/workspace",
       icon: User,
       hasDropdown: true,
       dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string }[],
+    },
+    {
+      title: "Inbox",
+      url: "#",
+      icon: Inbox,
     },
   ],
   navSecondary: [
@@ -85,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.hasDropdown && item.title == "Personal") {
         item.dropdownItems = personalWorkspaces.map((workspace) => ({
           name: workspace.name,
-          url: `/dashboard/personal/${workspace.id}`,
+          url: `/dashboard/workspace/${workspace.id}`,
           active: workspace.id === "someDefaultWorkspaceId",
           icon:workspace.icon,
         }));

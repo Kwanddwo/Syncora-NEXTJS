@@ -36,19 +36,12 @@ export function NavRecent() {
       <SidebarGroupLabel>Recent</SidebarGroupLabel>
       <SidebarMenu>
         {recent.map((item) => (
-          <SidebarMenuItem key={item.workspaceId}>
+          <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild>
-              {item.workspace.isPersonal ? (
-                  <Link href={`/dashboard/personal/${item.workspaceId}`} title={item.workspace.name}>
-                    <span>{item.workspace.icon}</span>
-                    <span>{item.workspace.name}</span>
-                  </Link>
-              ) : (
                   <Link href={`/dashboard/workspace/${item.workspaceId}`} title={item.workspace.name}>
                     <span>{item.workspace.icon}</span>
                     <span>{item.workspace.name}</span>
                   </Link>
-              )}
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

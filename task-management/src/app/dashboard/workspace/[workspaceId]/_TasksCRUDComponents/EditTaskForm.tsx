@@ -40,10 +40,12 @@ export function EditTaskDialog({
   workspaceId,
   taskId,
   setTodos,
+    isPersonal,
 }: {
   workspaceId: string;
   taskId :string
   setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+  isPersonal: boolean;
 }) {
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
@@ -167,76 +169,77 @@ export function EditTaskDialog({
                 </Select>
               </div>
             </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="assignee">Assignees</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "w-full justify-between",
-                      !selectedAssignees.length && "text-muted-foreground"
-                    )}
-                  >
-                    {selectedAssignees.length > 0 ? (
-                      <div className="flex items-center gap-1 truncate">
+            {!isPersonal && (
+                <div className="grid gap-2">
+                  <Label htmlFor="assignee">Assignees</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                              "w-full justify-between",
+                              !selectedAssignees.length && "text-muted-foreground"
+                          )}
+                      >
+                        {selectedAssignees.length > 0 ? (
+                            <div className="flex items-center gap-1 truncate">
                         <span className="truncate">
                           {selectedAssignees.length === 1
-                            ? getSelectedNames()[0]
-                            : `${getSelectedNames()[0]} +${selectedAssignees.length - 1}`}
+                              ? getSelectedNames()[0]
+                              : `${getSelectedNames()[0]} +${selectedAssignees.length - 1}`}
                         </span>
-                      </div>
-                    ) : (
-                      "Select assignees"
-                    )}
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0" align="start">
-                  <div className="max-h-[200px] overflow-auto p-1">
-                    {members.map((member) => (
-                      <div
-                        key={member.user.id}
-                        className="flex items-center space-x-2 rounded-sm px-2 py-1.5 hover:bg-muted cursor-pointer"
-                        onClick={() => toggleAssignee(member.user.id)}
-                      >
-                        <Checkbox
-                          id={`assignee-${member.user.id}`}
-                          checked={selectedAssignees.includes(member.user.id)}
-                          onCheckedChange={() => toggleAssignee(member.user.id)}
-                        />
-                        <label
-                          htmlFor={`assignee-${member.user.id}`}
-                          className="flex-grow cursor-pointer text-sm"
-                        >
-                          {member.user.name}
-                        </label>
-                        {selectedAssignees.includes(member.user.id) && (
-                          <Check className="h-4 w-4" />
+                            </div>
+                        ) : (
+                            "Select assignees"
                         )}
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0" align="start">
+                      <div className="max-h-[200px] overflow-auto p-1">
+                        {members.map((member) => (
+                            <div
+                                key={member.user.id}
+                                className="flex items-center space-x-2 rounded-sm px-2 py-1.5 hover:bg-muted cursor-pointer"
+                                onClick={() => toggleAssignee(member.user.id)}
+                            >
+                              <Checkbox
+                                  id={`assignee-${member.user.id}`}
+                                  checked={selectedAssignees.includes(member.user.id)}
+                                  onCheckedChange={() => toggleAssignee(member.user.id)}
+                              />
+                              <label
+                                  htmlFor={`assignee-${member.user.id}`}
+                                  className="flex-grow cursor-pointer text-sm"
+                              >
+                                {member.user.name}
+                              </label>
+                              {selectedAssignees.includes(member.user.id) && (
+                                  <Check className="h-4 w-4" />
+                              )}
+                            </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                    </PopoverContent>
+                  </Popover>
 
-              {/* Display selected assignees */}
-              {selectedAssignees.length > 0 && (
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {getSelectedNames().map((name, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
-                    >
-                      <User className="h-3 w-3" />
-                      {name}
-                    </div>
-                  ))}
+                  {/* Display selected assignees */}
+                  {selectedAssignees.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {getSelectedNames().map((name, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            >
+                              <User className="h-3 w-3" />
+                              {name}
+                            </div>
+                        ))}
+                      </div>
+                  )}
                 </div>
-              )}
-            </div>
+            )}
           </div>
           <DialogFooter className="flex justify-between sm:justify-end">
             <DialogClose asChild>

@@ -46,6 +46,7 @@ export function useRecentWorkspaces() {
           console.error("User is not authenticated");
           return;
         }
+
         const res = await createRecentWorkspaceAPI(workspaceId, user.id);
 
         if (!res) {

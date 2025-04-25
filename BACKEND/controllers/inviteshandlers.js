@@ -25,13 +25,16 @@ export const CreateInvite = async (req, res) => {
           status: "pending"
         }
       });
-   
       const inboxEntry = await prisma.inbox.create({
         data: {
           userId: invitedUserId,
           senderId: inviteSenderId,
           type: "workspace_invite",
-          message: `${inviteSenderEmail} invited you to join a workspace.`,
+          details: {
+            inviteId: invite.id,
+            
+          },
+          message: `${inviteSenderEmail} invited you to join  his workspace .`,
         },
       });
       res.status(201).json({
@@ -85,6 +88,27 @@ export const DeclineInvite = async (req, res) => {
     res.status(500).json({ message: "Failed to decline invite." });
   }
 }
+export const GetInviteByIdFromInbox = async (req, res) => {
+  const inviteId = req.details.inviteId; // get the fucking  invite ID from the request body
+  try {
+    const invite = await prisma.workspaceInvite.findUnique({
+      where: {
+        id: inviteId,
+      },
+    }); 
+    if (!invite) {
+      return res.status(404).json({ message: "Invite not found." });
+    }
+    res.status(200).json(invite);
+
+  } catch (error) {
+    console.error("Error fetching invite by ID:", error);
+    res.status(500).json({ message: "Failed to fetch invite." });
+    
+  }
+}
+export const GetUserInvites = async (req, res) => {} // will be useful if we decide to create an inbox filter
+
 
 
 
