@@ -66,7 +66,11 @@ export type RecentWorkspace = {
   viewedAt: string;
   workspace: Workspace;
 };
-
+export type TaskAssignee={
+  taskId: string;
+  workspaceId: string;
+  workspaceMemberIds ?: string[];
+}
 export type InboxType =
   | "workspace_invite"
   | "workspace_role_updated"
