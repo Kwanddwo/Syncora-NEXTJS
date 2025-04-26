@@ -4,8 +4,6 @@ import * as taskController from "../controllers/taskhandlers.js"
 import * as workspaceMiddleware from "../middleware/workspacemiddleware.js"
 import * as taskmiddleware from "../middleware/taskmiddleware.js"
 import { authenticateUser } from "../middleware/middleware.js";
-import * as taskmiddleware from "../middleware/taskmiddleware.js"
-import { authenticateUser } from "../middleware/middleware.js";
 import express from "express"
 const router = express.Router();
 
