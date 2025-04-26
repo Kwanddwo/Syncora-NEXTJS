@@ -19,7 +19,7 @@ interface User {
   name?: string;
   lastName?: string;
   email?: string;
-  avatarUrl?: string | null;
+  avatarUrl?: string | undefined;
 }
 
 interface AssignedBy {
