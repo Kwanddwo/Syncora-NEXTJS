@@ -33,7 +33,7 @@ export default function MembersTab({ workspaceId }: { workspaceId: string }) {
             </div>
           </div>
 
-          <InviteDialog workspaceId={workspaceId} />
+          <InviteDialog workspaceId={workspaceId} members={members} />
 
           <div className="space-y-2 pt-2">
             {members &&
