@@ -1,12 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { GetInviteByIdFromInbox } from "./inviteshandlers.js";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 
 const prisma = new PrismaClient();   
-
-
 /*
 req includes:
      an array of userIDs or one userID
@@ -15,10 +12,9 @@ req includes:
      the senderID or in cases where there is no sender it will simply show system
      
 */
-
 export const addToInbox = async (req,res) => {
 
-        const {recievers,senderId,message,type} = req.body;
+        const {recievers,senderId,message,type, Inboxdetails} = req.body;
         try{
            if (!recievers || recievers.length === 0) {
                return res.status(400).json({ message: "Recievers are required" });
@@ -37,13 +33,15 @@ export const addToInbox = async (req,res) => {
                const inbox = await prisma.inbox.create({
                    data: {
                        senderId: senderId,
-                       recieverId: recieverId,
+                       userId: recieverId,
                        message: message,
                        type: type,
+                    details: Inboxdetails,
+                    read: false,
                    },
                });
            }
-           res.status(200).json({ message: "Inbox created successfully" });
+        
         }catch (error) {
            console.error("Error creating inbox:", error);
            res.status(500).json({ message: "Internal server error" });
@@ -76,13 +74,8 @@ export const viewInboxdetail = async (req, res) => {
                 id: inboxId,
             },
         });
-        req.details=inbox.details; // include the details of the inbox in the request object
-        if (inbox.type === "workspace_invite") {
-            const inviteDetails = await GetInviteByIdFromInbox(req, res);
-            res.status(200).json(inviteDetails);
-        } else {
-            res.status(200).json(inbox);
-        }
+            res.status(200).json(inbox.details);
+        
     } catch (error) {
         console.error("Error fetching inbox details:", error);
         res.status(500).json({ message: "Internal server error" });
