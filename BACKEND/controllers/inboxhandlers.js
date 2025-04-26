@@ -10,7 +10,6 @@ req includes:
      the senderID or in cases where there is no sender it will simply show system
      
 */
-
 export const addToInbox = async (req, res) => {
   const { recievers, senderId, message, type } = req.body;
   try {
@@ -31,13 +30,13 @@ export const addToInbox = async (req, res) => {
       const inbox = await prisma.inbox.create({
         data: {
           senderId: senderId,
-          recieverId: recieverId,
+          userId: recieverId,
           message: message,
           type: type,
+          read: false,
         },
       });
     }
-    res.status(200).json({ message: "Inbox created successfully" });
   } catch (error) {
     console.error("Error creating inbox:", error);
     res.status(500).json({ message: "Internal server error" });
