@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,32 +13,26 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Plus } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { fetchMembersFromWorkspace } from "@/app/_api/WorkspacesAPIs";
 import { ClipLoader } from "react-spinners";
 import { toast } from "sonner";
 import { sendInviteAPI } from "@/app/_api/InviteAPI";
 import { getUsersFromEmailAPI } from "@/app/_api/UsersAPIs";
 
 import { User } from "@/types";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { WorkspaceMember } from "@/lib/types";
 
-export function InviteDialog({ workspaceId }: { workspaceId: string }) {
-  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+export function InviteDialog({
+  workspaceId,
+  members,
+}: {
+  workspaceId: string;
+  members: WorkspaceMember[] | undefined | null;
+}) {
   const [userList, setUserList] = useState<User[]>([]);
-  const [invitedUserId, setInvitedUserId] = useState("");
+  const [invitedUser, setInvitedUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,14 +41,14 @@ export function InviteDialog({ workspaceId }: { workspaceId: string }) {
     e.preventDefault();
     setLoading(true);
 
-    if (!invitedUserId) {
+    if (!invitedUser) {
       toast.error("Please select a user to invite.");
       setLoading(false);
       return;
     }
 
     try {
-      const res = await sendInviteAPI(invitedUserId, workspaceId);
+      const res = await sendInviteAPI(workspaceId, invitedUser.id);
       if (res && res.message) {
         setLoading(false);
         setOpen(false);
@@ -71,13 +65,6 @@ export function InviteDialog({ workspaceId }: { workspaceId: string }) {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    const getWorkspaceMembers = async () => {
-      const response = await fetchMembersFromWorkspace(workspaceId);
-      setMembers(response);
-    };
-    getWorkspaceMembers();
-  }, [workspaceId]);
 
   useEffect(() => {
     console.log("Email changed:", email);
@@ -86,8 +73,14 @@ export function InviteDialog({ workspaceId }: { workspaceId: string }) {
         console.log("Fetching users from email API...");
         const { users } = await getUsersFromEmailAPI(email);
         console.log("Users fetched:", users);
-        if (users && users.length > 0) {
-          setUserList(users);
+        const filteredUsers = members
+          ? users.filter(
+              (user: User) =>
+                !members.map((member) => member.user.id).includes(user.id)
+            )
+          : users;
+        if (filteredUsers && filteredUsers.length > 0) {
+          setUserList(filteredUsers);
         } else {
           setUserList([]);
         }
@@ -112,49 +105,92 @@ export function InviteDialog({ workspaceId }: { workspaceId: string }) {
           <DialogHeader>
             <DialogTitle>Invite user</DialogTitle>
             <DialogDescription>
-              Invite a new user to your workspace
+              Invite an user to your workspace
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                placeholder="Enter email address"
-                onChange={(e) => setEmail(e.target.value)}
-              />
+          {invitedUser ? (
+            <div
+              key={invitedUser.id}
+              className="flex items-center gap-2 rounded-md border-2 my-2 py-2 px-3"
+            >
+              <Avatar>
+                <AvatarImage src={invitedUser.avatarUrl} />
+                <AvatarFallback>
+                  {invitedUser.name &&
+                    invitedUser.name.charAt(0).toUpperCase() +
+                      (invitedUser.lastName &&
+                        invitedUser.lastName.charAt(0).toUpperCase())}
+                </AvatarFallback>
+              </Avatar>
+              <span>{invitedUser.name}</span>
+              {invitedUser.lastName && <span>{invitedUser.lastName}</span>}
+              <Button
+                type="button"
+                variant="outline"
+                className="ml-auto"
+                onClick={() => setInvitedUser(null)}
+              >
+                Remove
+              </Button>
             </div>
-            <div className="grid gap-2">
-              {email.length > 2 && userList.length > 0 && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start">
-                      {userList[0].name}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-72 p-4">
+          ) : (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  placeholder="Enter email address"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                {email.length > 2 && userList.length > 0 && (
+                  <ScrollArea>
                     <div className="flex flex-col gap-2">
                       {userList.map((user) => (
-                        <div key={user.id} className="flex items-center gap-2">
-                          {/* <Avatar src={user.avatarUrl} alt={user.name} /> */}
-                          <span>{user.name}</span>
+                        <div
+                          key={user.id}
+                          className="flex items-center gap-2 hover:cursor-pointer hover:bg-slate-100 rounded-md border-2 py-2 px-3"
+                          onClick={() => {
+                            setInvitedUser(user);
+                          }}
+                        >
+                          <Avatar>
+                            <AvatarImage src={user.avatarUrl} />
+                            <AvatarFallback>
+                              {user.name &&
+                                user.name.charAt(0).toUpperCase() +
+                                  (user.lastName &&
+                                    user.lastName.charAt(0).toUpperCase())}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm text-muted-foreground">
+                            {user.name} {user.lastName && user.lastName}
+                          </span>
+                          <span className="text-sm ml-auto">{user.email}</span>
                         </div>
                       ))}
                     </div>
-                  </PopoverContent>
-                </Popover>
-              )}
+                  </ScrollArea>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           <DialogFooter className="flex justify-between sm:justify-end">
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setInvitedUser(null)}
+              >
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="button" onClick={handleSubmit}>
-              Invite
-            </Button>
+            {invitedUser && (
+              <Button type="button" onClick={handleSubmit}>
+                Invite
+              </Button>
+            )}
           </DialogFooter>
         </form>
         {loading && (
