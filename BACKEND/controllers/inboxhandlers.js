@@ -1,9 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { GetInviteByIdFromInbox } from "./inviteshandlers.js";
-dotenv.config();
-const SECRET = process.env.JWT_SECRET || "secret";
-
 const prisma = new PrismaClient();
 
 /*
@@ -56,18 +52,30 @@ export const getUserInbox = async (req, res) => {
         userId,
       },
       include: {
-        sender: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        sender: true,
       },
       orderBy: {
         createdAt: "desc",
       },
     });
-    res.status(200).json(inbox);
+
+    const augmentedItems = await Promise.all(
+      inbox.map(async (item) => {
+        if (item.type === "workspace_invite" && item.details?.inviteId) {
+          const invite = await prisma.workspaceInvite.findUnique({
+            where: { id: item.details.inviteId },
+            include: { workspace: { select: { id: true, name: true } } },
+          });
+
+          if (invite) {
+            item.details.invite = invite;
+          }
+        }
+        return item;
+      })
+    );
+
+    res.status(200).json(augmentedItems);
   } catch (error) {
     console.error("Error fetching inbox:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -83,13 +91,27 @@ export const viewInboxdetail = async (req, res) => {
       where: {
         id: inboxId,
       },
+      include: { sender: true },
     });
-    req.details = inbox.details; // include the details of the inbox in the request object
+    if (!inbox) {
+      return res.status(404).json({ message: "Inbox not found" });
+    }
+
     if (inbox.type === "workspace_invite") {
-      const inviteDetails = await GetInviteByIdFromInbox(req, res);
-      res.status(200).json(inviteDetails);
-    } else {
-      res.status(200).json(inbox);
+      const invite = await prisma.workspaceInvite.findUnique({
+        where: { id: inbox.details.inviteId },
+        include: {
+          workspace: true,
+          inviteSender: {
+            select: { name: true, email: true },
+          },
+        },
+      });
+
+      inbox.details.invite = invite;
+      return res.status(200).json({
+        inbox,
+      });
     }
   } catch (error) {
     console.error("Error fetching inbox details:", error);
