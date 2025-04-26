@@ -1,6 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+export const verifyTask  = async (req, res, next) => {
+    try {
+      const taskId = req.body.taskId;
+      if (!taskId) {
+        return res.status(400).json({ message: "Task ID is required" });
+      }
+      const task = await prisma.task.findUnique({
+        where: {
+          id: taskId,
+        },
+      });
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      req.body.task = task;
+      next();
+    } catch (error) {
+      console.error("Error verifying task:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
 export const extractWorkspaceMemberUserIds = async (req, res, next) => {
     try {
       const { workspaceMemberIds } = req.body;
@@ -51,6 +72,7 @@ export const extractWorkspaceMemberUserIds = async (req, res, next) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+  // Technically , this doesnt follow the logic in the frontend, but it works, so tal mn ba3ed wn bdlha 
  export  const filterUnassignedUsers = async (req, res, next) => {
     try {
       const { memberUserIds, taskId } = req.body;
@@ -77,3 +99,6 @@ export const extractWorkspaceMemberUserIds = async (req, res, next) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+
+  

@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { addToInbox } from "./inboxhandlers.js";
 export const prisma = new PrismaClient();
 
 
@@ -132,6 +133,70 @@ export const UpdateTask = async (req, res) => {
     res.status(500).json({ error: "Internal server error", details: error.message });
   }
 };
+
+export const updateTaskPriority = async (req, res) => {
+  const userId = req.userId;
+  const { taskId, workspaceId, priority } = req.body;
+  if (!taskId || !workspaceId || !priority) {
+    return res.status(400).json({ error: "taskId, workspaceId, and priority are required" });
+  }
+  try {
+    const task = await prisma.task.update({
+      where:{
+        id: taskId,
+      },
+      data: {
+        priority: priority,
+      },
+    });
+    // DABA let us send some notification to evryone assigned to the task
+    // And to the admins of the workspace
+    const taskAssignees = await prisma.taskAssignee.findMany({
+      where: {
+        taskId: taskId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+    const taskAssigneeIds = taskAssignees.map((assignee) => assignee.userId);
+    const workspaceAdmins = await prisma.workspaceMember.findMany({
+      where: {
+        workspaceId: workspaceId,
+        role: 'admin',
+      },
+      select: {
+        userId: true,
+      },
+    });
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        name: true,
+      }});
+    const workspaceAdminIds = workspaceAdmins.map((admin) => admin.userId);
+    const allUserIds = [...new Set([...taskAssigneeIds, ...workspaceAdminIds])];
+    const inboxmessage = `This admin ${user.name} priority of task ${task.title} has been changed to ${priority}`
+    // Adding this to the inbox table
+    req.body.Inboxdetails = {
+      task
+    }
+    console.log("message", inboxmessage),
+    req.body.recievers = allUserIds; 
+    req.body.senderId = userId ;
+    req.body.message = inboxmessage;
+    req.body.type = "task_updated";
+    addToInbox(req, res);
+    res.status(200).json({ message: "Task priority updated successfully to " + priority });
+
+  } catch (error) {
+    console.error("Error updating task priority:", error);
+    return res.status(500).json({ error: "Internal server error", details: error.message });
+    
+  }
+}
 
 export const updateTaskStatus = async (req, res) => {
   const userId = req.userId;
