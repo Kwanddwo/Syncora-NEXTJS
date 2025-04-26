@@ -128,9 +128,9 @@ export default function InboxPage() {
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {Date.now() - notif.createdAt.getTime() < 1000 * 60
+                    {Date.now() - new Date(notif.createdAt).getTime() < 1000 * 60
                       ? "Just now"
-                      : notif.createdAt.toLocaleDateString("fr-MA", {
+                      :  new Date(notif.createdAt).toLocaleDateString("fr-MA", {
                           year: "numeric",
                           month: "2-digit",
                           day: "2-digit",
