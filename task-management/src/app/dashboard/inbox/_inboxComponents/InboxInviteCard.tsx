@@ -3,20 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Inbox } from "@/types";
-import { useRouter } from "next/navigation";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { toast } from "sonner";
 
-const InboxInviteCard = (notif: Inbox) => {
-  const router = useRouter();
-
+const InboxInviteCard = (notif: Inbox, router: AppRouterInstance) => {
   const notifDate = new Date(notif.createdAt);
 
-  const handleInviteAccept = async (inviteId: string) => {
+  const handleInviteAccept = async (inviteId: string, workspaceId: string) => {
     try {
       const response = await acceptInviteAPI(inviteId);
       console.log("Invite accepted:", response.data);
       toast.success("Invite accepted successfully!");
-      router.push("/dashboard/workspace/" + response.data.workspaceId);
+      router.push("/dashboard/workspace/" + workspaceId);
     } catch (error) {
       console.error("Error accepting invite:", error);
       toast.error("Failed to accept invite.");
@@ -28,6 +26,7 @@ const InboxInviteCard = (notif: Inbox) => {
       const response = await declineInviteAPI(inviteId);
       console.log("Invite declined:", response.data);
       toast.success("Invite declined successfully!");
+      router.refresh();
     } catch (error) {
       console.error("Error declining invite:", error);
       toast.error("Failed to decline invite.");
@@ -88,7 +87,12 @@ const InboxInviteCard = (notif: Inbox) => {
         {notif.details?.invite.status === "pending" ? (
           <div className="flex gap-2 align-items-center">
             <Button
-              onClick={() => handleInviteAccept(notif.details?.invite.id)}
+              onClick={() =>
+                handleInviteAccept(
+                  notif.details?.invite.id,
+                  notif.details?.invite.workspaceId
+                )
+              }
             >
               Accept
             </Button>

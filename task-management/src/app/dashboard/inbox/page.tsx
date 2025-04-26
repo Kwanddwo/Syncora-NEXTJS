@@ -24,8 +24,10 @@ import {
 import { useInbox } from "@/context/InboxContext";
 import InboxInviteCard from "./_inboxComponents/InboxInviteCard";
 import InboxGeneralCard from "./_inboxComponents/InboxGeneralCard";
+import { useRouter } from "next/navigation";
 
 export default function InboxPage() {
+  const router = useRouter();
   const { inbox, fetchInbox, setInbox } = useInbox();
 
   return (
@@ -106,7 +108,7 @@ export default function InboxPage() {
           {inbox.map((notif) => {
             switch (notif.type) {
               case "workspace_invite":
-                return InboxInviteCard(notif);
+                return InboxInviteCard(notif, router);
               default:
                 return InboxGeneralCard(notif);
             }
