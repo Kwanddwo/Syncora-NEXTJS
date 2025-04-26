@@ -43,16 +43,13 @@ export type TaskRequest = {
   priority: string;
   workspaceId: string;
   dueDate: string;
-  assigneesIds: string[];
 };
 
 export type TaskUpdateRequest = {
   title: string | undefined;
   description?: string | undefined;
-  priority: string | undefined;
   workspaceId: string;
   dueDate: string | undefined;
-  assignees: string[] | null;
 };
 
 export type WorkspaceCreateRequest = {
@@ -69,3 +66,9 @@ export type RecentWorkspace = {
   viewedAt: string;
   workspace: Workspace;
 };
+
+export type TaskAssignee={
+  taskId: string;
+  workspaceId: string;
+  workspaceMemberIds ?: string[];
+}
