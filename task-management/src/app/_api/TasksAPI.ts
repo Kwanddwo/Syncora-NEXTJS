@@ -77,8 +77,11 @@ export const updateTaskAPI = async (workspaceId :string,taskId : string,task:Tas
 }
 
 export const getTasksByWorkspaceId =async(workspaceId :string) =>{
+    const token = localStorage.getItem("token")
     try{
-        const response = await axios.post(GET_TASKS_API,{workspaceId});
+        const response = await axios.post(GET_TASKS_API,{workspaceId},{
+            headers : { Authorization: `Bearer ${token}` },
+        });
         return response.data;
     }catch(error){
         console.error(
