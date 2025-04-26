@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-
+import { addToInbox } from "./inboxhandlers.js";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 const prisma = new PrismaClient();
@@ -273,6 +273,70 @@ export const UpdateTask = async (req, res) => {
       .json({ error: "Internal server error", details: error.message });
   }
 };
+export const updateTaskPriority = async (req, res) => {
+  const userId = req.userId;
+  const { taskId, workspaceId, priority } = req.body;
+  if (!taskId || !workspaceId || !priority) {
+    return res.status(400).json({ error: "taskId, workspaceId, and priority are required" });
+  }
+  try {
+    const task = await prisma.task.update({
+      where: {
+        id: taskId,
+      },
+      data: {
+        priority: priority,
+      },
+    });
+    // DABA let us send some notification to evryone assigned to the task
+    // And to the admins of the workspace
+    const taskAssignees = await prisma.taskAssignee.findMany({
+      where: {
+        taskId: taskId,
+      },
+      select: {
+        userId: true,
+      },
+    });
+    const taskAssigneeIds = taskAssignees.map((assignee) => assignee.userId);
+    const workspaceAdmins = await prisma.workspaceMember.findMany({
+      where: {
+        workspaceId: workspaceId,
+        role: 'admin',
+      },
+      select: {
+        userId: true,
+      },
+    });
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        name: true,
+      }
+    });
+    const workspaceAdminIds = workspaceAdmins.map((admin) => admin.userId);
+    const allUserIds = [...new Set([...taskAssigneeIds, ...workspaceAdminIds])];
+    const inboxmessage = `This admin ${user.name} priority of task ${task.title} has been changed to ${priority}`
+    // Adding this to the inbox table
+    req.body.Inboxdetails = {
+      task
+    }
+    console.log("message", inboxmessage),
+      req.body.recievers = allUserIds;
+    req.body.senderId = userId;
+    req.body.message = inboxmessage;
+    req.body.type = "task_updated";
+    addToInbox(req, res);
+    res.status(200).json({ message: "Task priority updated successfully to " + priority });
+
+  } catch (error) {
+    console.error("Error updating task priority:", error);
+    return res.status(500).json({ error: "Internal server error", details: error.message });
+
+  }
+}
 export const updateTaskStatus = async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
@@ -549,3 +613,95 @@ export const getTasksByUserId = async (req, res) => {
     console.log(error);
   }
 };
+
+
+
+export const assignTask = async (req, res) => {
+  const userId = req.userId;
+  const { taskId, assigneeIds } = req.body;
+
+  if (!taskId || !assigneeIds || assigneeIds.length === 0) {
+    return res.status(400).json({ error: "taskId and assigneeIds are required" });
+  }
+  try {
+
+    const taskAssignees = assigneeIds.map((assigneeId) => ({
+      taskId,
+      userId: assigneeId,
+      assignedById: userId,
+    }));
+
+    await prisma.taskAssignee.createMany({
+      data: taskAssignees,
+    });
+    res.status(200).json({ message: "Task assigned successfully" });
+  } catch (error) {
+    console.error("Error assigning task:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+  const task = await prisma.task.findUnique({
+    where: {
+      id: taskId,
+    },
+  });
+  // Adding this to the inbox table
+  for (const assigneeId of assigneeIds) {
+    await prisma.inbox.create({
+      data: {
+        userId: assigneeId,
+        type: "task_assigned",
+        message: "You have been assigned a new task",
+        senderId: userId,
+        details: {
+          task
+        },
+        read: false,
+      },
+    });
+  }
+
+
+}
+
+export const unassignTask = async (req, res) => {
+  const userId = req.userId
+  const { taskId, usersToUnassign } = req.body;
+
+  try {
+    await prisma.taskAssignee.deleteMany({
+      where: {
+        taskId: taskId,
+        userId: {
+          in: usersToUnassign,
+        },
+      },
+    });
+    // Adding this to the inbox table 
+
+    const task = await prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+    });
+    // Adding this to the inbox table
+    // Create inbox notifications for each assignee
+    for (const assigneeId of usersToUnassign) {
+      await prisma.inbox.create({
+        data: {
+          userId: assigneeId,
+          type: "generic",
+          message: "You have been unassigned from a  task!",
+          senderId: userId,
+          details: {
+            task
+          },
+          read: false,
+        },
+      });
+    }
+    res.status(200).json({ message: "Task unassigned successfully" });
+  } catch (error) {
+    console.error("Error unassigning task:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
+}
