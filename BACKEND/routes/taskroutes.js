@@ -7,7 +7,6 @@ import { authenticateUser } from "../middleware/middleware.js";
 import express from "express"
 const router = express.Router();
 
-
 router.post('/tasks',
     handleInputError,
     authenticateUser,
@@ -55,7 +54,6 @@ router.post("/assign",
     authenticateUser,
     workspaceMiddleware.verifyworkspace,
     workspaceMiddleware.userMembershipCheck,
-
     taskmiddleware.extractWorkspaceMemberUserIds,
     taskmiddleware.filterAlreadyAssignedUsers,
 
@@ -68,6 +66,7 @@ router.delete("/unassign",
     taskmiddleware.extractWorkspaceMemberUserIds,
     taskmiddleware.filterUnassignedUsers,
     taskController.unassignTask);
+
 router.put("/updatePriority",
     handleInputError,
     authenticateUser,

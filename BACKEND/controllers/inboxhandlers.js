@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 
-const prisma = new PrismaClient();   
+
+const prisma = new PrismaClient();
+
+
 /*
 req includes:
      an array of userIDs or one userID
@@ -49,35 +52,53 @@ export const addToInbox = async (req,res) => {
            
        }
 
+
+
 export const getUserInbox = async (req, res) => {
-    const userId = req.userId
-    try {
-        const inbox = await prisma.inbox.findMany({
-            where: {
-                userId,
-            },
-        });
-        res.status(200).json(inbox);
-    } catch (error) {
-        console.error("Error fetching inbox:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-}
-// the following function  checks the type of the inbox, 
-//eg if it is an invite, it will get the invite id from the details of 
+  const userId = req.userId;
+  try {
+    const inbox = await prisma.inbox.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json(inbox);
+  } catch (error) {
+    console.error("Error fetching inbox:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+// the following function  checks the type of the inbox,
+//eg if it is an invite, it will get the invite id from the details of
 // that inbox and return every single detail  from that invite and option to accpet it of refuse it
 export const viewInboxdetail = async (req, res) => {
-    const inboxId = req.body.inboxId;
-    try {
-        const inbox = await prisma.inbox.findUnique({
-            where: {
-                id: inboxId,
-            },
-        });
-            res.status(200).json(inbox.details);
-        
-    } catch (error) {
-        console.error("Error fetching inbox details:", error);
-        res.status(500).json({ message: "Internal server error" });
+  const inboxId = req.body.inboxId;
+  try {
+    const inbox = await prisma.inbox.findUnique({
+      where: {
+        id: inboxId,
+      },
+    });
+    req.details = inbox.details; // include the details of the inbox in the request object
+    if (inbox.type === "workspace_invite") {
+      const inviteDetails = await GetInviteByIdFromInbox(req, res);
+      res.status(200).json(inviteDetails);
+    } else {
+      res.status(200).json(inbox);
     }
-}
+  } catch (error) {
+    console.error("Error fetching inbox details:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

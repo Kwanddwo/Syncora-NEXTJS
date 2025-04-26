@@ -133,6 +133,7 @@ export const UpdateTask = async (req, res) => {
     res.status(500).json({ error: "Internal server error", details: error.message });
   }
 };
+
 export const updateTaskPriority = async (req, res) => {
   const userId = req.userId;
   const { taskId, workspaceId, priority } = req.body;
@@ -196,6 +197,7 @@ export const updateTaskPriority = async (req, res) => {
     
   }
 }
+
 export const updateTaskStatus = async (req, res) => {
   const userId = req.userId;
 
