@@ -18,7 +18,7 @@ function RecentWorkspaces() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white cursor-pointer">
             <AddWorkspaceDialog/>
           </div>
-          <div className="mt-2 text-center">Add/Join...</div>
+          <div className="mt-2 text-center">Create</div>
         </Card>
         {personalWorkspaces.map(item => (
             <Link key={item.id} href={`/dashboard/workspace/${item.workspaceId}`} className="hover:no-underline">
