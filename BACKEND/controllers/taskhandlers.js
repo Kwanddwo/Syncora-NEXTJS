@@ -1,7 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import { addToInbox } from "./inboxhandlers.js";
-export const prisma = new PrismaClient();
-
+dotenv.config();
+const SECRET = process.env.JWT_SECRET || "secret";
+const prisma = new PrismaClient();
 
 export const CreateTask = async (req, res) => {
   try {
@@ -130,10 +133,11 @@ export const UpdateTask = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating task:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
-
 export const updateTaskPriority = async (req, res) => {
   const userId = req.userId;
   const { taskId, workspaceId, priority } = req.body;
@@ -142,7 +146,7 @@ export const updateTaskPriority = async (req, res) => {
   }
   try {
     const task = await prisma.task.update({
-      where:{
+      where: {
         id: taskId,
       },
       data: {
@@ -175,7 +179,8 @@ export const updateTaskPriority = async (req, res) => {
       },
       select: {
         name: true,
-      }});
+      }
+    });
     const workspaceAdminIds = workspaceAdmins.map((admin) => admin.userId);
     const allUserIds = [...new Set([...taskAssigneeIds, ...workspaceAdminIds])];
     const inboxmessage = `This admin ${user.name} priority of task ${task.title} has been changed to ${priority}`
@@ -184,8 +189,8 @@ export const updateTaskPriority = async (req, res) => {
       task
     }
     console.log("message", inboxmessage),
-    req.body.recievers = allUserIds; 
-    req.body.senderId = userId ;
+      req.body.recievers = allUserIds;
+    req.body.senderId = userId;
     req.body.message = inboxmessage;
     req.body.type = "task_updated";
     addToInbox(req, res);
@@ -194,17 +199,29 @@ export const updateTaskPriority = async (req, res) => {
   } catch (error) {
     console.error("Error updating task priority:", error);
     return res.status(500).json({ error: "Internal server error", details: error.message });
-    
+
   }
 }
-
 export const updateTaskStatus = async (req, res) => {
-  const userId = req.userId;
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
 
+  let decoded;
+  try {
+    decoded = jwt.verify(token, SECRET);
+  } catch (error) {
+    return res.status(403).json({ error: "Invalid or expired token" });
+  }
+
+  const userId = decoded.id;
   const { taskId, workspaceId, status } = req.body;
 
   if (!taskId || !workspaceId || !status) {
-    return res.status(400).json({ error: "taskId, workspaceId, and status are required" });
+    return res
+      .status(400)
+      .json({ error: "taskId, workspaceId, and status are required" });
   }
 
   try {
@@ -212,8 +229,8 @@ export const updateTaskStatus = async (req, res) => {
     const isAssignee = await prisma.taskAssignee.findFirst({
       where: {
         taskId,
-        userId
-      }
+        userId,
+      },
     });
 
     // Check if user is admin in the workspace
@@ -221,18 +238,20 @@ export const updateTaskStatus = async (req, res) => {
       where: {
         workspaceId,
         userId,
-        role: 'admin'
-      }
+        role: "admin",
+      },
     });
 
     if (!isAssignee || !isAdmin) {
-      return res.status(403).json({ error: "Unauthorized: Not an assignee or workspace admin" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized: Not an assignee or workspace admin" });
     }
 
     // Update task status
     const updatedTask = await prisma.task.update({
       where: { id: taskId },
-      data: { status }
+      data: { status },
     });
 
     // Optionally log this activity
@@ -240,17 +259,20 @@ export const updateTaskStatus = async (req, res) => {
       data: {
         taskId,
         userId,
-        action: 'status_changed',
-        details: { newStatus: status }
-      }
+        action: "status_changed",
+        details: { newStatus: status },
+      },
     });
 
     return res.status(200).json({ message: "Task status updated" });
   } catch (error) {
     console.error("Error updating task status:", error);
-    return res.status(500).json({ error: "Internal server error", details: error.message });
+    return res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
+
 export const getAllTasks = async (req, res) => {
   try {
     const { workspaceId } = req.body;
@@ -360,62 +382,38 @@ export const getAllTasks = async (req, res) => {
 ]
 
  */
-
-/**expected return 
- [
-  {
-    "id": 1,
-    "title": "Design Homepage",
-    "description": "Create a responsive homepage design.",
-    "createdAt": "2023-10-01T10:00:00Z",
-    "workspace": {
-      "id": 101,
-      "name": "Marketing Team",
-      "icon": "https://example.com/icons/marketing.png"
-    },
-    "createdBy": {
-      "id": 201,
-      "name": "Alice",
-      "lastName": "Smith",
-      "email": "alice@example.com"
-    },
-    "assignees": [
-      {
-        "user": {
-          "id": 301,
-          "name": "Bob",
-          "lastName": "Johnson",
-          "email": "bob@example.com",
-          "avatarUrl": "https://example.com/avatars/bob.png"
-        },
-        "assignedBy": {
-          "id": 201,
-          "name": "Alice",
-          "lastName": "Smith"
-        }
-      },
-      {
-        "user": {
-          "id": 302,
-          "name": "Charlie",
-          "lastName": "Brown",
-          "email": "charlie@example.com",
-          "avatarUrl": "https://example.com/avatars/charlie.png"
-        },
-        "assignedBy": {
-          "id": 201,
-          "name": "Alice",
-          "lastName": "Smith"
-        }
-      }
-    ]
-  }
-]
-
- */
 export const getTasksByUserId = async (req, res) => {
   try {
-    const userId = req.userId;
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      console.error("Authorization header missing or malformed");
+      return res.status(401).json({ error: "No Token Provided" });
+    }
+
+    // Decode token to extract user ID
+    let decoded;
+    try {
+      decoded = jwt.verify(token, SECRET);
+    } catch (error) {
+      if (error.name === "TokenExpiredError") {
+        console.error("Token has expired:", error);
+        return res.status(403).json({ error: "Token Expired" });
+      } else if (error.name === "JsonWebTokenError") {
+        console.error("Invalid token:", error);
+        return res.status(403).json({ error: "Invalid Token" });
+      } else {
+        console.error("Error decoding token:", error);
+        return res
+          .status(500)
+          .json({ error: "Token Decoding Error", details: error.message });
+      }
+    }
+
+    const userId = decoded.id;
+
+    // Debugging log (before using the variable)
+    console.log("Decoded userId:", userId);
+
     if (!userId) {
       console.error("Decoded token does not contain a user ID");
       return res.status(401).json({ error: "Unauthorized: User ID Missing" });
@@ -424,9 +422,9 @@ export const getTasksByUserId = async (req, res) => {
       where: {
         assignees: {
           some: {
-            userId: userId
-          }
-        }
+            userId: userId,
+          },
+        },
       },
       include: {
         assignees: {
@@ -437,37 +435,37 @@ export const getTasksByUserId = async (req, res) => {
                 name: true,
                 lastName: true,
                 email: true,
-                avatarUrl: true
-              }
+                avatarUrl: true,
+              },
             },
             assignedBy: {
               select: {
                 id: true,
                 name: true,
-                lastName: true 
-              }
-            }
-          }
+                lastName: true,
+              },
+            },
+          },
         },
         createdBy: {
           select: {
             id: true,
             name: true,
             lastName: true,
-            email: true
-          }
+            email: true,
+          },
         },
         workspace: {
           select: {
             id: true,
             name: true,
-            icon: true 
-          }
-        }
+            icon: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     console.log("tasks:", tasks);
@@ -478,9 +476,11 @@ export const getTasksByUserId = async (req, res) => {
     console.error("Error fetching tasks for user:", error);
     res.status(500).json({ error: "Internal server error" });
     console.log(error);
-
   }
 };
+
+
+
 export const assignTask = async (req, res) => {
   const userId = req.userId;
   const { taskId, assigneeIds } = req.body;
@@ -489,11 +489,13 @@ export const assignTask = async (req, res) => {
     return res.status(400).json({ error: "taskId and assigneeIds are required" });
   }
   try {
+
     const taskAssignees = assigneeIds.map((assigneeId) => ({
       taskId,
       userId: assigneeId,
       assignedById: userId,
     }));
+
     await prisma.taskAssignee.createMany({
       data: taskAssignees,
     });
@@ -521,18 +523,21 @@ export const assignTask = async (req, res) => {
         read: false,
       },
     });
-  } 
+  }
+
+
 }
+
 export const unassignTask = async (req, res) => {
   const userId = req.userId
   const { taskId, usersToUnassign } = req.body;
-  
+
   try {
     await prisma.taskAssignee.deleteMany({
       where: {
         taskId: taskId,
         userId: {
-          in:usersToUnassign,
+          in: usersToUnassign,
         },
       },
     });

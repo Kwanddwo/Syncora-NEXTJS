@@ -48,7 +48,6 @@ router.put("/updateStatus",
     
     taskController.updateTaskStatus);
 
-
 router.post("/assign",
     handleInputError,
     authenticateUser,
@@ -56,7 +55,6 @@ router.post("/assign",
     workspaceMiddleware.userMembershipCheck,
     taskmiddleware.extractWorkspaceMemberUserIds,
     taskmiddleware.filterAlreadyAssignedUsers,
-
     taskController.assignTask);
 router.delete("/unassign",
     handleInputError,
@@ -66,15 +64,13 @@ router.delete("/unassign",
     taskmiddleware.extractWorkspaceMemberUserIds,
     taskmiddleware.filterUnassignedUsers,
     taskController.unassignTask);
-
 router.put("/updatePriority",
     handleInputError,
     authenticateUser,
     workspaceMiddleware.verifyworkspace,
     workspaceMiddleware.userMembershipCheck,
-    workspaceMiddleware.adminPrivileges,
+   /*  workspaceMiddleware.adminPrivileges, */
     taskmiddleware.verifyTask,
-    
-    taskController.updateTaskPriority);
 
-    export default router;
+    taskController.updateTaskPriority);
+export default router;
