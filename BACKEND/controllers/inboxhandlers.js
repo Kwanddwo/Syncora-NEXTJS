@@ -4,6 +4,8 @@ dotenv.config();
 const SECRET = process.env.JWT_SECRET || "secret";
 
 
+
+const prisma = new PrismaClient();
 const prisma = new PrismaClient();
 
 
@@ -51,6 +53,8 @@ export const addToInbox = async (req,res) => {
          }
            
        }
+
+
 
 
 
