@@ -9,9 +9,13 @@ const prisma = new PrismaClient();
 export const CreateTask = async (req, res) => {
   try {
     const userId = req.userId;
-
-    const { title, description, priority, workspaceId, dueDate, assigneeIds } =
-      req.body;
+    const {
+      title,
+      description,
+      workspaceId,
+      priority,
+      dueDate,
+    } = req.body;
 
     const newTask = await prisma.task.create({
       data: {
@@ -21,29 +25,58 @@ export const CreateTask = async (req, res) => {
         workspaceId,
         dueDate: new Date(dueDate),
         createdById: userId,
-        status: "pending",
+        status: 'pending',
         priorityOrder: 0,
       },
     });
 
-    if (assigneeIds && assigneeIds.length > 0) {
-      const taskAssignees = assigneeIds.map((assigneeId) => ({
-        taskId: newTask.id,
-        userId: assigneeId,
-        assignedById: userId,
-      }));
-
-      await prisma.taskAssignee.createMany({
-        data: taskAssignees,
-      });
-    }
-
-    res.status(201).json({ message: "Task created successfully" });
+    const fullTask = await prisma.task.findUnique({
+      where: { id: newTask.id },
+      include: {
+        assignees: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+            assignedBy: {
+              select: {
+                id: true,
+                name: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        workspace: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+          },
+        },
+      },
+    });
+    return res.status(201).json({
+      message: "Task created successfully",
+      task: fullTask,
+    });
   } catch (error) {
-    console.error("Error creating task:", error);
-    res
-      .status(500)
-      .json({ error: "Internal server error", details: error.message });
+    console.error('Error creating task:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
 
