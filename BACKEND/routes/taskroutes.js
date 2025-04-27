@@ -16,7 +16,12 @@ router.post(
   getAllTasks
 );
 
-router.get("/usertasks", taskController.getTasksByUserId);
+router.post(
+  "/user",
+  handleInputError,
+  authenticateUser,
+  taskController.getTasksByUserId
+);
 
 router.post(
   "/create",
