@@ -24,16 +24,13 @@ function RecentWorkspaces() {
                     <Link key={item.id} href={`/dashboard/workspace/${item.workspaceId}`} className="hover:no-underline">
                         <Card className="flex h-36 w-36 flex-col items-center justify-center">
                             <div
-                                className={`flex h-16 w-16 items-center justify-center rounded-md cursor-pointer ${
-                                    item.workspace.icon == null ? 'bg-gray-300' : ''
-                                }`}
-                            >
-                                {item.workspace.icon != null ? (
-                                    <span className="h-10 w-10 flex items-center justify-center text-gray-500 text-3xl">
-                                {item.workspace.icon}
-                             </span>
-                                ) : (
+                                className="flex h-16 w-16 items-center justify-center rounded-md cursor-pointer" >
+                                {(item.workspace.icon == null || item.workspace.icon == '') ? (
                                     <User className="h-10 w-10 text-gray-500" />
+                                ) : (
+                                    <span className="h-10 w-10 flex items-center justify-center text-gray-500 text-3xl">
+                                         {item.workspace.icon}
+                                </span>
                                 )}
                             </div>
                             <div className="mt-2 text-center text-gray-500 text-sm">{item.workspace.name}</div>
@@ -46,17 +43,13 @@ function RecentWorkspaces() {
                         <Card
                             className="flex h-36 w-36 flex-col items-center justify-center"
                         >
-                            <div
-                                className={`flex h-16 w-16 items-center justify-center rounded-md cursor-pointer ${
-                                    item.workspace.icon == null ? 'bg-gray-300' : ''
-                                }`}
-                            >
-                                {item.workspace.icon != null ? (
-                                    <span className="h-10 w-10 flex items-center justify-center text-gray-500 text-3xl">
-                                {item.workspace.icon}
-                             </span>
-                                ) : (
+                            <div className="flex h-16 w-16 items-center justify-center rounded-md cursor-pointer">
+                                {(item.workspace.icon == null || item.workspace.icon == '') ? (
                                     <ImageIcon className="h-10 w-10 text-gray-500" />
+                                ) : (
+                                    <span className="h-10 w-10 flex items-center justify-center text-gray-500 text-3xl">
+                                        {item.workspace.icon}
+                                 </span>
                                 )}
                             </div>
                             <div className="mt-2 text-center text-gray-500 text-sm">{item.workspace.name}</div>
