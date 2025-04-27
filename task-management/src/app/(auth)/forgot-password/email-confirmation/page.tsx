@@ -1,35 +1,35 @@
-"use client"
-import { Button } from '@/components/ui/button';
-import {  useSearchParams } from 'next/navigation';
-import React, { useRef} from 'react'
-import {codeVerificationAPI, resetPassAPI} from "@/app/_api/ResetPassAPIs";
-import { toast } from 'sonner';
+"use client";
+import { Button } from "@/components/ui/button";
+import { useSearchParams } from "next/navigation";
+import React, { useRef } from "react";
+import { codeVerificationAPI, resetPassAPI } from "@/app/_api/ResetPassAPIs";
+import { toast } from "sonner";
 function EmailConfirmation() {
   const codeRef = useRef<HTMLInputElement>(null);
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
-  const handleSubmit =async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const code= codeRef.current?.value;
-    if(!code){
+    const code = codeRef.current?.value;
+    if (!code) {
       toast.error("Code Verification is required");
       return;
     }
-    if(!email){
+    if (!email) {
       toast.error("Error while sending email address");
       return;
     }
     try {
-     const verificationResponse = await codeVerificationAPI(email,code);
-     if (verificationResponse.data.message) {
-       const resetResponse = await resetPassAPI(email);
-       const token = resetResponse.data.token;
-       localStorage.setItem("resetToken", token);
-       window.location.href = "/forgot-password/reset-password/";
-     } else {
-       toast.error("Failed to verify the code. Please try again.");
-     }
+      const verificationResponse = await codeVerificationAPI(email, code);
+      if (verificationResponse.data.message) {
+        const resetResponse = await resetPassAPI(email);
+        const token = resetResponse.data.token;
+        localStorage.setItem("resetToken", token);
+        window.location.href = "/forgot-password/reset-password/";
+      } else {
+        toast.error("Failed to verify the code. Please try again.");
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err.response) {
@@ -38,22 +38,23 @@ function EmailConfirmation() {
             "Failed to verify the code. Please try again."
         );
       } else if (err.request) {
-        toast.error("Network error. Please check your connection and try again.");
+        toast.error(
+          "Network error. Please check your connection and try again."
+        );
       } else {
         toast.error("An unexpected error occurred. Please try again.");
       }
 
       toast.error("Verification or reset error:", err);
     }
-    
   };
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+    <div className="flex justify-center items-center h-screen bg-background">
+      <div className="bg-background p-6 rounded-lg shadow-lg max-w-sm w-full">
         <h2 className="text-2xl font-semibold text-center mb-4">
           Enter Verification Code
         </h2>
-        <p className="text-gray-600 text-sm text-center mb-6">
+        <p className="text-muted-foreground text-sm text-center mb-6">
           A verification code has been sent to your email address. Please check
           your inbox and enter the 6-digit code below to proceed.
         </p>
@@ -62,19 +63,15 @@ function EmailConfirmation() {
             <input
               type="text"
               ref={codeRef}
-              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-tag-blue"
               placeholder="Enter 6-digit code"
             />
           </div>
-          <Button
-            type="submit"
-          >
-            Verify
-          </Button>
+          <Button type="submit">Verify</Button>
         </form>
       </div>
     </div>
   );
 }
 
-export default EmailConfirmation
+export default EmailConfirmation;

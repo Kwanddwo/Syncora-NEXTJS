@@ -51,7 +51,7 @@ function ActiveWorkspaces() {
             }
           >
             <CollapsibleTrigger
-              className="flex w-full items-center justify-between rounded-md bg-gray-200 p-3"
+              className="flex w-full items-center justify-between rounded-md bg-background p-3"
               onClick={() => toggleWorkspace(workspace.id)}
             >
               <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ function ActiveWorkspaces() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                      className="text-red-500 focus:text-red-500"
+                      className="text-tag-destructive focus:text-tag-destructive"
                       asChild
                     >
                       <DeleteWorkspaceAlert workspaceId={workspace.id} />

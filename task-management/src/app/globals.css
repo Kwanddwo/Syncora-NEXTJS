@@ -45,16 +45,18 @@
   --sidebar-border: var(--color-slate-200);
   --sidebar-ring: var(--color-slate-300);
 
-  --tag-red: var(--color-red-100);
-  --tag-red-foreground: var(--color-red-700);
-  --tag-blue: var(--color-blue-100);
-  --tag-blue-foreground: var(--color-blue-700);
-  --tag-green: var(--color-green-100);
-  --tag-green-foreground: var(--color-green-700);
-  --tag-yellow: var(--color-yellow-100);
-  --tag-yellow-foreground: var(--color-yellow-700);
-  --tag-neutral: var(--color-gray-100);
-  --tag-neutral-foreground: var(--color-gray-700);
+  --tag-red: hsl(354, 90%, 95%);
+  --tag-red-foreground: hsl(354, 70%, 40%);
+  --tag-blue: hsl(210, 90%, 95%);
+  --tag-blue-foreground: hsl(210, 70%, 40%);
+  --tag-green: hsl(142, 70%, 95%);
+  --tag-green-foreground: hsl(142, 65%, 35%);
+  --tag-yellow: hsl(45, 90%, 95%);
+  --tag-yellow-foreground: hsl(45, 90%, 35%);
+  --tag-purple: hsl(270, 70%, 95%);
+  --tag-purple-foreground: hsl(270, 60%, 40%);
+  --tag-neutral: hsl(220, 15%, 95%);
+  --tag-neutral-foreground: hsl(220, 15%, 35%);
 }
 
 .dark {
@@ -90,16 +92,18 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: var(--color-slate-600);
 
-  --tag-red: var(--color-red-700);
-  --tag-red-foreground: var(--color-red-50);
-  --tag-blue: var(--color-blue-700);
-  --tag-blue-foreground: var(--color-blue-50);
-  --tag-green: var(--color-green-700);
-  --tag-green-foreground: var(--color-green-50);
-  --tag-yellow: var(--color-yellow-700);
-  --tag-yellow-foreground: var(--color-yellow-50);
-  --tag-neutral: var(--color-gray-700);
-  --tag-neutral-foreground: var(--color-gray-200);
+  --tag-red: hsl(354, 70%, 35%);
+  --tag-red-foreground: hsl(354, 90%, 95%);
+  --tag-blue: hsl(210, 70%, 35%);
+  --tag-blue-foreground: hsl(210, 90%, 95%);
+  --tag-green: hsl(142, 60%, 30%);
+  --tag-green-foreground: hsl(142, 70%, 90%);
+  --tag-yellow: hsl(45, 80%, 40%);
+  --tag-yellow-foreground: hsl(45, 90%, 95%);
+  --tag-purple: hsl(270, 50%, 35%);
+  --tag-purple-foreground: hsl(270, 70%, 95%);
+  --tag-neutral: hsl(220, 15%, 30%);
+  --tag-neutral-foreground: hsl(220, 15%, 90%);
 }
 
 @theme inline {

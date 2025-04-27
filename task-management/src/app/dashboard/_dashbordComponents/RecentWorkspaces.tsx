@@ -27,10 +27,10 @@ function RecentWorkspaces() {
             className="hover:no-underline"
           >
             <Card className="flex h-36 w-36 flex-col items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-300 cursor-pointer">
-                <User className="h-10 w-10 text-gray-500" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-card cursor-pointer">
+                <User className="h-10 w-10 text-muted-foreground" />
               </div>
-              <div className="mt-2 text-center text-gray-500">
+              <div className="mt-2 text-center text-muted-foreground">
                 {item.workspace.name}
               </div>
             </Card>
@@ -43,10 +43,10 @@ function RecentWorkspaces() {
             className="hover:no-underline"
           >
             <Card className="flex h-36 w-36 flex-col items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-md bg-gray-300 cursor-pointer">
-                <ImageIcon className="h-10 w-10 text-gray-500" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-md bg-card cursor-pointer">
+                <ImageIcon className="h-10 w-10 text-muted-foreground" />
               </div>
-              <div className="mt-2 text-center text-gray-500">
+              <div className="mt-2 text-center text-muted-foreground">
                 {item.workspace.name}
               </div>
             </Card>

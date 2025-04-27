@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +14,7 @@ import { Delete } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteTaskAPI } from "@/app/_api/TasksAPI";
 import { Task } from "@/lib/types";
-import {toast} from "sonner";
+import { toast } from "sonner";
 export default function DeleteTaskAlert({
   workspaceId,
   taskId,
@@ -27,13 +27,10 @@ export default function DeleteTaskAlert({
   const handleDeleteClick = async () => {
     try {
       const res = await deleteTaskAPI(workspaceId, taskId);
-      setTodos(prev => prev.filter((todo) => todo.id != res.deletedTask.id))
+      setTodos((prev) => prev.filter((todo) => todo.id != res.deletedTask.id));
       toast.success("Task deleted successfully.");
     } catch (error) {
-        console.error(
-          `Error Deleting task ${taskId}:`,
-          error
-        );
+      console.error(`Error Deleting task ${taskId}:`, error);
       toast.error("Error deleting task");
     }
   };
@@ -43,7 +40,7 @@ export default function DeleteTaskAlert({
         <AlertDialogTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full h-8 justify-start text-[#ef4444] focus:text-[#ef4444] cursor-pointer"
+            className="w-full h-8 justify-start text-destructive focus:text-destructive cursor-pointer"
           >
             <Delete className="mr-2 h-2 w-4" />
             Delete
@@ -58,7 +55,9 @@ export default function DeleteTaskAlert({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteClick}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteClick}>
+              Continue
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
