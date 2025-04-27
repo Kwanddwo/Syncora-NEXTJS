@@ -44,7 +44,7 @@ router.put("/updateStatus",
     authenticateUser,
     workspaceMiddleware.verifyworkspace,
     workspaceMiddleware.userMembershipCheck,
-    workspaceMiddleware.adminPrivileges,
+    /* workspaceMiddleware.adminPrivileges, */
     
     taskController.updateTaskStatus);
 
