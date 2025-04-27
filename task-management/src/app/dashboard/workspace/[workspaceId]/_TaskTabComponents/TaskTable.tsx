@@ -1,20 +1,19 @@
 "use client"
 import React, {useState} from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {Check, ChevronDown, ChevronRight, MoreHorizontal, User} from 'lucide-react';
+import { ChevronRight, MoreHorizontal, User} from 'lucide-react';
 import { NewTaskDialog } from '../_TasksCRUDComponents/AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from '../_TasksCRUDComponents/EditTaskForm';
 import { cn } from '@/lib/utils';
-import {Task, TaskPriority, WorkspaceMember} from "@/lib/types";
+import {Task, TaskPriority, TaskStatus, WorkspaceMember} from "@/lib/types";
 import DeleteTaskAlert from '../_TasksCRUDComponents/DeleteTaskAlert';
 import AssigneeManagement from './AssigneeManagement';
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Command, CommandGroup, CommandItem, CommandList} from "@/components/ui/command";
-import {updateTaskPriorityAPI} from "@/app/_api/TasksAPI";
+import {updateStatusAPI, updateTaskPriorityAPI} from "@/app/_api/TasksAPI";
 import {toast} from "sonner";
+import {AxiosError} from "axios";
+import PopoverComponent from './PopoverComponent';
 
 const TaskTable = ({
                        workspaceId,
@@ -42,48 +41,80 @@ const TaskTable = ({
     unassignUser: (taskId: string, memberId: string) => Promise<void>
 }) => {
     const [priorityPopoverTask, setPriorityPopoverTask] = useState<string | null>(null)
+    const [statusPopoverTask, setStatusPopoverTask] = useState<string | null>(null)
+
     const updatePriority = async(taskId: string, newPriority: string) => {
-        console.log("New priority",newPriority);
         try{
-            const pastTodos =  todos;
+            const pastTodos = todos;
             setTodos((prev) => prev.map((todo) =>
                 todo.id === taskId ? { ...todo, priority: newPriority as TaskPriority } : todo
             ));
-            const res = await updateTaskPriorityAPI(workspaceId,taskId,newPriority);
+            const res = await updateTaskPriorityAPI(workspaceId, taskId, newPriority);
             if(res){
                 toast.success("Priority updated successfully.");
-               return ;
-            }else{
+                setPriorityPopoverTask(null);
+                return;
+            } else {
                 setTodos(pastTodos);
                 toast.error('Failed to update priority');
                 return;
             }
-        }catch(error){
-            console.log("Failed to update Priority",error);
+        } catch(error) {
+            console.log("Failed to update Priority", error);
+            toast.error('Failed to update priority');
         }
-
     };
-    const status = [
-        { title: "pending", style: "bg-gray-100" },
-        { title: "in_progress", style: "bg-green-100 text-green-800" },
-        { title: "completed", style: "bg-blue-100 text-blue-800" },
+
+    const updateStatus = async(taskId: string, newStatus: string) => {
+        const pastTodos = todos;
+        try {
+            setTodos((prev) => prev.map((todo) =>
+                todo.id === taskId ? { ...todo, status: newStatus as TaskStatus } : todo
+            ));
+            const response = await updateStatusAPI(workspaceId, taskId, newStatus);
+            if (response && response.message == "Task status updated") {
+                toast.success('Task status updated successfully.');
+                setStatusPopoverTask(null);
+                return;
+            } else {
+                setTodos(pastTodos);
+                toast.error('Failed to update status');
+                return;
+            }
+        } catch (e) {
+            const error = e as AxiosError<{ message: string }>;
+            if(error.response?.status === 403){
+                setTodos(pastTodos);
+                toast.error("Unauthorized: Not an assignee or workspace admin");
+                return;
+            } else {
+                console.error("Error Updating Status", e);
+                toast.error('Failed to update status');
+            }
+        }
+    }
+
+    const statusOptions = [
+        { value: "pending", label: "Pending", style: "bg-gray-400" },
+        { value: "in_progress", label: "In Progress", style: "bg-green-100 text-green-800" },
+        { value: "completed", label: "Completed", style: "bg-blue-100 text-blue-800" },
     ];
 
-    const priorities = [
+    const priorityOptions = [
         { value: "high", label: "High", style: "bg-red-500 hover:bg-red-600" },
         { value: "medium", label: "Medium", style: "bg-yellow-500 hover:bg-yellow-600" },
         { value: "low", label: "Low", style: "bg-blue-500 hover:bg-blue-600" },
-    ]
+    ];
 
     const getStatusStyle = (taskStatus: string) => {
-        const foundStatus = status.find((s) => s.title === taskStatus);
-        return foundStatus ? foundStatus.style : "bg-gray-100";
+        const foundStatus = statusOptions.find((s) => s.value === taskStatus);
+        return foundStatus ? foundStatus.style : "bg-gray-400";
     };
 
     const getPriorityStyle = (taskPriority: string) => {
-        const foundPriority = priorities.find((p) => p.value === taskPriority)
-        return foundPriority ? foundPriority.style : "bg-gray-100"
-    }
+        const foundPriority = priorityOptions.find((p) => p.value === taskPriority);
+        return foundPriority ? foundPriority.style : "bg-gray-100";
+    };
 
     const isUserSelected = (taskId: string, memberId: string) => {
         return (tempSelectedAssignees[taskId] || []).includes(memberId);
@@ -110,59 +141,36 @@ const TaskTable = ({
                                     {todo.title}
                                 </TableCell>
                                 <TableCell>
-                                    <Badge
-                                        variant="outline"
-                                        className={getStatusStyle(todo.status)}
-                                    >
-                                        {todo.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <Popover
-                                        open={priorityPopoverTask === todo.id}
+                                    <PopoverComponent
+                                        currentValue={todo.status}
+                                        options={statusOptions}
+                                        isOpen={statusPopoverTask === todo.id}
                                         onOpenChange={(open) => {
                                             if (open) {
-                                                setPriorityPopoverTask(todo.id)
+                                                setStatusPopoverTask(todo.id);
                                             } else {
-                                                setPriorityPopoverTask(null)
+                                                setStatusPopoverTask(null);
                                             }
                                         }}
-                                    >
-                                        <PopoverTrigger asChild>
-                                            <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
-                                                <Badge
-                                                    className={cn(
-                                                        getPriorityStyle(todo.priority),
-                                                        "transition-opacity duration-200 flex items-center gap-1",
-                                                    )}
-                                                >
-                                                    {todo.priority}
-                                                    <ChevronDown className="h-3 w-3 opacity-70" />
-                                                </Badge>
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-[200px] p-0" align="start">
-                                            <Command>
-                                                <CommandList>
-                                                    <CommandGroup>
-                                                        {priorities.map((priority) => (
-                                                            <CommandItem
-                                                                key={priority.value}
-                                                                value={priority.value}
-                                                                onSelect={() => updatePriority(todo.id, priority.value)}
-                                                                className="flex items-center gap-2 cursor-pointer"
-                                                            >
-                                                                <Badge className={priority.style}>{priority.label}</Badge>
-                                                                <span className="ml-auto">
-                                          {todo.priority === priority.value && <Check className="h-4 w-4" />}
-                                        </span>
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
+                                        onSelect={(value) => updateStatus(todo.id, value)}
+                                        getStyle={getStatusStyle}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <PopoverComponent
+                                        currentValue={todo.priority}
+                                        options={priorityOptions}
+                                        isOpen={priorityPopoverTask === todo.id}
+                                        onOpenChange={(open) => {
+                                            if (open) {
+                                                setPriorityPopoverTask(todo.id);
+                                            } else {
+                                                setPriorityPopoverTask(null);
+                                            }
+                                        }}
+                                        onSelect={(value) => updatePriority(todo.id, value)}
+                                        getStyle={getPriorityStyle}
+                                    />
                                 </TableCell>
                                 <TableCell>
                                     {new Date(todo.dueDate).toISOString().split("T")[0]}
