@@ -154,23 +154,21 @@ function TaskTab({
           value="tasks"
           className="space-y-6 [&_td]:border-0 [&_th]:border-0"
       >
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <h2 className="mb-4 text-xl font-bold">Tasks</h2>
-            <TaskTable
-                workspaceId={workspaceId}
-                todos={todos}
-                setTodos={setTodos}
-                isPersonal={isPersonal}
-                expandedRows={expandedRows}
-                toggleRowExpand={toggleRowExpand}
-                members={members}
-                tempSelectedAssignees={tempSelectedAssignees}
-                handleAssigneeSelection={handleAssigneeSelection}
-                saveAssignees={saveAssignees}
-                unassignUser={unassignUser}
-            />
-          </div>
+        <div className="w-full">
+          <h2 className="mb-4 text-xl font-bold">Tasks</h2>
+          <TaskTable
+              workspaceId={workspaceId}
+              todos={todos}
+              setTodos={setTodos}
+              isPersonal={isPersonal}
+              expandedRows={expandedRows}
+              toggleRowExpand={toggleRowExpand}
+              members={members}
+              tempSelectedAssignees={tempSelectedAssignees}
+              handleAssigneeSelection={handleAssigneeSelection}
+              saveAssignees={saveAssignees}
+              unassignUser={unassignUser}
+          />
         </div>
       </TabsContent>
   );
