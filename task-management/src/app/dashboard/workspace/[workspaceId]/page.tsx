@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useParams } from "next/navigation";
-import TodoTab from "./KanbanBoard";
+import KanbanBoard from "./KanbanBoard";
 import TaskTab from "./TaskTab";
 import CalendarTab from "./CalendarTab";
 import MembersTab from "./MembersTab";
@@ -58,9 +58,9 @@ function Page() {
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
           {!isPersonal && <TabsTrigger value="members">Members</TabsTrigger>}
         </TabsList>
-        <TodoTab
+        <KanbanBoard
           workspaceId={workspaceId}
-          todos={todos}
+          todos={todos.filter((todo) => !!todo.status)}
           setTodos={setTodos}
           isPersonal={isPersonal}
         />
