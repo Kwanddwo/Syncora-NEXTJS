@@ -150,7 +150,7 @@ export function InviteDialog({
                       {userList.map((user) => (
                         <div
                           key={user.id}
-                          className="flex items-center gap-2 hover:cursor-pointer hover:bg-slate-100 rounded-md border-2 py-2 px-3"
+                          className="flex items-center gap-2 hover:cursor-pointer hover:bg-accent text-accent-foreground rounded-md border-2 py-2 px-3"
                           onClick={() => {
                             setInvitedUser(user);
                           }}

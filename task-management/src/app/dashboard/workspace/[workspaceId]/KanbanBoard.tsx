@@ -11,12 +11,25 @@ import { updateStatusAPI } from "@/app/_api/TasksAPI";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
 
-function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
-                 { workspaceId: string, todos: Task[], setTodos: React.Dispatch<React.SetStateAction<Task[]>>, isPersonal: boolean }) {
+function KanbanBoard({
+  workspaceId,
+  todos,
+  setTodos,
+  isPersonal,
+}: {
+  workspaceId: string;
+  todos: Task[];
+  setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+  isPersonal: boolean;
+}) {
   const todoTasks = todos?.filter((todo) => todo.status === "pending");
   const ongoingTasks = todos?.filter((todo) => todo.status === "in_progress");
   const doneTasks = todos?.filter((todo) => todo.status === "completed");
-  const [activeDroppableId, setActiveDroppableId] = useState<string | null>(null);
+
+  // Track which column is currently being dragged over
+  const [activeDroppableId, setActiveDroppableId] = useState<string | null>(
+    null
+  );
 
   const onDragEnd = async (result: DropResult) => {
     setActiveDroppableId(null);
@@ -24,22 +37,23 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
     if (!destination) return;
 
     if (
-        source.droppableId === destination.droppableId &&
-        source.index === destination.index
-    ) return;
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    )
+      return;
 
     let draggedTask;
     let newStatus;
 
     if (source.droppableId === 'todo') {
       draggedTask = todoTasks[source.index];
-      newStatus = 'pending';
-    } else if (source.droppableId === 'ongoing') {
+      newStatus = "pending";
+    } else if (source.droppableId === "ongoing") {
       draggedTask = ongoingTasks[source.index];
-      newStatus = 'in_progress';
+      newStatus = "in_progress";
     } else {
       draggedTask = doneTasks[source.index];
-      newStatus = 'completed';
+      newStatus = "completed";
     }
 
     if (destination.droppableId === 'todo') {
@@ -90,51 +104,51 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
     setActiveDroppableId(destination?.droppableId || null);
   };
 
-  const TaskCard = ({ task, index }: { task: Task, index: number }) => (
-      <Draggable draggableId={task.id} index={index}>
-        {(provided, snapshot) => (
-            <Card
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                className={`p-3 mb-3 transition-all ${snapshot.isDragging ? 'shadow-lg ring-2 ring-blue-400 z-10' : ''}`}
-            >
-              <div className="flex justify-between">
-                <div className="flex-1 pr-2">
-                  <div className="flex items-center mb-2">
-                    <div
-                        {...provided.dragHandleProps}
-                        className="mr-2 p-1 rounded hover:bg-gray-100 cursor-grab active:cursor-grabbing"
-                    >
-                      <GripVertical className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <h4 className="text-sm font-medium">{task.title}</h4>
-                  </div>
-                  <div className="text-xs text-muted-foreground ml-6">
-                    Due: {new Date(task.dueDate).toISOString().split("T")[0]}
-                  </div>
-                  {!isPersonal && (
-                      <div className="text-xs text-muted-foreground ml-6 mt-1">
-                        Assignee:{" "}
-                        <div className="flex space-x-2">
-                          {task.assignees?.map((assignee: TaskAssignee) => (
-                              <div
-                                  key={assignee.id}
-                                  className="flex items-center space-x-1"
-                              >
-                                <span>{assignee.user.name}</span>
-                              </div>
-                          ))}
-                        </div>
-                      </div>
-                  )}
+  const TaskCard = ({ task, index }: { task: Task; index: number }) => (
+    <Draggable draggableId={task.id} index={index}>
+      {(provided, snapshot) => (
+        <Card
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          className={`p-3 mb-3 transition-all ${snapshot.isDragging ? "shadow-lg ring-2 ring-tag-blue z-10" : ""}`}
+        >
+          <div className="flex justify-between">
+            <div className="flex-1 pr-2">
+              <div className="flex items-center mb-2">
+                <div
+                  {...provided.dragHandleProps}
+                  className="mr-2 p-1 rounded hover:bg-accent cursor-grab active:cursor-grabbing"
+                >
+                  <GripVertical className="h-4 w-4 text-accent-foreground" />
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 self-start">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
+                <h4 className="text-sm font-medium">{task.title}</h4>
               </div>
-            </Card>
-        )}
-      </Draggable>
+              <div className="text-xs text-muted-foreground ml-6">
+                Due: {new Date(task.dueDate).toISOString().split("T")[0]}
+              </div>
+              {!isPersonal && (
+                <div className="text-xs text-muted-foreground ml-6 mt-1">
+                  Assignee:{" "}
+                  <div className="flex space-x-2">
+                    {task.assignees?.map((assignee: TaskAssignee) => (
+                      <div
+                        key={assignee.id}
+                        className="flex items-center space-x-1"
+                      >
+                        <span>{assignee.user.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <Button variant="ghost" size="icon" className="h-6 w-6 self-start">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      )}
+    </Draggable>
   );
 
   return (
@@ -228,4 +242,4 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
   );
 }
 
-export default TodoTab
+export default KanbanBoard;

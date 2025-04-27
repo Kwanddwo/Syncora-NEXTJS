@@ -7,19 +7,28 @@ import { addMonths, format, subMonths } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { CalendarGrid } from "@/components/calendar-grid";
 import { TaskList } from "@/components/task-list";
-import { useTasksByUserId } from "@/hooks/use-tasks";
+// import { useTasksByUserId } from "@/hooks/use-tasks";
+import { Task } from "@/lib/types";
 
-export function Calendar() {
+export function Calendar({
+  todos,
+  onMonthChange = () => {},
+}: {
+  todos: Task[];
+  onMonthChange: (newMonth: Date | undefined) => void;
+}) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const { data: tasks } = useTasksByUserId("userId");
-
+  // const { data: tasks } = useTasksByUserId("userId");
+  const tasks = todos;
   const nextMonth = () => {
     setCurrentDate(addMonths(currentDate, 1));
+    onMonthChange(addMonths(currentDate, 1));
   };
 
   const prevMonth = () => {
     setCurrentDate(subMonths(currentDate, 1));
+    onMonthChange(subMonths(currentDate, 1));
   };
 
   return (

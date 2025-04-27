@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Task } from "@/lib/types";
 
 import React from "react";
 import {ScrollArea} from "@/components/ui/scroll-area";
@@ -21,24 +22,38 @@ function TaskForToday() {
     { id: "6", title: "Sleep", status: "On going", priority: "High" },
   ];
   const status = [
-    { title: "To Do", style: "bg-gray-100" },
-    { title: "Done", style: "bg-green-100 text-green-800" },
-    { title: "On going", style: "bg-blue-100 text-blue-800" },
+    { title: "pending", style: "bg-tag-neutral text-tag-neutral-foreground" },
+    { title: "in_progress", style: "bg-tag-blue text-tag-blue-foreground" },
+    { title: "completed", style: "bg-tag-green text-tag-green-foreground" },
   ];
+
   const priorities = [
-    { title: "High", style: "bg-red-500 hover:bg-red-600" },
-    { title: "Medium", style: "bg-yellow-500 hover:bg-yellow-600" },
-    { title: "Low", style: "bg-blue-500 hover:bg-blue-600" },
+    {
+      value: "high",
+      label: "High",
+      style: "bg-tag-red hover:bg-tag-red text-tag-red-foreground",
+    },
+    {
+      value: "medium",
+      label: "Medium",
+      style: "bg-tag-yellow hover:bg-tag-yellow text-tag-yellow-foreground",
+    },
+    {
+      value: "low",
+      label: "Low",
+      style: "bg-tag-blue hover:bg-tag-blue text-tag-blue-foreground",
+    },
   ];
 
-
-  const getStatusStyle = (taskStatus:string) => {
+  const getStatusStyle = (taskStatus: string) => {
+    console.log(taskStatus);
+    console.log(status);
     const foundStatus = status.find((s) => s.title === taskStatus);
-    return foundStatus ? foundStatus.style : "bg-gray-100"; // Default style if not found
+    return foundStatus ? foundStatus.style : "bg-tag-red"; // Default style if not found
   };
   const getPriorityStyle = (taskPriority: string) => {
-    const foundStatus = priorities.find((p) => p.title === taskPriority);
-    return foundStatus ? foundStatus.style : "bg-gray-100"; // Default style if not found
+    const foundStatus = priorities.find((p) => p.value === taskPriority);
+    return foundStatus ? foundStatus.style : "bg-tag-red"; // Default style if not found
   };
   return (
     <section>

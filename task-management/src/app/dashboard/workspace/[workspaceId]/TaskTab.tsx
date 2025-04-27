@@ -1,28 +1,29 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { TabsContent } from '@/components/ui/tabs';
-import { Task, WorkspaceMember } from "@/lib/types";
+"use client";
+import React, { useEffect, useState } from "react";
+import { TabsContent } from "@/components/ui/tabs";
+import { Task, TaskAssignee, WorkspaceMember } from "@/lib/types";
 import { fetchMembersFromWorkspace } from "@/app/_api/WorkspacesAPIs";
-import TaskTable from './_TaskTabComponents/TaskTable';
+import TaskTable from "./_TaskTabComponents/TaskTable";
 import { taskAssigneeAPI, taskUnassigneeAPI } from "@/app/_api/TasksAPI";
 import { toast } from "sonner";
-import { TaskAssignee } from "@/lib/types";
 import { AxiosError } from "axios";
 
 function TaskTab({
-                   workspaceId,
-                   todos,
-                   setTodos,
-                   isPersonal
-                 }: {
-  workspaceId: string,
-  todos: Task[],
-  setTodos: React.Dispatch<React.SetStateAction<Task[]>>,
-  isPersonal: boolean
+  workspaceId,
+  todos,
+  setTodos,
+  isPersonal,
+}: {
+  workspaceId: string;
+  todos: Task[];
+  setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+  isPersonal: boolean;
 }) {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
-  const [tempSelectedAssignees, setTempSelectedAssignees] = useState<Record<string, string[]>>({});
+  const [tempSelectedAssignees, setTempSelectedAssignees] = useState<
+    Record<string, string[]>
+  >({});
 
   useEffect(() => {
     const getWorkspaceMembers = async () => {
@@ -40,17 +41,17 @@ function TaskTab({
   };
 
   const handleAssigneeSelection = (taskId: string, memberId: string) => {
-    setTempSelectedAssignees(prev => {
+    setTempSelectedAssignees((prev) => {
       const currentSelected = prev[taskId] || [];
       if (currentSelected.includes(memberId)) {
         return {
           ...prev,
-          [taskId]: currentSelected.filter(id => id !== memberId)
+          [taskId]: currentSelected.filter((id) => id !== memberId),
         };
       } else {
         return {
           ...prev,
-          [taskId]: [...currentSelected, memberId]
+          [taskId]: [...currentSelected, memberId],
         };
       }
     });
@@ -112,18 +113,17 @@ function TaskTab({
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
   };
 
-
-  const unassignUser = async(taskId: string, memberId: string) => {
+  const unassignUser = async (taskId: string, memberId: string) => {
     const member = members.find((m) => m.user.id === memberId);
-    if(!member) {
-      toast.error("Cannot find the user, please try again.")
+    if (!member) {
+      toast.error("Cannot find the user, please try again.");
       return;
     }
     const unassign = {
       taskId,
       workspaceId,
       workspaceMemberIds: [member.id],
-    }
+    };
     try {
       const pastTodos = todos;
       setTodos((prevTodos) => {
@@ -146,10 +146,10 @@ function TaskTab({
         toast.error("Unassign task failed.");
         return ;
       }
-    } catch(e) {
+    } catch (e) {
       console.error("Failed to unassign task", e);
     }
-  }
+  };
 
   return (
       <TabsContent

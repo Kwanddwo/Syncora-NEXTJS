@@ -16,29 +16,29 @@ import {AxiosError} from "axios";
 import PopoverComponent from './PopoverComponent';
 
 const TaskTable = ({
-                       workspaceId,
-                       todos,
-                       setTodos,
-                       isPersonal,
-                       expandedRows,
-                       toggleRowExpand,
-                       members,
-                       tempSelectedAssignees,
-                       handleAssigneeSelection,
-                       saveAssignees,
-                       unassignUser
-                   }: {
-    workspaceId: string,
-    todos: Task[],
-    setTodos: React.Dispatch<React.SetStateAction<Task[]>>,
-    isPersonal: boolean,
-    expandedRows: Record<string, boolean>,
-    toggleRowExpand: (id: string) => void,
-    members: WorkspaceMember[],
-    tempSelectedAssignees: Record<string, string[]>,
-    handleAssigneeSelection: (taskId: string, memberId: string) => void,
-    saveAssignees: (taskId: string) => Promise<void>,
-    unassignUser: (taskId: string, memberId: string) => Promise<void>
+  workspaceId,
+  todos,
+  setTodos,
+  isPersonal,
+  expandedRows,
+  toggleRowExpand,
+  members,
+  tempSelectedAssignees,
+  handleAssigneeSelection,
+  saveAssignees,
+  unassignUser,
+}: {
+  workspaceId: string;
+  todos: Task[];
+  setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+  isPersonal: boolean;
+  expandedRows: Record<string, boolean>;
+  toggleRowExpand: (id: string) => void;
+  members: WorkspaceMember[];
+  tempSelectedAssignees: Record<string, string[]>;
+  handleAssigneeSelection: (taskId: string, memberId: string) => void;
+  saveAssignees: (taskId: string) => Promise<void>;
+  unassignUser: (taskId: string, memberId: string) => Promise<void>;
 }) => {
     const [priorityPopoverTask, setPriorityPopoverTask] = useState<string | null>(null)
     const [statusPopoverTask, setStatusPopoverTask] = useState<string | null>(null)
