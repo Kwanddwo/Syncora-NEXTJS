@@ -14,6 +14,7 @@ import AssigneeManagement from './AssigneeManagement';
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Command, CommandGroup, CommandItem, CommandList} from "@/components/ui/command";
 import {updateTaskPriorityAPI} from "@/app/_api/TasksAPI";
+import {toast} from "sonner";
 
 const TaskTable = ({
                        workspaceId,
@@ -44,11 +45,18 @@ const TaskTable = ({
     const updatePriority = async(taskId: string, newPriority: string) => {
         console.log("New priority",newPriority);
         try{
+            const pastTodos =  todos;
+            setTodos((prev) => prev.map((todo) =>
+                todo.id === taskId ? { ...todo, priority: newPriority as TaskPriority } : todo
+            ));
             const res = await updateTaskPriorityAPI(workspaceId,taskId,newPriority);
             if(res){
-                setTodos((prev) => prev.map((todo) =>
-                    todo.id === taskId ? { ...todo, priority: newPriority as TaskPriority } : todo
-                ));
+                toast.success("Priority updated successfully.");
+               return ;
+            }else{
+                setTodos(pastTodos);
+                toast.error('Failed to update priority');
+                return;
             }
         }catch(error){
             console.log("Failed to update Priority",error);

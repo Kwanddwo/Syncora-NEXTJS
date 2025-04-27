@@ -64,32 +64,39 @@ function TaskTab({
       workspaceMemberIds: selectedIds,
     };
     try {
+      const pastTodos = todos;
+      setTodos(prevTodos => {
+        return prevTodos.map(todo => {
+          if (todo.id === taskId) {
+            const newAssignees = selectedIds.map(id => {
+              const member = members.find(m => m.id === id);
+              if (!member) return null;
+              return {
+                id: crypto.randomUUID(),
+                taskId,
+                userId: member.user.id,
+                assignedAt: new Date(),
+                task: todo,
+                user: member.user,
+              } as TaskAssignee;
+            }).filter(Boolean) as TaskAssignee[];
+
+            return {
+              ...todo,
+              assignees: newAssignees,
+            };
+          }
+          return todo;
+        });
+      });
       const data = await taskAssigneeAPI(assignees);
       if (data.message === "Task assigned successfully") {
-        setTodos(prevTodos => {
-          return prevTodos.map(todo => {
-            if (todo.id === taskId) {
-              const newAssignees = selectedIds.map(id => {
-                const member = members.find(m => m.id === id);
-                if (!member) return null;
-                return {
-                  id: crypto.randomUUID(),
-                  taskId,
-                  userId: member.user.id,
-                  assignedAt: new Date(),
-                  task: todo,
-                  user: member.user,
-                } as TaskAssignee;
-              }).filter(Boolean) as TaskAssignee[];
-
-              return {
-                ...todo,
-                assignees: newAssignees,
-              };
-            }
-            return todo;
-          });
-        });
+          toast.success("Task assigned successfully");
+          return;
+      }else{
+        setTodos(pastTodos);
+        toast.error("Task assign failed");
+        return;
       }
     } catch (e) {
       const error = e as AxiosError<{ message: string }>;
@@ -116,20 +123,26 @@ function TaskTab({
       workspaceMemberIds: [member.id],
     }
     try {
+      const pastTodos = todos;
+      setTodos((prevTodos) => {
+        return prevTodos.map((todo) => {
+          if (todo.id === taskId) {
+            return {
+              ...todo,
+              assignees: (todo.assignees || []).filter((assignee) => assignee.user.id !== memberId),
+            }
+          }
+          return todo
+        })
+      })
       const res = await taskUnassigneeAPI(unassign);
       if(res && res.data.message === "Task unassigned successfully"){
-        setTodos((prevTodos) => {
-          return prevTodos.map((todo) => {
-            if (todo.id === taskId) {
-              return {
-                ...todo,
-                assignees: (todo.assignees || []).filter((assignee) => assignee.user.id !== memberId),
-              }
-            }
-            return todo
-          })
-        })
         toast.success("Task unassigned successfully");
+        return ;
+      }else{
+        setTodos(pastTodos);
+        toast.error("Unassign task failed.");
+        return ;
       }
     } catch(e) {
       console.error("Failed to unassign task", e);
