@@ -63,8 +63,8 @@ function TaskTab({
       workspaceId,
       workspaceMemberIds: selectedIds,
     };
+    const pastTodos = todos;
     try {
-      const pastTodos = todos;
       setTodos(prevTodos => {
         return prevTodos.map(todo => {
           if (todo.id === taskId) {
@@ -101,7 +101,9 @@ function TaskTab({
     } catch (e) {
       const error = e as AxiosError<{ message: string }>;
       if (error.response?.status === 400) {
+        setTodos(pastTodos);
         toast.error("All users are already assigned to this task.");
+        return ;
       } else {
         console.error(error);
         toast.error("Something went wrong assigning users.");
