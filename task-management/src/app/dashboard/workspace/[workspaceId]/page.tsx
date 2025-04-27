@@ -71,7 +71,7 @@ function Page() {
           isPersonal={isPersonal}
         />
         {!isPersonal && <MembersTab workspaceId={workspaceId} />}
-        <CalendarTab />
+        <CalendarTab todos={todos} />
       </Tabs>
     </div>
   );
