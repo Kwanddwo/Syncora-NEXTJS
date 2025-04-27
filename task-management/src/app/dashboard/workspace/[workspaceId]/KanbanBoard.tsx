@@ -6,38 +6,31 @@ import { TabsContent } from '@/components/ui/tabs';
 import { Task, TaskAssignee, TaskStatus } from '@/lib/types';
 import { MoreVertical, GripVertical } from 'lucide-react';
 import React, { useState } from 'react'
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"
+import {DragDropContext, Droppable, Draggable, DropResult, DragStart, DragUpdate} from "@hello-pangea/dnd"
 import { updateStatusAPI } from "@/app/_api/TasksAPI";
+import {toast} from "sonner";
+import {AxiosError} from "axios";
 
 function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
                  { workspaceId: string, todos: Task[], setTodos: React.Dispatch<React.SetStateAction<Task[]>>, isPersonal: boolean }) {
   const todoTasks = todos?.filter((todo) => todo.status === "pending");
   const ongoingTasks = todos?.filter((todo) => todo.status === "in_progress");
   const doneTasks = todos?.filter((todo) => todo.status === "completed");
-
-  // Track which column is currently being dragged over
   const [activeDroppableId, setActiveDroppableId] = useState<string | null>(null);
 
   const onDragEnd = async (result: DropResult) => {
-    // Clear the active droppable when drag ends
     setActiveDroppableId(null);
-
     const { source, destination } = result;
-
-    // If dropped outside a droppable area
     if (!destination) return;
 
-    // If dropped in the same place
     if (
         source.droppableId === destination.droppableId &&
         source.index === destination.index
     ) return;
 
-    // Find the task that was dragged
     let draggedTask;
     let newStatus;
 
-    // Determine which list the task was dragged from
     if (source.droppableId === 'todo') {
       draggedTask = todoTasks[source.index];
       newStatus = 'pending';
@@ -49,7 +42,6 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
       newStatus = 'completed';
     }
 
-    // Update the status based on where it was dropped
     if (destination.droppableId === 'todo') {
       newStatus = 'pending';
     } else if (destination.droppableId === 'ongoing') {
@@ -59,39 +51,41 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
     }
 
     if (draggedTask.status !== newStatus) {
+      const pastTodos = todos;
       try {
-        const pastTodos = todos;
         setTodos((prev) => prev.map((todo) =>
             todo.id === draggedTask.id ? { ...todo, status: newStatus as TaskStatus } : todo
         ));
-
         const response = await updateStatusAPI(workspaceId, draggedTask.id, newStatus);
 
         if (response && response.message == "Task status updated") {
+          toast.success('Task status updated successfully.');
           return;
         } else {
           setTodos(pastTodos);
-          throw new Error("An error occurred while updating task");
+          console.log("test")
+          return ;
         }
       } catch (e) {
-        if (e instanceof Error) {
-          console.error(e);
+        const error = e as AxiosError<{ message: string }>;
+        if(error.response?.status === 403){
+          setTodos(pastTodos);
+          toast.error("Unauthorized: Not an assignee or workspace admin");
+          return ;
+        }else{
+          console.error("Error Updating Status", e);
         }
-        console.error("Error Updating Status", e);
       }
     }
     console.log(`Task ${draggedTask.id} moved to ${newStatus}`);
   };
 
-  // Track when dragging starts to provide visual feedback
-  const onDragStart = (result: DropResult) => {
+  const onDragStart = (result: DragStart) => {
     const { source } = result;
-    // Set the source droppable as active initially
     setActiveDroppableId(source.droppableId);
   };
 
-  // Update which column is being dragged over
-  const onDragUpdate = (result: DropResult) => {
+  const onDragUpdate = (result: DragUpdate) => {
     const { destination } = result;
     setActiveDroppableId(destination?.droppableId || null);
   };
@@ -154,7 +148,7 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
             {/* To Do Column */}
             <Card className={`border-t-4 border-t-gray-200 transition-all ${activeDroppableId === 'todo' ? 'ring-2 ring-blue-400 bg-blue-50/20' : ''}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <h3 className="font-semibold">To Do</h3>
+                <h3 className="font-semibold">Pending</h3>
                 <Badge variant="outline" className="text-xs font-normal">
                   {todoTasks?.length} Tasks
                 </Badge>
@@ -180,7 +174,7 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
             {/* Ongoing Column */}
             <Card className={`border-t-4 border-t-blue-200 transition-all ${activeDroppableId === 'ongoing' ? 'ring-2 ring-blue-400 bg-blue-50/30' : 'bg-blue-50/10'}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <h3 className="font-semibold">Ongoing</h3>
+                <h3 className="font-semibold">In Progress</h3>
                 <Badge variant="outline" className="text-xs font-normal">
                   {ongoingTasks?.length} Tasks
                 </Badge>
@@ -206,7 +200,7 @@ function TodoTab({ workspaceId, todos, setTodos, isPersonal }:
             {/* Done Column */}
             <Card className={`border-t-4 border-t-green-200 transition-all ${activeDroppableId === 'done' ? 'ring-2 ring-green-400 bg-green-50/30' : 'bg-green-50/10'}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <h3 className="font-semibold">Done</h3>
+                <h3 className="font-semibold">Completed</h3>
                 <Badge variant="outline" className="text-xs font-normal">
                   {doneTasks?.length} Tasks
                 </Badge>
