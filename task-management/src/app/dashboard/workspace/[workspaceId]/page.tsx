@@ -60,7 +60,7 @@ function Page() {
         </TabsList>
         <KanbanBoard
           workspaceId={workspaceId}
-          todos={todos.filter((todo) => !!todo.status)}
+          todos={todos}
           setTodos={setTodos}
           isPersonal={isPersonal}
         />
