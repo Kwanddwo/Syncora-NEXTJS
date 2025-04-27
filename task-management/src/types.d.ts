@@ -12,6 +12,7 @@ export interface Workspace {
   defaultOpen: boolean;
   isPersonal?: boolean;
   icon?: string;
+  updatedAt?:string;
   tasks: Task[];
 }
 interface User {
