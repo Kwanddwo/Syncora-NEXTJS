@@ -7,15 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Task } from "@/lib/types";
 
 import React from "react";
 
-function TaskForToday() {
-  const tasks = [
-    { id: "1", title: "Throw Trash", status: "pending", priority: "medium" },
-    { id: "2", title: "Pay Rent", status: "completed", priority: "low" },
-    { id: "3", title: "Make report", status: "in_progress", priority: "high" },
-  ];
+function TaskForToday({ todos }: { todos: Task[] }) {
+  const tasks = todos;
   const status = [
     { title: "pending", style: "bg-tag-neutral text-tag-neutral-foreground" },
     { title: "in_progress", style: "bg-tag-blue text-tag-blue-foreground" },
@@ -53,37 +50,43 @@ function TaskForToday() {
   return (
     <section>
       <h2 className="mb-4 text-xl font-bold">Your tasks for today</h2>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-accent">
-              <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Priority</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tasks.map((task) => (
-              <TableRow key={task.id}>
-                <TableCell className="font-medium">{task.title}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={getStatusStyle(task.status)}
-                  >
-                    {task.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getPriorityStyle(task.priority)}>
-                    {task.priority}
-                  </Badge>
-                </TableCell>
+      {tasks && tasks.length !== 0 ? (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-accent">
+                <TableHead>Title</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {tasks.map((task) => (
+                <TableRow key={task.id}>
+                  <TableCell className="font-medium">{task.title}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={getStatusStyle(task.status)}
+                    >
+                      {task.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getPriorityStyle(task.priority)}>
+                      {task.priority}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <div className="flex w-full items-center justify-center p-6 text-lg font-semibold text-muted-foreground">
+          No tasks for today
+        </div>
+      )}
     </section>
   );
 }

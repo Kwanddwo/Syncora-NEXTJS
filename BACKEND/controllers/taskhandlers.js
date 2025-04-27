@@ -10,14 +10,8 @@ export const CreateTask = async (req, res) => {
   try {
     const userId = req.userId;
 
-    const {
-      title,
-      description,
-      priority,
-      workspaceId,
-      dueDate,
-      assigneeIds,
-    } = req.body;
+    const { title, description, priority, workspaceId, dueDate, assigneeIds } =
+      req.body;
 
     const newTask = await prisma.task.create({
       data: {
@@ -27,13 +21,13 @@ export const CreateTask = async (req, res) => {
         workspaceId,
         dueDate: new Date(dueDate),
         createdById: userId,
-        status: 'pending',
+        status: "pending",
         priorityOrder: 0,
       },
     });
 
     if (assigneeIds && assigneeIds.length > 0) {
-      const taskAssignees = assigneeIds.map(assigneeId => ({
+      const taskAssignees = assigneeIds.map((assigneeId) => ({
         taskId: newTask.id,
         userId: assigneeId,
         assignedById: userId,
@@ -46,15 +40,16 @@ export const CreateTask = async (req, res) => {
 
     res.status(201).json({ message: "Task created successfully" });
   } catch (error) {
-    console.error('Error creating task:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    console.error("Error creating task:", error);
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
 
 export const DeleteTask = async (req, res) => {
   const userId = req.userId;
 
- 
   const { taskId, workspaceId } = req.body;
 
   if (!userId) {
@@ -73,11 +68,11 @@ export const DeleteTask = async (req, res) => {
     res.status(200).json({ message: "Task deleted successfully", deletedTask });
   } catch (error) {
     console.error("Error deleting task:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
-}
-
-
+};
 
 export const UpdateTask = async (req, res) => {
   const userId = req.userId;
@@ -107,10 +102,8 @@ export const UpdateTask = async (req, res) => {
     if (assignees) {
       assigneeUpdate = {
         assignees: {
-        
           create: assignees.map((userId) => ({
             userId: userId, // Correctly reference the userId field
-          
           })),
         },
       };
@@ -142,7 +135,9 @@ export const updateTaskPriority = async (req, res) => {
   const userId = req.userId;
   const { taskId, workspaceId, priority } = req.body;
   if (!taskId || !workspaceId || !priority) {
-    return res.status(400).json({ error: "taskId, workspaceId, and priority are required" });
+    return res
+      .status(400)
+      .json({ error: "taskId, workspaceId, and priority are required" });
   }
   try {
     const task = await prisma.task.update({
@@ -167,7 +162,7 @@ export const updateTaskPriority = async (req, res) => {
     const workspaceAdmins = await prisma.workspaceMember.findMany({
       where: {
         workspaceId: workspaceId,
-        role: 'admin',
+        role: "admin",
       },
       select: {
         userId: true,
@@ -179,29 +174,30 @@ export const updateTaskPriority = async (req, res) => {
       },
       select: {
         name: true,
-      }
+      },
     });
     const workspaceAdminIds = workspaceAdmins.map((admin) => admin.userId);
     const allUserIds = [...new Set([...taskAssigneeIds, ...workspaceAdminIds])];
-    const inboxmessage = `This admin ${user.name} priority of task ${task.title} has been changed to ${priority}`
+    const inboxmessage = `This admin ${user.name} priority of task ${task.title} has been changed to ${priority}`;
     // Adding this to the inbox table
     req.body.Inboxdetails = {
-      task
-    }
-    console.log("message", inboxmessage),
-      req.body.recievers = allUserIds;
+      task,
+    };
+    console.log("message", inboxmessage), (req.body.recievers = allUserIds);
     req.body.senderId = userId;
     req.body.message = inboxmessage;
     req.body.type = "task_updated";
     addToInbox(req, res);
-    res.status(200).json({ message: "Task priority updated successfully to " + priority });
-
+    res
+      .status(200)
+      .json({ message: "Task priority updated successfully to " + priority });
   } catch (error) {
     console.error("Error updating task priority:", error);
-    return res.status(500).json({ error: "Internal server error", details: error.message });
-
+    return res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
-}
+};
 export const updateTaskStatus = async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) {
@@ -384,46 +380,26 @@ export const getAllTasks = async (req, res) => {
  */
 export const getTasksByUserId = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      console.error("Authorization header missing or malformed");
-      return res.status(401).json({ error: "No Token Provided" });
-    }
+    const userId = req.userId;
+    const { lowerDate, higherDate } = req.body;
 
-    // Decode token to extract user ID
-    let decoded;
-    try {
-      decoded = jwt.verify(token, SECRET);
-    } catch (error) {
-      if (error.name === "TokenExpiredError") {
-        console.error("Token has expired:", error);
-        return res.status(403).json({ error: "Token Expired" });
-      } else if (error.name === "JsonWebTokenError") {
-        console.error("Invalid token:", error);
-        return res.status(403).json({ error: "Invalid Token" });
-      } else {
-        console.error("Error decoding token:", error);
-        return res
-          .status(500)
-          .json({ error: "Token Decoding Error", details: error.message });
-      }
-    }
-
-    const userId = decoded.id;
-
-    // Debugging log (before using the variable)
     console.log("Decoded userId:", userId);
 
     if (!userId) {
       console.error("Decoded token does not contain a user ID");
       return res.status(401).json({ error: "Unauthorized: User ID Missing" });
     }
+
     const tasks = await prisma.task.findMany({
       where: {
         assignees: {
           some: {
             userId: userId,
           },
+        },
+        dueDate: {
+          gte: lowerDate ? new Date(lowerDate) : undefined,
+          lte: higherDate ? new Date(higherDate) : undefined,
         },
       },
       include: {
@@ -479,17 +455,16 @@ export const getTasksByUserId = async (req, res) => {
   }
 };
 
-
-
 export const assignTask = async (req, res) => {
   const userId = req.userId;
   const { taskId, assigneeIds } = req.body;
 
   if (!taskId || !assigneeIds || assigneeIds.length === 0) {
-    return res.status(400).json({ error: "taskId and assigneeIds are required" });
+    return res
+      .status(400)
+      .json({ error: "taskId and assigneeIds are required" });
   }
   try {
-
     const taskAssignees = assigneeIds.map((assigneeId) => ({
       taskId,
       userId: assigneeId,
@@ -502,7 +477,9 @@ export const assignTask = async (req, res) => {
     res.status(200).json({ message: "Task assigned successfully" });
   } catch (error) {
     console.error("Error assigning task:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
   const task = await prisma.task.findUnique({
     where: {
@@ -518,18 +495,16 @@ export const assignTask = async (req, res) => {
         message: "You have been assigned a new task",
         senderId: userId,
         details: {
-          task
+          task,
         },
         read: false,
       },
     });
   }
-
-
-}
+};
 
 export const unassignTask = async (req, res) => {
-  const userId = req.userId
+  const userId = req.userId;
   const { taskId, usersToUnassign } = req.body;
 
   try {
@@ -541,7 +516,7 @@ export const unassignTask = async (req, res) => {
         },
       },
     });
-    // Adding this to the inbox table 
+    // Adding this to the inbox table
 
     const task = await prisma.task.findUnique({
       where: {
@@ -558,7 +533,7 @@ export const unassignTask = async (req, res) => {
           message: "You have been unassigned from a  task!",
           senderId: userId,
           details: {
-            task
+            task,
           },
           read: false,
         },
@@ -567,6 +542,8 @@ export const unassignTask = async (req, res) => {
     res.status(200).json({ message: "Task unassigned successfully" });
   } catch (error) {
     console.error("Error unassigning task:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
-}
+};
