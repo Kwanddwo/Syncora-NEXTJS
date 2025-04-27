@@ -63,9 +63,9 @@ export function NewTaskDialog({
     try {
       const res = await addTaskAPI(task);
       if (res && res.message === "Task created successfully") {
-        setLoading(false);
         setOpen(false);
         setTodos((prev) => [res.task,...prev])
+        setLoading(false);
         toast.success("Task created successfully");
       } else {
         throw new Error("Task creation failed.");
