@@ -80,7 +80,7 @@ export default function AddWorkspaceDialog() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-tag-green-foreground">
             <Plus className="h-8 w-8" />
           </div>
-          <div className="mt-2 text-center">Create new...</div>
+          <div className="mt-2 text-center">Create</div>
         </Card>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

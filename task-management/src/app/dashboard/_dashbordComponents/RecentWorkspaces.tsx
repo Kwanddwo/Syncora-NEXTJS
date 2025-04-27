@@ -14,12 +14,7 @@ function RecentWorkspaces() {
         <ScrollArea className="w-[1200px] whitespace-nowrap rounded-md pb-3">
             <h2 className="mb-4 text-xl font-bold">Recent Workspaces</h2>
             <div className="flex gap-4 overflow-x-auto pb-2 ">
-                <Card className="flex h-36 w-36 flex-col items-center justify-center bg-green-500 text-white">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white cursor-pointer">
                         <AddWorkspaceDialog/>
-                    </div>
-                    <div className="mt-2 text-center">Create</div>
-                </Card>
                 {personalWorkspaces.map(item => (
                     <Link key={item.id} href={`/dashboard/workspace/${item.workspaceId}`} className="hover:no-underline">
                         <Card className="flex h-36 w-36 flex-col items-center justify-center">
