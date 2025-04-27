@@ -5,13 +5,13 @@ import React from 'react'
 import AddWorkspaceDialog from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceAddModalDialog";
 import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
 import Link from "next/link";
-
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 function RecentWorkspaces() {
     const { recent} = useRecentWorkspacesContext();
     const personalWorkspaces= recent.filter((item) => item.workspace.isPersonal == true)
     const publicWorkspaces = recent.filter((item) => item.workspace.isPersonal == false)
     return (
-        <section>
+        <ScrollArea className="w-[1200px] whitespace-nowrap rounded-md pb-3">
             <h2 className="mb-4 text-xl font-bold">Recent Workspaces</h2>
             <div className="flex gap-4 overflow-x-auto pb-2 ">
                 <Card className="flex h-36 w-36 flex-col items-center justify-center bg-green-500 text-white">
@@ -65,7 +65,8 @@ function RecentWorkspaces() {
 
                 ))}
             </div>
-        </section>
+            <ScrollBar orientation="horizontal" />
+        </ScrollArea>
     );
 }
 
