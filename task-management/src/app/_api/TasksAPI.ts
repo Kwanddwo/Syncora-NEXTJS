@@ -115,31 +115,6 @@ export const getTasksByUserId = async (
   }
 };
 
-export const updateStatusAPI = async (
-  workspaceId: string,
-  taskId: string,
-  status: string
-) => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await axios.put(
-      UPDATE_STATUS_API,
-      {
-        workspaceId,
-        taskId,
-        status,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.log("Update status Error :", error);
-  }
-};
 export const updateStatusAPI =async(workspaceId :string,taskId :string,status:string) =>{
     const token = localStorage.getItem("token");
     const response = await axios.put(UPDATE_STATUS_API,{
