@@ -42,8 +42,13 @@ export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
 export const fetchTasksForWorkspace = async (
     workspaceId: string
 ): Promise<Task[]> => {
+    const token= localStorage.getItem("token");
     try {
-        const response = await axios.post(TASKS_API, { workspaceId: workspaceId });
+        const response = await axios.post(TASKS_API, { workspaceId: workspaceId },{
+            headers : {
+                Authorization: `Bearer ${token}`
+            }
+        });
         return response.data; // Assuming the API returns an array of tasks
     } catch (error) {
         console.error(`Error fetching tasks for workspace ${workspaceId}:`, error);

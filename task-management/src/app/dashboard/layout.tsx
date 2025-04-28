@@ -2,10 +2,12 @@ import React from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import ReactQueryProvider from "@/components/providers/react-query-provider";
-import DashbordHeader from "./DashbordHeader";
+import DashboardHeader from "./DashboardHeader";
 import ProtectedPage from "@/components/ProtectedPage";
 import { WorkspacesProvider } from "@/context/WorkspaceContext";
-import { RecentWorkspacesProvider } from '@/context/RecentWorkspacesContext';
+import { RecentWorkspacesProvider } from "@/context/RecentWorkspacesContext";
+import { InboxProvider } from "@/context/InboxContext";
+
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
@@ -13,13 +15,15 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         <ReactQueryProvider>
           <SidebarProvider>
             <WorkspacesProvider>
-              <RecentWorkspacesProvider>
-                <AppSidebar />
-                <SidebarInset>
-                  <DashbordHeader />
-                  {children}
-                </SidebarInset>
-              </RecentWorkspacesProvider>
+              <InboxProvider>
+                <RecentWorkspacesProvider>
+                  <AppSidebar />
+                  <SidebarInset>
+                    <DashboardHeader />
+                    {children}
+                  </SidebarInset>
+                </RecentWorkspacesProvider>
+              </InboxProvider>
             </WorkspacesProvider>
           </SidebarProvider>
         </ReactQueryProvider>
