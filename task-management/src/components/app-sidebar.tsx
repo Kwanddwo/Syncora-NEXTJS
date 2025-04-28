@@ -7,9 +7,9 @@ import Logo from "./Logo";
 import {
   Building,
   Calendar,
+  Inbox,
   LayoutDashboard,
   LogOut,
-  Search,
   Settings2,
   User,
 } from "lucide-react";
@@ -24,35 +24,44 @@ import { useWorkspaces } from "@/context/WorkspaceContext";
 const data = {
   navMain: [
     {
-      title: "Search",
-      url: "#",
-      icon: Search,
-    },
-    {
-      title: "Dashbord",
+      title: "Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
-      isActive: true,
+    },
+    {
+      title: "Inbox",
+      url: "/dashboard/inbox",
+      icon: Inbox,
     },
     {
       title: "My Workspaces",
       url: "/dashboard/workspace",
       icon: Building,
       hasDropdown: true,
-      dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string}[],
+      dropdownItems: [] as {
+        name: string;
+        url: string;
+        active: boolean;
+        icon?: string;
+      }[],
     },
     {
       title: "Personal",
       url: "/dashboard/workspace",
       icon: User,
       hasDropdown: true,
-      dropdownItems: [] as { name: string; url: string; active: boolean;icon ?:string }[],
+      dropdownItems: [] as {
+        name: string;
+        url: string;
+        active: boolean;
+        icon?: string;
+      }[],
     },
   ],
   navSecondary: [
     {
       title: "Calendar",
-      url: "#",
+      url: "#calendar",
       icon: Calendar,
     },
     {
@@ -69,9 +78,13 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const {workspaces} = useWorkspaces();
-  const publicWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == false);
-  const personalWorkspaces = workspaces.filter((workspace) => workspace.isPersonal == true);
+  const { workspaces } = useWorkspaces();
+  const publicWorkspaces = workspaces.filter(
+    (workspace) => workspace.isPersonal == false
+  );
+  const personalWorkspaces = workspaces.filter(
+    (workspace) => workspace.isPersonal == true
+  );
   const updatedNavMain = React.useMemo(() => {
     return data.navMain.map((item) => {
       if (item.hasDropdown && item.title == "My Workspaces") {
@@ -79,7 +92,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           name: workspace.name,
           url: `/dashboard/workspace/${workspace.id}`,
           active: workspace.id === "someDefaultWorkspaceId",
-          icon:workspace.icon,
+          icon: workspace.icon,
         }));
       }
       if (item.hasDropdown && item.title == "Personal") {
@@ -87,13 +100,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           name: workspace.name,
           url: `/dashboard/workspace/${workspace.id}`,
           active: workspace.id === "someDefaultWorkspaceId",
-          icon:workspace.icon,
+          icon: workspace.icon,
         }));
       }
       return item;
     });
-  }, [personalWorkspaces,publicWorkspaces]);
-  
+  }, [personalWorkspaces, publicWorkspaces]);
+
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>

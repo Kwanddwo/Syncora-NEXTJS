@@ -4,13 +4,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
+import { NotificationButton } from "@/components/notification-button";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Building } from "lucide-react";
 import React from "react";
 
-function DashbordHeader() {
+function DashboardHeader() {
   return (
     <header className="flex h-14 shrink-0 justify-between items-center gap-2 border-b px-3">
       <div className="flex flex-1 items-center gap-2">
@@ -27,11 +28,12 @@ function DashbordHeader() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <NotificationButton />
         <ModeToggle />
       </div>
     </header>
   );
 }
 
-export default DashbordHeader;
+export default DashboardHeader;
