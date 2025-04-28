@@ -47,7 +47,7 @@ function ActiveWorkspaces() {
   return (
       <section>
         <h2 className="mb-4 text-xl font-bold">Active Workspaces</h2>
-        <ScrollArea className="h-54">
+        <ScrollArea className="h-41">
           <div className="space-y-2">
             {workspaces.map((workspace) => (
                 <Collapsible
