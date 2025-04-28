@@ -12,6 +12,7 @@ import workspaceRoutes from "./routes/workspaceRoutes.js"
 import inviteRoutes from "./routes/invitesroutes.js"
 import inboxRoutes from "./routes/inboxroutes.js"
 import recentWorkspaceRoutes from "./routes/recentWorkspaceRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -28,6 +29,7 @@ app.use("/api/workspace",workspaceRoutes);
 app.use("/api/invite",inviteRoutes);
 app.use("/api/inbox",inboxRoutes);
 app.use("/api/recentWorkspace", recentWorkspaceRoutes);
+app.use("/api/user", userRoutes);
 
 
 app.listen(3001, () => console.log("Server running on port 3001"));
