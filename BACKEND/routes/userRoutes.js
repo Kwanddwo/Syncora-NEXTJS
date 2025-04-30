@@ -5,15 +5,13 @@ import { authenticateUser } from "../middleware/middleware.js";
 import { FindChecker } from "../middleware/usermiddleware.js";
 const router = express.Router();
 
-router.post("
-            /UserDetails",
-            authenticateUser,
-            FindChecker, 
-            userHandlers.getUserDetails);
-router.put("
-           /UpdateDetails",
-           authenticateUser, 
-           userHandlers.updateUserDetails);
+router.post(
+  "/UserDetails",
+  authenticateUser,
+  FindChecker,
+  userHandlers.getUserDetails
+);
+router.put("/UpdateDetails", authenticateUser, userHandlers.updateUserDetails);
 router.post(
   "/email",
   handleInputError,
@@ -21,4 +19,4 @@ router.post(
   userHandlers.getUsersByEmail
 );
 
-export default routerr;
+export default router;
