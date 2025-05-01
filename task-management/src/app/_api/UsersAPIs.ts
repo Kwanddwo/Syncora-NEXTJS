@@ -5,6 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const GET_USERS_FROM_EMAIL_API = `${API_URL}/api/user/email`;
 const GET_USER_DETAILS_API = `${API_URL}/api/user/UserDetails`;
 const UPDATE_USER_DETAILS_API = `${API_URL}/api/user/UpdateDetails`;
+const DELETE_USER_ACCOUNT_API = `${API_URL}/api/user/DeleteAccount`;
 export const getUsersFromEmailAPI = async (email: string) => {
   const token = localStorage.getItem("token");
   const response = await axios.post(
@@ -52,5 +53,16 @@ export const updateUserDetailsAPI=async(user : updateUserRequest) =>{
         }
     )
 
+    return response.data;
+}
+
+export const deleteUserAccountAPI=async() =>{
+    const token = localStorage.getItem("token");
+    const response = await axios.delete(DELETE_USER_ACCOUNT_API,{
+        headers :{
+            Authorization: `Bearer ${token}`,
+        }
+    });
+    console.log("Response from deleteAccountAccountAPI:", response.data);
     return response.data;
 }
