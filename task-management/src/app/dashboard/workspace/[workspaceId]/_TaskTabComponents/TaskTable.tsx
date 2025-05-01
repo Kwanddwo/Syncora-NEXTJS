@@ -271,6 +271,7 @@ const TaskTable = ({
                 <EditTaskDialog
                     workspaceId={workspaceId}
                     taskId={taskToEdit}
+                    todos={todos}
                     setTodos={setTodos}
                     open={editDialogOpen}
                     onOpenChange={setEditDialogOpen}
