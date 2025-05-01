@@ -93,13 +93,14 @@ export const authenticateUser = async(req, res, next) => {
     }
 
     req.userId = userId;
-    const user =await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: userId },
     });
     if (!user) {
       console.error("User not found in database");
       return res.status(404).json({ error: "User Not Found" });
     }
+    console.log("Authenticated user ID:", userId);
     next();
   } catch (err) {
     console.error("Unexpected error in authentication middleware:", err);
@@ -107,4 +108,5 @@ export const authenticateUser = async(req, res, next) => {
       .status(500)
       .json({ error: "Internal Server Error", details: err.message });
   }
+
 };
