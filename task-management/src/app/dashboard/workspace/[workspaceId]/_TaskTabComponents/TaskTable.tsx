@@ -14,6 +14,7 @@ import {updateStatusAPI, updateTaskPriorityAPI} from "@/app/_api/TasksAPI";
 import {toast} from "sonner";
 import {AxiosError} from "axios";
 import PopoverComponent from './PopoverComponent';
+import {format} from "date-fns";
 
 const TaskTable = ({
   workspaceId,
@@ -173,7 +174,7 @@ const TaskTable = ({
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    {new Date(todo.dueDate).toISOString().split("T")[0]}
+                                    {format(new Date(todo.dueDate).toISOString().split("T")[0],"MMMM d, yyyy")}
                                 </TableCell>
                                 {!isPersonal && (
                                     <TableCell className="flex items-center pt-3">
