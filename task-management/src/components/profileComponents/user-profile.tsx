@@ -20,7 +20,7 @@ import {
     AtSignIcon,
     CalendarIcon,
     PencilIcon,
-    SaveIcon,
+    SaveIcon, Trash2,
     UserIcon,
     UserRoundIcon,
     XIcon,
@@ -29,6 +29,7 @@ import {Slot} from "@radix-ui/react-slot";
 import {getUserDetailsAPI, updateUserDetailsAPI} from "@/app/_api/UsersAPIs";
 import {updateUserRequest, UserDetails} from "@/types";
 import {toast} from "sonner";
+import DeleteProfileAlert from "@/components/profileComponents/DeleteProfileAlert";
 
 interface UserProfileSheetProps {
     children: React.ReactNode;
@@ -231,8 +232,8 @@ const UserProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({
 
                             <Separator />
 
-                            <CardFooter className="p-6 flex justify-end">
-                                {isEditing && (
+                            <CardFooter className="p-6 flex">
+                                {isEditing ? (
                                     <Button
                                         onClick={handleSave}
                                         className="flex items-center gap-2 shadow-md transition-all hover:shadow-lg"
@@ -240,6 +241,8 @@ const UserProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({
                                         <SaveIcon className="h-4 w-4" />
                                         Save Changes
                                     </Button>
+                                ):(
+                                   <DeleteProfileAlert />
                                 )}
                             </CardFooter>
                         </Card>
