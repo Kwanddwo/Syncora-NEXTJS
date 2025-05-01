@@ -4,7 +4,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronRight, ImageIcon, MoreVertical } from "lucide-react";
+import {ChevronRight, ImageIcon, MoreVertical, Pencil} from "lucide-react";
 import React, { useState } from "react";
 import { useWorkspaces } from "@/context/WorkspaceContext";
 import {
@@ -23,6 +23,7 @@ import DeleteWorkspaceAlert from "@/app/dashboard/_dashbordComponents/_workspace
 import { useAuth } from "@/hooks/use-auth";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {format} from "date-fns";
+import UpdateWorkspaceDialog from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceUpdateDialog";
 
 interface OpenStates {
   [key: string]: boolean;
@@ -36,6 +37,8 @@ function ActiveWorkspaces() {
       return acc;
     }, {})
   );
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+  const [workspaceToUpdate, setWorkspaceToUpdate] = useState<string | null>(null);
   console.log("WORKSPACE Description",workspaces);
 
   const toggleWorkspace = (id: string) => {
@@ -44,8 +47,15 @@ function ActiveWorkspaces() {
       [id]: !prev[id],
     }));
   };
+  const handleOpenUpdateDialog = (workspaceId: string) => {
+        setWorkspaceToUpdate(workspaceId);
+        setTimeout(() => {
+            setUpdateDialogOpen(true);
+        }, 10);
+  };
 
-  return (
+    return (
+      <>
       <section>
         <h2 className="mb-4 text-xl font-bold">Active Workspaces</h2>
         <ScrollArea className="h-41">
@@ -59,11 +69,9 @@ function ActiveWorkspaces() {
                         setOpenStates((prev) => ({ ...prev, [workspace.id]: open }))
                     }
                 >
-                  <CollapsibleTrigger
-                      className="flex w-full items-center justify-between rounded-md bg-gray-200 p-3"
-                      onClick={() => toggleWorkspace(workspace.id)}
-                  >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between rounded-md bg-gray-200 p-3">
+                  <CollapsibleTrigger asChild>
+                    <div className="flex items-center gap-2"  onClick={() => toggleWorkspace(workspace.id)}>
                       <ChevronRight
                           className={`h-4 w-4 transition-transform ${openStates[workspace.id] ? "rotate-90" : ""}`}
                       />
@@ -100,27 +108,34 @@ function ActiveWorkspaces() {
                             </HoverCardContent>
                         </HoverCard>
                     </div>
+                  </CollapsibleTrigger>
                     {workspace.ownerId === user?.id && (
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="focus:outline-none"
-                            >
-                              <MoreVertical className="h-4 w-4" />
-                            </div>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                className="text-red-500 focus:text-red-500"
-                                asChild
-                            >
-                              <DeleteWorkspaceAlert workspaceId={workspace.id} />
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
+                            <DropdownMenuTrigger asChild>
+                                <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="focus:outline-none"
+                                >
+                                    <MoreVertical className="h-4 w-4" />
+                                </div>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    onSelect={() => handleOpenUpdateDialog(workspace.id)}
+                                    className="justify-start text-muted-foreground cursor-pointer w-full">
+                                    <Pencil className="mr-2 h-4 w-4" />
+                                    <div className="text-center">Edit</div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-red-500 focus:text-red-500"
+                                    asChild
+                                >
+                                    <DeleteWorkspaceAlert workspaceId={workspace.id} />
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
                         </DropdownMenu>
                     )}
-                  </CollapsibleTrigger>
+                    </div>
                   <CollapsibleContent>
                     {workspace.tasks?.length > 0 ? (
                         <div className="mt-2 space-y-2">
@@ -143,6 +158,14 @@ function ActiveWorkspaces() {
           </div>
         </ScrollArea>
       </section>
+    {workspaceToUpdate && (
+        <UpdateWorkspaceDialog
+            workspaceId={workspaceToUpdate}
+            open={updateDialogOpen}
+            onOpenChange={setUpdateDialogOpen}
+        />
+    )}
+    </>
   );
 }
 
