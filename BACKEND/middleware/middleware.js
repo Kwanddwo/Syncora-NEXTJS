@@ -93,6 +93,13 @@ export const authenticateUser = (req, res, next) => {
     }
 
     req.userId = userId;
+     const user = prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      console.error("User not found in database");
+      return res.status(404).json({ error: "User Not Found" });
+    }
     next();
   } catch (err) {
     console.error("Unexpected error in authentication middleware:", err);
