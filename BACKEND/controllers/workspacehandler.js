@@ -245,3 +245,95 @@ export const changeUserRole = async (req, res) => {
 
     return res.status(200).json({ message: 'User role updated successfully.' });
 };
+export const updateworkspace = async (req, res) => {
+    const { workspaceId, name, description, icon } = req.body;
+    const currentUserId = req.userId;
+    
+    try {    
+        console.log("ownerId:", req.is_owner);
+        if (!req.is_owner) {
+            return res.status(403).json({ message: 'Only the workspace owner can update the workspace details' });
+        }
+        const updatedWorkspace = await prisma.workspace.update({
+            where: { id: workspaceId },
+            data: {
+                name,
+                description,
+                icon,
+                updatedAt: new Date()
+            }
+        });
+        
+        return res.status(200).json({
+            message: 'Workspace updated successfully',
+            workspace: updatedWorkspace
+        });
+    } catch (error) {
+        console.error("Error updating workspace:", error);
+        return res.status(500).json({
+            message: 'Error updating workspace',
+            error: error.message
+        });
+    }
+};
+
+// NOT DONE
+export const getAllWorkspaceDetails = async (req, res) => {
+    try {
+        const { workspaceId } = req.body;
+        
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                lastName: true,
+                                email: true,
+                                avatarUrl: true
+                            }
+                        }
+                    }
+                },
+                tasks: {
+                    include: {
+                        assignees: {
+                            include: {
+                                user: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        lastName: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        lastName: true,
+                        email: true
+                    }
+                }
+            }
+        });
+        
+        if (!workspace) {
+            return res.status(404).json({ message: 'Workspace not found' });
+        }
+        
+        return res.status(200).json(workspace);
+    } catch (error) {
+        console.error("Error fetching workspace details:", error);
+        return res.status(500).json({
+            message: 'Error fetching workspace details',
+            error: error.message
+        });
+    }
+}

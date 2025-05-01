@@ -106,3 +106,4 @@ export const getUsersByEmail = async (req, res) => {
   console.log(users);
   return res.status(200).json({ users });
 };
+
