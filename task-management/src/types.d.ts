@@ -120,3 +120,10 @@ export interface updateUserRequest {
   email?: string;
   avatarUrl?: string | undefined;
 }
+
+export interface workspaceUpdateRequest {
+  workspaceId: string;
+  name?: string;
+  description?: string;
+  icon?: string;
+}
