@@ -10,7 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import UserProfileSheet from "@/components/user-profile";
+import UserProfileSheet from "@/components/profileComponents/user-profile";
 
 export function NavSecondary({
   items,
