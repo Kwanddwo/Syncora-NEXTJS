@@ -3,6 +3,10 @@ import { handleInputError } from "../middleware/middleware.js";
 import * as userHandlers from "../controllers/userhandlers.js";
 import { authenticateUser } from "../middleware/middleware.js";
 import { FindChecker } from "../middleware/usermiddleware.js";
+
+import { FixSuccessors } from "../middleware/usermiddleware.js";
+
+
 const router = express.Router();
 
 router.post("/UserDetails",
@@ -12,6 +16,10 @@ router.post("/UserDetails",
 router.put("/UpdateDetails",
   authenticateUser,
   userHandlers.updateUserDetails);
+router.delete("/DeleteAccount",
+  authenticateUser,
+  FixSuccessors, 
+  deleteUserAccount);
 router.post(
   "/email",
   handleInputError,

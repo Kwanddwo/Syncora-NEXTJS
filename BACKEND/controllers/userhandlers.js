@@ -81,6 +81,22 @@ export const updateUserDetails = async (req, res) => {
   }
 }
 
+export const deleteUserAccount = async (req, res) => {
+    const userId = req.userId;
+    console.log(userId);
+    console.log("middleware worked"); 
+    try {
+        await prisma.user.delete({
+            where: { id: userId },
+        });
+        
+    } catch (error) {
+        console.error("Error deleting user account:", error);
+        res.status(500).json({ message: "Internal server error" });
+        
+    }
+}
+
 
 export const getUsersByEmail = async (req, res) => {
   const { email } = req.body;
@@ -106,4 +122,5 @@ export const getUsersByEmail = async (req, res) => {
   console.log(users);
   return res.status(200).json({ users });
 };
+
 
