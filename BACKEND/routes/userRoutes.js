@@ -19,7 +19,7 @@ router.put("/UpdateDetails",
 router.delete("/DeleteAccount",
   authenticateUser,
   FixSuccessors, 
-  deleteUserAccount);
+  userHandlers.deleteUserAccount);
 router.post(
   "/email",
   handleInputError,
