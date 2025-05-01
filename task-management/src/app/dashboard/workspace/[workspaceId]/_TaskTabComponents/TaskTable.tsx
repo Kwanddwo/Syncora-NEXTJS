@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChevronRight, MoreHorizontal, User} from 'lucide-react';
+import {ChevronRight, Edit, MoreHorizontal, User} from 'lucide-react';
 import { NewTaskDialog } from '../_TasksCRUDComponents/AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from '../_TasksCRUDComponents/EditTaskForm';
@@ -43,6 +43,15 @@ const TaskTable = ({
 }) => {
     const [priorityPopoverTask, setPriorityPopoverTask] = useState<string | null>(null)
     const [statusPopoverTask, setStatusPopoverTask] = useState<string | null>(null)
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [taskToEdit, setTaskToEdit] = useState<string | null>(null);
+
+    const handleOpenEditDialog = (taskId: string) => {
+        setTaskToEdit(taskId);
+        setTimeout(() => {
+            setEditDialogOpen(true);
+        }, 10);
+    };
 
     const updatePriority = async(taskId: string, newPriority: string) => {
         try{
@@ -122,6 +131,7 @@ const TaskTable = ({
     };
 
     return (
+        <>
         <div className="rounded-md border">
             <Table>
                 <TableHeader>
@@ -210,12 +220,11 @@ const TaskTable = ({
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem asChild>
-                                                <EditTaskDialog
-                                                    workspaceId={workspaceId}
-                                                    taskId={todo.id}
-                                                    setTodos={setTodos}
-                                                />
+                                            <DropdownMenuItem
+                                                className="w-full h-8 justify-start text-muted-foreground"
+                                                onSelect={() => handleOpenEditDialog(todo.id)}>
+                                                <Edit className="mr-2 h-4 w-4" />
+                                                Edit
                                             </DropdownMenuItem>
                                             <DropdownMenuItem asChild>
                                                 <DeleteTaskAlert
@@ -258,6 +267,16 @@ const TaskTable = ({
                 </TableBody>
             </Table>
         </div>
+            {taskToEdit && (
+                <EditTaskDialog
+                    workspaceId={workspaceId}
+                    taskId={taskToEdit}
+                    setTodos={setTodos}
+                    open={editDialogOpen}
+                    onOpenChange={setEditDialogOpen}
+                />
+            )}
+    </>
     );
 };
 

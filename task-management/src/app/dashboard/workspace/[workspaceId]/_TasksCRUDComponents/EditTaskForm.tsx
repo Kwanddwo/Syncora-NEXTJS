@@ -12,17 +12,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Edit } from "lucide-react";
 import { updateTaskAPI } from "@/app/_api/TasksAPI";
 import CustomDatePicker from "@/components/datePicker";
 import { ClipLoader } from "react-spinners";
@@ -32,17 +23,22 @@ export function EditTaskDialog({
   workspaceId,
   taskId,
   setTodos,
+  open,
+  onOpenChange
 }: {
   workspaceId: string;
   taskId :string
   setTodos: React.Dispatch<React.SetStateAction<Task[]>>;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const [dueDate, setDueDate] = useState<string>("");
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const closeModal = () => {
+    onOpenChange?.(false);
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const title = titleRef.current?.value.trim();
@@ -65,7 +61,7 @@ export function EditTaskDialog({
             prev.map((t) => (t.id === res.updatedTask.id ? res.updatedTask : t))
           );
         setLoading(false);
-        setOpen(false);
+        closeModal();
         toast.success("Task updated successfully.");
       } else {
         throw new Error("Task update failed.");
@@ -81,16 +77,7 @@ export function EditTaskDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full h-8 justify-start text-muted-foreground"
-        >
-          <Edit className="mr-2 h-4 w-4" />
-          Edit
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <form>
           <DialogHeader>
