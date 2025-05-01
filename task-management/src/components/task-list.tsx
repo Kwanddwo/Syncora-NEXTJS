@@ -1,11 +1,12 @@
 "use client";
 
 import { format, isSameDay } from "date-fns";
-import { Calendar, Clock } from "lucide-react";
+import { Building, Clock } from "lucide-react";
 
 import { Task, TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 interface TaskListProps {
   selectedDate: Date | null;
@@ -62,22 +63,22 @@ export function TaskList({ selectedDate, tasks }: TaskListProps) {
                     "bg-teg-green text-tag-green-foreground"
                 )}
               >
-                <h3 className="font-medium">{task.title}</h3>
+                <h3 className="font-medium mt-0">{task.title}</h3>
+                <p className="mt-0">{task.status}</p>
                 <div className="mt-2 flex flex-col space-y-1 text-sm text-muted-foreground">
                   <div className="flex items-center">
                     <Clock className="mr-1 h-3.5 w-3.5" />
-                    {/* This might be wrong, this was for events where there would be a start and end time */}
-                    <span>{format(new Date(task.dueDate), "h:mm a")}</span>
-                    {task.dueDate && (
-                      <span> - {format(new Date(task.dueDate), "h:mm a")}</span>
-                    )}
+                    <span>
+                      {format(new Date(task.dueDate), "yy/MM/dd - h:mm a")}
+                    </span>
                   </div>
-                  {task.workspaceId && (
-                    <div className="flex items-center">
-                      <Calendar className="mr-1 h-3.5 w-3.5" />
-                      <span>{task.workspaceId}</span>
-                    </div>
-                  )}
+                  <Link
+                    href={`/dashboard/workspace/${task.workspaceId}`}
+                    className="flex items-center text-muted-foreground hover:text-primary"
+                  >
+                    <Building className="mr-1 h-3.5 w-3.5" />
+                    <span>{task.workspaceId}</span>
+                  </Link>
                 </div>
                 {task.description && (
                   <p className="mt-2 text-sm">{task.description}</p>

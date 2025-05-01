@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 const SECRET = process.env.JWT_SECRET || "secret";
 
-export const verifyToken = (req, res, next) => {
+export const verifyToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   console.log("Token:", token);
 
@@ -16,6 +18,14 @@ export const verifyToken = (req, res, next) => {
     const decoded = jwt.verify(token, SECRET);
     console.log("Decoded Token:", decoded);
     req.user = decoded;
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
     next();
   } catch (error) {
     console.error("Token verification error:", error);

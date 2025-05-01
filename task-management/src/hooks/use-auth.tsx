@@ -104,7 +104,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         })
         .catch((err) => {
           console.error("Token verification failed:", err);
-          removeToken();
         })
         .finally(() => {
           setLoading(false);
