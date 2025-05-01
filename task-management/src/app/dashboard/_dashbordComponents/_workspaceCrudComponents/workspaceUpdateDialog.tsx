@@ -115,12 +115,7 @@ export default function UpdateWorkspaceDialog(
                             />
                         </div>
                         <div className="flex items-center gap-2">
-                            <EmojiSelector onSelectAction={setEmoji} />
-                            {emoji && (
-                                <div className="text-2xl">
-                                    {emoji}
-                                </div>
-                            )}
+                            <EmojiSelector onSelectAction={setEmoji} defaultValue={emoji} />
                         </div>
                     </div>
                     <DialogFooter className="flex justify-between sm:justify-end">
