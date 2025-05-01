@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { WorkspaceMember } from "@/lib/types";
-import {WorkspaceCreateRequest} from "@/types";
+import {WorkspaceCreateRequest, workspaceUpdateRequest} from "@/types";
 
 interface Task {
     id: string;
@@ -19,7 +19,7 @@ const WORKSPACES_API = `${API_URL}/api/workspace/workspaces`;
 const MEMBERS_API = `${API_URL}/api/workspace/members`;
 const TASKS_API = `${API_URL}/api/task/tasks`;
 const DELETE_WORKSPACE_API = `${API_URL}/api/workspace/delete`;
-
+const UPDATE_WORKSPACE_API = `${API_URL}/api/workspace/update`;
 export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
     const token = localStorage.getItem("token");
         try{
@@ -111,4 +111,19 @@ export const deleteWorkspaceAPI =async(workspaceId :string) =>{
     }catch(error){
         console.error("Error deleting workspace:", error);
     }
+}
+export const updateWorkspaceAPI =async(workspace :workspaceUpdateRequest) =>{
+    const token = localStorage.getItem("token");
+    const response = await axios.put(UPDATE_WORKSPACE_API,{
+            workspaceId :workspace.workspaceId,
+            name : workspace.name,
+            description : workspace.description,
+            icon : workspace.icon,
+    },{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+    });
+
+    return response.data;
 }
