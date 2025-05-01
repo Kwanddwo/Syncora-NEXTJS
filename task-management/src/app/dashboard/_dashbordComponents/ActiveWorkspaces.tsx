@@ -22,6 +22,7 @@ import DeleteWorkspaceAlert from "@/app/dashboard/_dashbordComponents/_workspace
 
 import { useAuth } from "@/hooks/use-auth";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import {format} from "date-fns";
 
 interface OpenStates {
   [key: string]: boolean;
@@ -92,7 +93,7 @@ function ActiveWorkspaces() {
                                     </div>
                                     <div className="mt-1 pt-2 border-t border-gray-100">
                                      <span className="text-xs text-gray-500">
-                                            Last updated: {workspace.updatedAt?.split("T")[0] || "Unknown"}
+                                            Last updated: {format(workspace.updatedAt.split("T")[0],"MMMM d, yyyy") || "Unknown"}
                                      </span>
                                     </div>
                                 </div>
@@ -129,7 +130,7 @@ function ActiveWorkspaces() {
                                   className="flex items-center justify-between rounded-md border p-3"
                               >
                                 <div>{task.title}</div>
-                                <div className="text-sm text-gray-500">Due: Soon</div>
+                                <div className="text-sm text-gray-500">Due: {format(task.dueDate.split("T")[0],"MMMM d, yyyy")}</div>
                               </div>
                           ))}
                         </div>
