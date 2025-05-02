@@ -1,9 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import dotenv from "dotenv";
 export const prisma = new PrismaClient();
-import jwt from "jsonwebtoken";
-dotenv.config();
-const SECRET = process.env.JWT_SECRET || "secret";
+import {addToInbox} from "../controllers/inboxhandlers.js";
 
 export const createWorkspace = async (req, res) => {
     const { name, description, isPersonal,icon } = req.body;
@@ -27,7 +24,20 @@ export const createWorkspace = async (req, res) => {
                     role: 'admin',
                 },
             });
-
+        // add to inbox
+        // what I need 
+        // const {recievers,senderId,message,type, Inboxdetails}
+        req.body.ecievers = [currentUserId];
+        req.body.senderId = currentUserId;
+        req.body.message = "You have created a new workspace with the name " + name;
+        req.body.type = "workspace_create";
+        req.body.Inboxdetails = {
+            workspaceId: workspace.id,
+            workspaceName: name,
+        };
+        // add to inbox
+        await addToInbox(req, res);
+        
         return res.status(201).json({
             message: 'Workspace created successfully',
             workspace,
@@ -39,6 +49,7 @@ export const createWorkspace = async (req, res) => {
             error: error.message,
         });
     }
+    
 }
 export const deleteWorkspace = async (req, res) => {
     const { workspaceId } = req.body
@@ -46,13 +57,32 @@ export const deleteWorkspace = async (req, res) => {
         await prisma.workspace.delete({
             where: { id: workspaceId },
         });
-
+        const membersIds = await prisma.workspaceMember.findMany({
+            where: { workspaceId: workspaceId },
+            select: { userId: true },
+        });
+        // now let us use the addToInbox function to add the message to all the members of the workspace
+        const members = membersIds.map((member) => member.userId);
+        req.body.recievers = members;
+        req.body.senderId = req.userId;
+        req.body.message = "This workspace" + workspaceId + " has been deleted by the owner";
+        req.body.type = "workspace_delete";
+        req.body.Inboxdetails = {
+            workspaceId: workspaceId,
+            workspaceName: "deleted",
+            dateofdeletion: new Date(),
+        };
+        // add to inbox
+        await addToInbox(req, res);
         return res.status(200).json({ message: 'Workspace deleted successfully' });
     } catch (error) {
         console.error(error);
         console.log("Error deleting workspace:", error);
         return res.status(500).json({ message: 'Failed to delete workspace', error: error.message });
     }
+   
+    
+
 };
 export const getWorkspacesByuserId = async (req, res) => {
     try {
@@ -115,6 +145,45 @@ export const getMembersByWorkspaceId = async (req, res) => {
         console.log("Error fetching members:", error);
     }
 }
+export const getAllworkspaces = async (req, res) => {
+    const userId = req.userId;
+    try {
+        const workspaceMemberships = await prisma.workspaceMember.findMany({
+            where: {
+                userId: userId,
+            },
+            include: {
+                workspace: {
+                    include: {
+                        tasks: {
+                            select: {
+                                id: true,
+                                title: true,
+                            },
+                        },
+                    },
+                },
+            }
+        });
+
+        // Restructure the data to match the requested format
+        const workspacesAndTasks = workspaceMemberships.map(membership => ({
+            id: membership.workspace.id,
+            name: membership.workspace.name,
+            description: membership.workspace.description,
+            tasks: membership.workspace.tasks
+        }));
+        
+
+        return res.status(200).json(workspacesAndTasks);
+    } catch (error) {
+        console.error("Error fetching workspaces:", error);
+        return res.status(500).json({
+            message: 'Error fetching workspaces',
+            error: error.message
+        });
+    }
+};
 export const addMemberToWorkspace = async (req, res) => {
    if (req.is_personal){
     return res.status(400).json({ message: 'You cannot add members to a personal workspace.' });

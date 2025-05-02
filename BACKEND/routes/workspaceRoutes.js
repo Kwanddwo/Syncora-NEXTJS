@@ -8,6 +8,7 @@ export const routerr = express.Router();
 
 
 routerr.get('/workspaces', workspaceHandlers.getWorkspacesByuserId); 
+routerr.get('/Dashboard', authenticateUser,workspaceHandlers.getAllworkspaces);
 routerr.put('/update',
     handleInputError,
     authenticateUser,
