@@ -15,11 +15,12 @@ interface Workspace {
 }
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL ;
 const CREATE_WORKSPACE_API=`${API_URL}/api/workspace/create`;
-const WORKSPACES_API = `${API_URL}/api/workspace/workspaces`;
 const MEMBERS_API = `${API_URL}/api/workspace/members`;
-const TASKS_API = `${API_URL}/api/task/tasks`;
 const DELETE_WORKSPACE_API = `${API_URL}/api/workspace/delete`;
 const UPDATE_WORKSPACE_API = `${API_URL}/api/workspace/update`;
+const GET_WORKSPACES_API = `${API_URL}/api/workspace/Dashboard`;
+
+
 export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
     const token = localStorage.getItem("token");
         try{
@@ -39,48 +40,17 @@ export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
         }
 }
 
-export const fetchTasksForWorkspace = async (
-    workspaceId: string
-): Promise<Task[]> => {
-    const token= localStorage.getItem("token");
-    try {
-        const response = await axios.post(TASKS_API, { workspaceId: workspaceId },{
-            headers : {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        return response.data; // Assuming the API returns an array of tasks
-    } catch (error) {
-        console.error(`Error fetching tasks for workspace ${workspaceId}:`, error);
-        return []; // Return empty tasks if API fails
-    }
-};
-
-// Main function to fetch workspaces with their tasks
-export const fetchActiveWorkspaces = async (): Promise<Workspace[]> => {
-    try {
-        const token = localStorage.getItem("token");
-
-        const response = await axios.get(WORKSPACES_API, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const workspacesData = response.data as Workspace[];
-
-        // Fetch tasks for each workspace
-        const workspacesWithTasks = await Promise.all(
-            workspacesData.map(async (workspace) => {
-                const tasks = await fetchTasksForWorkspace(workspace.id);
-                return { ...workspace, defaultOpen: false, tasks };
-            })
-        );
-
-        return workspacesWithTasks;
-    } catch (error) {
-        console.error("Error fetching workspaces:", error);
-        return [];
-    }
-};
+export const fetchActiveWorkspacesAPI =async() =>{
+    const token = localStorage.getItem("token");
+    const response = await axios.get(GET_WORKSPACES_API, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    const workspacesData = response.data as Workspace[];
+    const workspacesWithTasks = workspacesData.map((workspace) =>{
+        return {...workspace,defaultOpen : false}
+    })
+    return workspacesWithTasks;
+}
 
 export const fetchMembersFromWorkspace = async (
     workspaceId: string
