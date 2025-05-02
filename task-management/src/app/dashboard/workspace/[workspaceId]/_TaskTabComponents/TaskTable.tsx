@@ -192,6 +192,11 @@ const TaskTable = ({
                                             <div className="flex items-center">
                                                 <User className="h-4 w-4 mr-1" />
                                                 {todo.assignees?.[0]?.user?.name}
+                                                {(todo.assignees?.length ?? 0) > 1 && (
+                                                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                                                     +{(todo.assignees?.length ?? 1) - 1}
+                                                    </span>
+                                                )}
                                             </div>
                                             <Button
                                                 variant="ghost"

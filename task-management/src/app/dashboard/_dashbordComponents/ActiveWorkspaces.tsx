@@ -69,7 +69,7 @@ function ActiveWorkspaces() {
                         setOpenStates((prev) => ({ ...prev, [workspace.id]: open }))
                     }
                 >
-                    <div className="flex items-center justify-between rounded-md bg-gray-200 p-3">
+                    <div className="flex items-center justify-between rounded-md bg-input p-3">
                   <CollapsibleTrigger asChild>
                     <div className="flex items-center gap-2"  onClick={() => toggleWorkspace(workspace.id)}>
                       <ChevronRight
