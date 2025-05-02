@@ -1,5 +1,5 @@
 "use client"
-import React, {forwardRef, useEffect} from "react"
+import React, {forwardRef, useEffect, useRef} from "react"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ import {
     AtSignIcon,
     CalendarIcon,
     PencilIcon,
-    SaveIcon, Trash2,
+    SaveIcon, Upload, User,
     UserIcon,
     UserRoundIcon,
     XIcon,
@@ -30,6 +30,7 @@ import {getUserDetailsAPI, updateUserDetailsAPI} from "@/app/_api/UsersAPIs";
 import {updateUserRequest, UserDetails} from "@/types";
 import {toast} from "sonner";
 import DeleteProfileAlert from "@/components/profileComponents/DeleteProfileAlert";
+import {useEdgeStore} from "@/lib/edgestore";
 
 interface UserProfileSheetProps {
     children: React.ReactNode;
@@ -47,6 +48,31 @@ const UserProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({
     const [isEditing, setIsEditing] = useState(false)
     const [formData, setFormData] = useState<UserDetails>(userDetailsState)
     const [open, setOpen] = useState(false)
+    const [file,setFile] = useState<File>();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+    const { edgestore } = useEdgeStore();
+    const [uploading, setUploading] = useState(false);
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (!selectedFile) return;
+        setUploading(true);
+        try {
+            const res = await edgestore.publicFiles.upload({ file : selectedFile});
+            setAvatarSrc(res.url);
+            setFile(selectedFile);
+            setFormData(prev => ({ ...prev, avatarUrl: res.url }));
+            console.log("AVATAR URL",avatarSrc);
+        } catch (err) {
+            console.error("Avatar upload error:", err);
+            toast.error("Failed to upload avatar.");
+        }
+    };
+
+    const triggerFileInput = () => {
+        fileInputRef.current?.click()
+    }
 
     useEffect(()=>{
         const fetchUserDetails =async() =>{
@@ -112,20 +138,36 @@ const UserProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({
                         <Card className="border shadow-sm overflow-hidden">
                             <div className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-900 dark:to-slate-800 p-6">
                                 <div className="flex flex-col items-center gap-6">
-                                    <div className="relative">
-                                        <Avatar className="h-24 w-24 border-4 border-white dark:border-slate-800 shadow-md">
-                                            <AvatarImage
-                                                src={userDetailsState.avatarUrl || "https://github.com/shadcn.png"}
-                                                alt={`${userDetailsState.name} ${userDetailsState.lastName}`}
-                                            />
-                                            <AvatarFallback className="bg-slate-200 text-slate-800">
-                                                <UserIcon className="h-12 w-12" />
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <Badge className="absolute -bottom-2 right-0 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20">
-                                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                                        </Badge>
-                                    </div>
+                                    {isEditing ? (
+                                        <div className="relative group cursor-pointer" onClick={triggerFileInput}>
+                                            <Avatar className="w-24 h-24 border-2 border-primary/20 group-hover:border-primary/50 transition-all">
+                                                <AvatarImage src={avatarSrc} />
+                                                <AvatarFallback className="bg-muted">
+                                                    <User className="h-12 w-12 text-muted-foreground" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Upload className="h-6 w-6 text-white" />
+                                            </div>
+                                            <input type="file" ref={fileInputRef}  className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={uploading} />
+                                        </div>
+                                    ):(
+                                        <div className="relative">
+                                            <Avatar className="h-24 w-24 border-4 border-white dark:border-slate-800 shadow-md">
+                                                <AvatarImage
+                                                    src={userDetailsState.avatarUrl || ""}
+                                                    alt={`${userDetailsState.name} ${userDetailsState.lastName}`}
+                                                />
+                                                <AvatarFallback className="bg-slate-200 text-slate-800">
+                                                    <UserIcon className="h-12 w-12" />
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <Badge className="absolute -bottom-2 right-0 bg-green-500/10 text-green-600 border-green-200 hover:bg-green-500/20">
+                                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                                            </Badge>
+                                        </div>
+                                    )
+                                    }
                                     <div className="space-y-1 text-center">
                                         <h2 className="text-2xl font-bold tracking-tight">
                                             {userDetailsState.name} {userDetailsState.lastName}
