@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { Task, WorkspaceMember } from "@/lib/types";
 import MemberProfileSheet from "@/app/dashboard/workspace/[workspaceId]/_TaskTabComponents/memberProfile";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import AvatarUser from "@/components/Avatar-User";
 
 const AssigneeManagement = ({
                                 todo,
@@ -87,18 +87,15 @@ const AssigneeManagement = ({
                             key={index}
                             className="flex items-center gap-2 text-sm bg-muted/40 rounded-md px-3 py-2"
                         >
-                            <Avatar className="h-10 w-10 border-4 border-white dark:border-slate-800 shadow-md">
-                                <AvatarImage
-                                    src={assignee.user.avatarUrl || undefined}
-                                    alt={`${assignee.user.name} ${assignee.user.lastName}`}
-                                />
-                                <AvatarFallback className="bg-slate-200 text-slate-800">
-                                    {assignee.user.name &&
-                                        assignee.user.name.charAt(0).toUpperCase() +
-                                        (assignee.user.lastName &&
-                                            assignee.user.lastName.charAt(0).toUpperCase())}
-                                </AvatarFallback>
-                            </Avatar>
+                            <AvatarUser
+                                name={assignee.user.name}
+                                lastName={assignee.user.lastName}
+                                avatarUrl={assignee.user.avatarUrl}
+                                height={10}
+                                width={10}
+                                borderSize={2}
+                                hasBorder={true}
+                            />
                             <div className="flex-1 min-w-0">
                                 <MemberProfileSheet member={assignee.user} assignedBy={`${assignee.assignedBy?.name ?? ""} ${assignee.assignedBy?.lastName ?? ""}`}>
                                   <div className="font-medium truncate cursor-pointer">{assignee.user.name}</div>

@@ -1,6 +1,4 @@
 "use client";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import React from "react";
@@ -8,6 +6,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { useMembersByWorkspace } from "@/hooks/use-workspace";
 import { useAuth } from "@/hooks/use-auth";
 import { InviteDialog } from "./_MembersCRUDComponents/InviteMemberForm";
+import AvatarUser from "@/components/Avatar-User";
 
 export default function MembersTab({ workspaceId }: { workspaceId: string }) {
   const { currentUser } = useAuth();
@@ -43,18 +42,15 @@ export default function MembersTab({ workspaceId }: { workspaceId: string }) {
                   className="flex items-center justify-between rounded-md border p-2"
                 >
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-10 w-10 border-2 border-white dark:border-slate-800 shadow-md">
-                      <AvatarImage
-                          src={member.user.avatarUrl || undefined}
-                          alt={`${member.user.name} ${member.user.lastName}`}
-                      />
-                      <AvatarFallback className="bg-slate-200 text-slate-800">
-                        {member.user.name &&
-                            member.user.name.charAt(0).toUpperCase() +
-                            (member.user.lastName &&
-                                member.user.lastName.charAt(0).toUpperCase())}
-                      </AvatarFallback>
-                    </Avatar>
+                    <AvatarUser
+                        name={member.user.name}
+                        lastName={member.user.lastName}
+                        avatarUrl={member.user.avatarUrl}
+                        height={10}
+                        width={10}
+                        borderSize={2}
+                        hasBorder={true}
+                    />
                     <div>
                       <div className="text-sm font-medium">
                         {member.user.name}

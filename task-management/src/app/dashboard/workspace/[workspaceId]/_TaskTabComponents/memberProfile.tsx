@@ -1,7 +1,6 @@
 "use client"
 import React, {forwardRef} from "react"
 import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent,CardHeader } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
@@ -21,6 +20,7 @@ import {
 import {Slot} from "@radix-ui/react-slot";
 import {User} from "@/types";
 import {toast} from "sonner";
+import AvatarUser from "@/components/Avatar-User";
 
 interface UserProfileSheetProps {
     children: React.ReactNode;
@@ -43,18 +43,15 @@ const MemberProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(
                             <div className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-900 dark:to-slate-800 p-6">
                                 <div className="flex flex-col items-center gap-6">
                                         <div className="relative">
-                                            <Avatar className="h-24 w-24 border-4 border-white dark:border-slate-800 shadow-md">
-                                                <AvatarImage
-                                                    src={member.avatarUrl || undefined}
-                                                    alt={`${member.name} ${member.lastName}`}
-                                                />
-                                                <AvatarFallback className="bg-slate-200 text-slate-800">
-                                                    {member.name &&
-                                                        member.name.charAt(0).toUpperCase() +
-                                                        (member.lastName &&
-                                                            member.lastName.charAt(0).toUpperCase())}
-                                                </AvatarFallback>
-                                            </Avatar>
+                                            <AvatarUser
+                                                name={member.name}
+                                                lastName={member.lastName}
+                                                avatarUrl={member.avatarUrl}
+                                                height={24}
+                                                width={24}
+                                                borderSize={4}
+                                                hasBorder={true}
+                                            />
                                         </div>
                                     <div className="space-y-1 text-center">
                                         <h2 className="text-2xl font-bold tracking-tight">
