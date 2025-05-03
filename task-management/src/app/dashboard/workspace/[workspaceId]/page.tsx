@@ -11,7 +11,7 @@ import { Task } from "@/lib/types";
 import { useRecentWorkspacesContext } from "@/context/RecentWorkspacesContext";
 import { toast } from "sonner";
 import { useWorkspaces } from "@/context/WorkspaceContext";
-import { notFound } from "next/navigation";
+import {AxiosError} from "axios";
 
 function Page() {
   const params = useParams();
@@ -19,36 +19,53 @@ function Page() {
   const [todos, setTodos] = useState<Task[]>([]);
   const { addRecentWorkspace } = useRecentWorkspacesContext();
   const { workspaces, loading } = useWorkspaces();
-  const isPersonal =
-    workspaces.find((w) => w.id === workspaceId)?.isPersonal ?? false;
-
+  const isPersonal = workspaces.find((w) => w.id === workspaceId)?.isPersonal ?? false;
+  const [notFoundError, setNotFoundError] = useState(false);
+  const [forbiddenError, setForbiddenError] = useState(false);
   useEffect(() => {
-    let isWorkspace = false;
-    if (!loading && workspaces.length > 0) {
-      isWorkspace = !!workspaces.find((w) => w.id === workspaceId);
-      if (!isWorkspace) {
-        // This will show the 404 page
-        notFound();
-      }
-    }
     const getTasks = async () => {
       try {
         const response = await getTasksByWorkspaceId(workspaceId);
         setTodos(response);
-      } catch (error) {
-        console.error(
-          `Error fetching tasks for workspace ${workspaceId}:`,
-          error
-        );
-        toast.error("Error fetching tasks for workspace:");
+        addRecentWorkspace(workspaceId);
+      } catch (e) {
+        const error = e as AxiosError<{ message: string }>;
+        if(error.response?.status == 403){
+          setForbiddenError(true);
+          toast.error("You are not authorized to access this page.");
+          return;
+        }
+        if(error.response?.status == 404) {
+          setNotFoundError(true);
+          return ;
+        }
+       else{
+          console.error(`Error fetching tasks for workspace ${workspaceId}:`, e);
+          toast.error("Error fetching tasks for workspace:");
+        }
       }
     };
-    if (!loading && isWorkspace) {
       getTasks();
-      addRecentWorkspace(workspaceId);
-    }
   }, [workspaces, workspaceId, loading]);
-
+  if (notFoundError || forbiddenError) {
+    return (
+        <div className="flex flex-1 items-center justify-center">
+            {notFoundError &&(
+                <div className="text-center">
+                <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
+              <p className="text-lg text-gray-600">Workspace not found</p>
+              <p className="text-sm text-gray-500 mt-2">Please check the URL or go back to your dashboard.</p>
+              </div>
+            )}
+          {forbiddenError && (
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-red-600 mb-4">403</h1>
+                <p className="text-lg text-gray-600">You are not authorized to access this page.</p>
+              </div>
+          )}
+        </div>
+    );
+  }
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
       <Tabs defaultValue="kanban">
