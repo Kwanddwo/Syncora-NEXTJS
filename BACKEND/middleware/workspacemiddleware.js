@@ -14,8 +14,10 @@ export const verifyworkspace = async (req, res, next) => {
                 id: workspaceId,
             },
         });
-        if (!workspace) {
-            return res.status(404).json({ message: "Workspace not found" });
+      if (!workspace) {
+          console.log("Workspace not found ajmi:", workspaceId);
+          return res.status(404).json({ message: "Workspace not found" });
+          
         }
         console.log("Workspace verified successfully:");
         
@@ -28,7 +30,7 @@ export const userMembershipCheck = async (req, res, next) => {
   const userId = req.userId;
     try {
         const workspaceId = req.body.workspaceId;
-        console.log("workspaceId:", workspaceId);
+        console.log("workspaceId to check membership:", workspaceId);
         const workspaceMembership = await prisma.workspaceMember.findFirst({
             where: {
                 workspaceId: workspaceId,
