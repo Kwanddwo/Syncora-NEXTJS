@@ -322,6 +322,7 @@ export const getAllTasks = async (req, res) => {
                 lastName: true,
                 email: true,
                 avatarUrl: true,
+                createdAt: true,
               },
             },
             assignedBy: {
