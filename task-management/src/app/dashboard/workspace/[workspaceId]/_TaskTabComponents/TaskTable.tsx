@@ -15,7 +15,7 @@ import {toast} from "sonner";
 import {AxiosError} from "axios";
 import PopoverComponent from './PopoverComponent';
 import {format} from "date-fns";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import AvatarUser from "@/components/Avatar-User";
 
 const TaskTable = ({
   workspaceId,
@@ -195,18 +195,15 @@ const TaskTable = ({
                                         <div className="flex items-center gap-2">
                                             <div className="flex items-center">
                                                 {todo.assignees?.[0] ? (
-                                                    <Avatar className="h-8 w-8 border-2 shadow-md mr-2">
-                                                        <AvatarImage
-                                                            src={todo.assignees?.[0]?.user.avatarUrl || undefined}
-                                                            alt={`${todo.assignees?.[0]?.user.name} ${todo.assignees?.[0]?.user.lastName}`}
-                                                        />
-                                                        <AvatarFallback className="bg-slate-200 text-slate-800">
-                                                            {todo.assignees?.[0]?.user.name &&
-                                                                todo.assignees?.[0]?.user.name.charAt(0).toUpperCase() +
-                                                                (todo.assignees?.[0]?.user.lastName &&
-                                                                    todo.assignees?.[0]?.user.lastName.charAt(0).toUpperCase())}
-                                                        </AvatarFallback>
-                                                    </Avatar>
+                                                    <AvatarUser
+                                                        name={todo.assignees?.[0]?.user.name}
+                                                        lastName={todo.assignees?.[0]?.user.lastName}
+                                                        avatarUrl={todo.assignees?.[0]?.user.avatarUrl}
+                                                        height={8}
+                                                        width={8}
+                                                        borderSize={2}
+                                                        hasBorder={false}
+                                                    />
                                                 ):(
                                                     <User className="h-4 w-4 mr-1" />
                                                 )}
