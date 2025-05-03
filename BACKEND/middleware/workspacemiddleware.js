@@ -37,7 +37,7 @@ export const userMembershipCheck = async (req, res, next) => {
         });
         if (!workspaceMembership) {
             console.error("User is not a member of the specified workspace");
-
+            return res.status(403).json({ message: "User is not a member of the specified workspace" });
         }
         req.workspacemember = workspaceMembership;
         console.log("User verified successfully in workspace:");
