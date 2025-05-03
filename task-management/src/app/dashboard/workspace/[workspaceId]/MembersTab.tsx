@@ -43,12 +43,16 @@ export default function MembersTab({ workspaceId }: { workspaceId: string }) {
                   className="flex items-center justify-between rounded-md border p-2"
                 >
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="h-10 w-10 border-2 border-white dark:border-slate-800 shadow-md">
                       <AvatarImage
-                        src={`/placeholder.svg?height=32&width=32`}
+                          src={member.user.avatarUrl || undefined}
+                          alt={`${member.user.name} ${member.user.lastName}`}
                       />
-                      <AvatarFallback>
-                        {member.user.name.charAt(0)}
+                      <AvatarFallback className="bg-slate-200 text-slate-800">
+                        {member.user.name &&
+                            member.user.name.charAt(0).toUpperCase() +
+                            (member.user.lastName &&
+                                member.user.lastName.charAt(0).toUpperCase())}
                       </AvatarFallback>
                     </Avatar>
                     <div>

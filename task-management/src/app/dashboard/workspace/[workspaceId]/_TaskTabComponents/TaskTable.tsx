@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {ChevronRight, Edit, MoreHorizontal, User} from 'lucide-react';
+import {CalendarIcon, ChevronRight, Edit, MoreHorizontal, User} from 'lucide-react';
 import { NewTaskDialog } from '../_TasksCRUDComponents/AddTaskForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EditTaskDialog } from '../_TasksCRUDComponents/EditTaskForm';
@@ -15,6 +15,7 @@ import {toast} from "sonner";
 import {AxiosError} from "axios";
 import PopoverComponent from './PopoverComponent';
 import {format} from "date-fns";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
 const TaskTable = ({
   workspaceId,
@@ -184,13 +185,31 @@ const TaskTable = ({
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    {format(new Date(todo.dueDate).toISOString().split("T")[0],"MMMM d, yyyy")}
+                                    <div className="flex items-center">
+                                        <CalendarIcon className="h-3.5 w-3.5 mr-1" />
+                                        {format(new Date(todo.dueDate).toISOString().split("T")[0],"MMMM d, yyyy")}
+                                    </div>
                                 </TableCell>
                                 {!isPersonal && (
                                     <TableCell className="flex items-center pt-3">
                                         <div className="flex items-center gap-2">
                                             <div className="flex items-center">
-                                                <User className="h-4 w-4 mr-1" />
+                                                {todo.assignees?.[0] ? (
+                                                    <Avatar className="h-8 w-8 border-2 shadow-md mr-2">
+                                                        <AvatarImage
+                                                            src={todo.assignees?.[0]?.user.avatarUrl || undefined}
+                                                            alt={`${todo.assignees?.[0]?.user.name} ${todo.assignees?.[0]?.user.lastName}`}
+                                                        />
+                                                        <AvatarFallback className="bg-slate-200 text-slate-800">
+                                                            {todo.assignees?.[0]?.user.name &&
+                                                                todo.assignees?.[0]?.user.name.charAt(0).toUpperCase() +
+                                                                (todo.assignees?.[0]?.user.lastName &&
+                                                                    todo.assignees?.[0]?.user.lastName.charAt(0).toUpperCase())}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                ):(
+                                                    <User className="h-4 w-4 mr-1" />
+                                                )}
                                                 {todo.assignees?.[0]?.user?.name}
                                                 {(todo.assignees?.length ?? 0) > 1 && (
                                                     <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
