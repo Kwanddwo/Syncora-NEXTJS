@@ -65,6 +65,6 @@ routerr.delete('/leave',
 routerr.post('/members',
      handleInputError,workspaceHandlers.getMembersByWorkspaceId); 
 
-routerr.get('/Dashboard', authenticateUser, workspaceHandlers.getAllworkspaces);
+routerr.get('/Dashboard', authenticateUser, workspaceMiddleware.userMembershipCheck, workspaceHandlers.getAllworkspaces);
      
 export default routerr;
