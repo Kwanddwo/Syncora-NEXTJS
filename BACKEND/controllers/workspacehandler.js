@@ -160,45 +160,7 @@ export const getMembersByWorkspaceId = async (req, res) => {
         console.log("Error fetching members:", error);
     }
 }
-export const getAllworkspaces = async (req, res) => {
-    const userId = req.userId;
-    try {
-        const workspaceMemberships = await prisma.workspaceMember.findMany({
-            where: {
-                userId: userId,
-            },
-            include: {
-                workspace: {
-                    include: {
-                        tasks: {
-                            select: {
-                                id: true,
-                                title: true,
-                            },
-                        },
-                    },
-                },
-            }
-        });
 
-        // Restructure the data to match the requested format
-        const workspacesAndTasks = workspaceMemberships.map(membership => ({
-            id: membership.workspace.id,
-            name: membership.workspace.name,
-            description: membership.workspace.description,
-            tasks: membership.workspace.tasks
-        }));
-        
-
-        return res.status(200).json(workspacesAndTasks);
-    } catch (error) {
-        console.error("Error fetching workspaces:", error);
-        return res.status(500).json({
-            message: 'Error fetching workspaces',
-            error: error.message
-        });
-    }
-};
 export const addMemberToWorkspace = async (req, res) => {
    if (req.is_personal){
     return res.status(400).json({ message: 'You cannot add members to a personal workspace.' });
