@@ -14,18 +14,20 @@ import {
 } from "@/components/ui/sheet"
 import { format } from "date-fns"
 import {
-    AtSignIcon,
-    CalendarIcon,
+    AtSignIcon, BadgeCheck,
+    CalendarIcon, CopyIcon,
     UserRoundIcon,
 } from "lucide-react"
 import {Slot} from "@radix-ui/react-slot";
 import {User} from "@/types";
+import {toast} from "sonner";
 
 interface UserProfileSheetProps {
     children: React.ReactNode;
     member :User;
+    assignedBy :string;
 }
-const MemberProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({ children,member }, ref) => {
+const MemberProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({ children,member,assignedBy }, ref) => {
     const [open, setOpen] = useState(false)
     return (
         <Sheet open={open} onOpenChange={setOpen}>
@@ -68,6 +70,10 @@ const MemberProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(
                                             <AtSignIcon className="h-3.5 w-3.5" />
                                             <span>{member.email}</span>
                                         </div>
+                                        <div className="text-sm text-muted-foreground flex items-center justify-center gap-1.5 mt-1">
+                                            <BadgeCheck className="h-3.5 w-3.5" />
+                                            <span>Assigned By : {assignedBy}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -103,9 +109,19 @@ const MemberProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(
                                         <AtSignIcon className="h-4 w-4 text-muted-foreground" />
                                         Email Address
                                     </Label>
-                                        <div className="p-2.5 rounded-md bg-slate-50 dark:bg-slate-900 border shadow-sm">
-                                            {member.email}
-                                        </div>
+                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-slate-900 border shadow-sm flex items-center justify-between gap-2">
+                                        <span className="truncate">{member.email}</span>
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(member.email ?? "")
+                                                toast.success("Email copied to clipboard")
+                                            }}
+                                            className="text-muted-foreground hover:text-primary transition cursor-pointer"
+                                            type="button"
+                                        >
+                                            <CopyIcon className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             </CardContent>
                             <Separator />
