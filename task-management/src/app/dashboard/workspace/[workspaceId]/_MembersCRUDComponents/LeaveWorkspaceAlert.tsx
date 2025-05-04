@@ -17,6 +17,8 @@ import { leaveWorkspaceAPI } from "@/app/_api/WorkspacesAPIs";
 import { Workspace } from "@/types";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import {useRecentWorkspacesContext} from "@/context/RecentWorkspacesContext";
+import {useWorkspaces} from "@/context/WorkspaceContext";
 export default function LeaveWorkspaceAlert({
   workspace,
 }: {
@@ -26,12 +28,17 @@ export default function LeaveWorkspaceAlert({
     (workspace.icon && workspace.icon + " ") + workspace.name;
 
   const router = useRouter();
-
+  const {deleteRecentWorkspace} =useRecentWorkspacesContext()
+  const { setWorkspaces } = useWorkspaces();
   const handleDeleteClick = async () => {
     try {
       const data = await leaveWorkspaceAPI(workspace.id);
       console.log("Response from leaveWorkspaceAPI:", data);
       toast.success(`Left ${workspaceName} successfully.`);
+      setWorkspaces((prev) =>
+          prev.filter((w) => w.id != workspace.id)
+      );
+      deleteRecentWorkspace(workspace.id);
       router.push("/dashboard");
     } catch (error) {
       console.error(`Error leaving workspace ${workspace.id}:`, error);
