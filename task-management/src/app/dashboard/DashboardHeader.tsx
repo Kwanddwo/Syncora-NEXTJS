@@ -22,7 +22,7 @@ function DashboardHeader() {
             <BreadcrumbItem>
               <BreadcrumbPage className="line-clamp-1 flex items-center gap-2">
                 <Building className="h-5 w-5" />
-                <span className="text-xl font-bold">Workspace</span>
+                <span className="text-xl font-bold">Dashboard</span>
               </BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
