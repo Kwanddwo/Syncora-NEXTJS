@@ -1,15 +1,6 @@
-import { notFound } from "next/navigation";
-import { fetchWorkspaceById } from "@/app/_api/WorkspacesAPIs"; // Server-side API
+import React from "react";
 
-// This runs on server before page loads
-export default async function WorkspaceLayout({ params, children }) {
-  // Validate workspace exists server-side
-  const { workspaceId } = await params;
-  const workspace = await fetchWorkspaceById(workspaceId);
-
-  if (!workspace) {
-    notFound(); // This happens BEFORE any client rendering
-  }
+export default async function WorkspaceLayout({ children } :{ children: React.ReactNode }) {
 
   return <>{children}</>;
 }
