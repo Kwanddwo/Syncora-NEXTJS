@@ -5,6 +5,7 @@ import { Inbox } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { toast } from "sonner";
+import {useWorkspaces} from "@/context/WorkspaceContext";
 
 interface InboxInviteCardProps {
   notif: Inbox;
@@ -14,12 +15,13 @@ interface InboxInviteCardProps {
 const InboxInviteCard =({ notif, handleMark, router }: InboxInviteCardProps)  => {
   const notifDate = new Date(notif.createdAt);
   const inviteDetails = notif.details?.invite;
-  console.log("NOTIFICATION DETAILS", notif.details);
+  const {refreshWorkspaces} =useWorkspaces();
   const handleInviteAccept = async (inviteId: string, workspaceId: string) => {
     try {
       const response = await acceptInviteAPI(inviteId);
       console.log("Invite accepted:", response.data);
       toast.success("Invite accepted successfully!");
+       await refreshWorkspaces();
       router.push("/dashboard/workspace/" + workspaceId);
     } catch (error) {
       console.error("Error accepting invite:", error);

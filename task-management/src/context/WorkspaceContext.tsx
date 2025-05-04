@@ -8,6 +8,7 @@ type WorkspacesContextType = {
   workspaces: Workspace[];
   setWorkspaces: React.Dispatch<React.SetStateAction<Workspace[]>>;
   loading: boolean;
+  refreshWorkspaces: () => Promise<void>;
 };
 
 const WorkspacesContext = createContext<WorkspacesContextType | null>(null);
@@ -19,22 +20,24 @@ export const WorkspacesProvider = ({
 }) => {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const getWorkspaces = async () => {
+    try {
+      const data = await fetchActiveWorkspacesAPI();
+      setWorkspaces(data);
+    } catch (error) {
+      console.error("Failed to fetch workspaces:", error);
+    }
+  };
   useEffect(() => {
-    const getWorkspaces = async () => {
-      try {
-        const data = await fetchActiveWorkspacesAPI();
-        setWorkspaces(data);
-      } catch (error) {
-        console.error("Failed to fetch workspaces:", error);
-      }
-    };
     getWorkspaces();
     setLoading(false);
   }, []);
+  const refreshWorkspaces = async () => {
+    return getWorkspaces();
+  };
 
   return (
-    <WorkspacesContext.Provider value={{ workspaces, setWorkspaces, loading }}>
+    <WorkspacesContext.Provider value={{ workspaces, setWorkspaces, loading,refreshWorkspaces }}>
       {children}
     </WorkspacesContext.Provider>
   );
