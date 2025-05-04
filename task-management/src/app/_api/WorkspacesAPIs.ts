@@ -118,6 +118,7 @@ export const changeRoleAPI = async (
     `workspaceId: ${workspaceId}, memberId: ${memberId}, newRole: ${newRole}`
   );
   const token = localStorage.getItem("token");
+  console.log("WORKSPACE ID IN CHANGE_ROLE_API:", workspaceId);
   try {
     const response = await axios.post(
       CHANGE_ROLE_API,

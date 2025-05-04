@@ -345,7 +345,8 @@ export const exitWorkspace = async (req, res) => {
 export const changeUserRole = async (req, res) => {
   const { workspaceId, memberId, newRole } = req.body;
   const currentUserId = req.userId;
-
+  console.log("WORKSPACE ID PROVIDED IN CHANGE USER ROLE:", workspaceId);
+  console.log("MEMBER ID PROVIDED IN CHANGE USER ROLE:", memberId);
   const allowedRoles = ["member", "admin", "viewer"];
   if (!allowedRoles.includes(newRole)) {
     return res.status(400).json({ message: "Invalid role provided." });

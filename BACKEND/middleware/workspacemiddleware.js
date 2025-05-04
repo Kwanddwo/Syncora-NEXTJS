@@ -19,6 +19,7 @@ export const verifyworkspace = async (req, res, next) => {
       return res.status(404).json({ message: "Workspace not found" });
 
     }
+    req.workspace = workspace; 
     console.log("Workspace verified successfully:");
 
   } catch (error) {
