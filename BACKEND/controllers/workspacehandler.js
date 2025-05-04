@@ -89,78 +89,56 @@ export const deleteWorkspace = async (req, res) => {
 };
 
 export const getAllworkspaces = async (req, res) => {
-    const userId = req.userId;
+  const userId = req.userId;
 
-    try {
-        const workspaceMemberships = await prisma.workspaceMember.findMany({
-            where: {
-                userId: userId,
-            },
-            include: {
-                workspace: {
-                    select: {
-                        id: true,
-                        icon: true,
-                        name: true,
-                        description: true,
-                        ownerId: true,
-                        createdAt: true,
-                        updatedAt: true,
-                        isPersonal: true,
-                        successorId: true,
-                        tasks: {
-                            select: {
-                                id: true,
-                                title: true,
-                                dueDate: true,
-                                status: true,
-                                priority: true,
-                                description: true,
-                            },
-                        },
-                        members: {
-                            include: {
-                                user: true,
-                            },
-                        },
-                    },
-                },
-            },
-        });
-
-        const workspaces = workspaceMemberships.map(m => ({
-            ...m.workspace,
-        }));
-
-        return res.status(200).json(workspaces);
-    } catch (error) {
-        console.error("Error fetching workspaces:", error);
-        return res.status(500).json({
-            message: "Error fetching workspaces",
-            error: error.message,
-        });
-    }
-    const workspaces = await prisma.workspace.findMany({
+  try {
+    const workspaceMemberships = await prisma.workspaceMember.findMany({
       where: {
-        members: {
-          some: {
-            userId: userId,
-          },
-        },
+        userId: userId,
       },
       include: {
-        members: {
-          include: {
-            user: true,
+        workspace: {
+          select: {
+            id: true,
+            icon: true,
+            name: true,
+            description: true,
+            ownerId: true,
+            createdAt: true,
+            updatedAt: true,
+            isPersonal: true,
+            successorId: true,
+            tasks: {
+              select: {
+                id: true,
+                title: true,
+                dueDate: true,
+                status: true,
+                priority: true,
+                description: true,
+              },
+            },
+            members: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
     });
 
-    res.status(200).json(workspaces);
+    const workspaces = workspaceMemberships.map(m => ({
+      ...m.workspace,
+    }));
+
+    return res.status(200).json(workspaces);
   } catch (error) {
     console.error("Error fetching workspaces:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({
+      message: "Error fetching workspaces",
+      error: error.message,
+    });
   }
 };
 

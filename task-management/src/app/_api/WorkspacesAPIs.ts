@@ -19,44 +19,11 @@ const CREATE_WORKSPACE_API=`${API_URL}/api/workspace/create`;
 const MEMBERS_API = `${API_URL}/api/workspace/members`;
 const DELETE_WORKSPACE_API = `${API_URL}/api/workspace/delete`;
 const UPDATE_WORKSPACE_API = `${API_URL}/api/workspace/update`;
-const WORKSPACE_API = `${API_URL}/api/workspace/check/`;
 const CHANGE_ROLE_API = `${API_URL}/api/workspace/change-role`;
 const TRANSFER_OWNERSHIP_API = `${API_URL}/api/workspace/transfer-ownership`;
 const REMOVE_MEMBER_API = `${API_URL}/api/workspace/remove-member`;
 const LEAVE_API = `${API_URL}/api/workspace/leave`;
 const GET_WORKSPACES_API = `${API_URL}/api/workspace/Dashboard`;
-
-export const fetchTasksForWorkspace = async (
-  workspaceId: string
-): Promise<Task[]> => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await axios.post(
-      TASKS_API,
-      { workspaceId: workspaceId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data; // Assuming the API returns an array of tasks
-  } catch (error) {
-    console.error(`Error fetching tasks for workspace ${workspaceId}:`, error);
-    return []; // Return empty tasks if API fails
-  }
-};
-
-export const fetchWorkspaceById = async (workspaceId: string) => {
-  console.log(workspaceId);
-  console.log(WORKSPACE_API + workspaceId);
-  try {
-    const response = await axios.get(WORKSPACE_API + workspaceId);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching workspace:", error);
-  }
-};
 
 export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
     const token = localStorage.getItem("token");
@@ -104,7 +71,7 @@ export const fetchMembersFromWorkspace = async (
     console.log("Members Data:", membersData);
     return membersData;
   } catch (error) {
-    console.error("Error fetching workspaces:", error);
+    console.error("Error fetching workspaces for members:", error);
     return [];
   }
 };
