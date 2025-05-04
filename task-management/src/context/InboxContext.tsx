@@ -8,12 +8,14 @@ type InboxContextType = {
   fetchInbox: () => void;
   inboxCount: number;
   setInbox: React.Dispatch<React.SetStateAction<Inbox[]>>;
+  loading: boolean;
 };
 
 const InboxContext = createContext<InboxContextType | null>(null);
 
 export const InboxProvider = ({ children }: { children: React.ReactNode }) => {
   const [inbox, setInbox] = useState<Inbox[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchInbox = async () => {
     try {
@@ -22,6 +24,7 @@ export const InboxProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error("Failed to fetch inbox:", error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -30,7 +33,13 @@ export const InboxProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <InboxContext.Provider
-      value={{ inbox, fetchInbox, setInbox, inboxCount: inbox.length }}
+      value={{
+        inbox,
+        fetchInbox,
+        setInbox,
+        inboxCount: inbox.filter((i) => !i.read).length,
+        loading,
+      }}
     >
       {children}
     </InboxContext.Provider>

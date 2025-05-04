@@ -1,9 +1,13 @@
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Inbox } from "@/types";
 import { getNotificationTitle } from "@/app/dashboard/inbox/_inboxComponents/inboxUtils";
+import { formatDistanceToNow } from "date-fns";
+import { Button } from "@/components/ui/button";
 
-const InboxGeneralCard = (notif: Inbox) => {
+const InboxGeneralCard = (
+  notif: Inbox,
+  handleMark: (id: string, read: boolean) => void
+) => {
   const notifDate = new Date(notif.createdAt);
   return (
     <div
@@ -13,7 +17,6 @@ const InboxGeneralCard = (notif: Inbox) => {
         !notif.read ? "bg-muted/30" : ""
       }`}
     >
-      <Checkbox id={`notif-${notif.id}`} />
       <div className="grid flex-1 gap-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -24,23 +27,22 @@ const InboxGeneralCard = (notif: Inbox) => {
                   : "Notification"}
               </div>
             )}
-            {!notif.read && (
-              <Badge variant="secondary" className="ml-2">
-                Unread
-              </Badge>
-            )}
+            <Badge variant="outline" className="text-xs">
+              {notif.read ? "Read" : "Unread"}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleMark(notif.id, !notif.read)}
+            >
+              {notif.read ? "Mark as unread" : "Mark as read"}
+            </Button>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {Date.now() - notifDate.getTime() < 1000 * 60
-              ? "Just now"
-              : notifDate.toLocaleDateString("fr-MA", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-          </div>
+          <p className="mt-0 text-xs text-muted-foreground">
+            {formatDistanceToNow(notifDate, {
+              addSuffix: true,
+            })}
+          </p>
         </div>
         <div className="text-sm font-medium">{getNotificationTitle(notif)}</div>
         <div className="text-xs text-muted-foreground line-clamp-2">

@@ -44,8 +44,6 @@ export const addToInbox = async (req, res) => {
   }
 };
 
-
-
 export const getUserInbox = async (req, res) => {
   const userId = req.userId;
   try {
@@ -117,6 +115,78 @@ export const viewInboxdetail = async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching inbox details:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const markAsRead = async (req, res) => {
+  const inboxId = req.body.inboxId;
+  try {
+    const updatedInbox = await prisma.inbox.update({
+      where: { id: inboxId },
+      data: { read: true },
+    });
+
+    if (updatedInbox.count === 0) {
+      return res.status(404).json({ message: "Inbox not found" });
+    }
+    res.status(200).json(updatedInbox);
+  } catch (error) {
+    console.error("Error marking inbox as read:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const markAsUnread = async (req, res) => {
+  const inboxId = req.body.inboxId;
+  try {
+    const updatedInbox = await prisma.inbox.update({
+      where: { id: inboxId },
+      data: { read: false },
+    });
+
+    if (updatedInbox.count === 0) {
+      return res.status(404).json({ message: "Inbox not found" });
+    }
+    res.status(200).json(updatedInbox);
+  } catch (error) {
+    console.error("Error marking inbox as unread:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const markAllAsRead = async (req, res) => {
+  const userId = req.userId;
+  try {
+    const updatedInbox = await prisma.inbox.updateMany({
+      where: { userId, read: false },
+      data: { read: true },
+    });
+
+    if (updatedInbox.count === 0) {
+      return res.status(404).json({ message: "No unread inbox found" });
+    }
+    res.status(200).json(updatedInbox);
+  } catch (error) {
+    console.error("Error marking all inbox as read:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteInbox = async (req, res) => {
+  const inboxId = req.body.inboxId;
+  try {
+    await prisma.inbox.delete({
+      where: { id: inboxId },
+    });
+
+    if (deletedInbox.count === 0) {
+      return res.status(404).json({ message: "Inbox not found" });
+    }
+
+    res.status(200).json({ message: "Inbox deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting inbox:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

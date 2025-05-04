@@ -1,12 +1,16 @@
 import { acceptInviteAPI, declineInviteAPI } from "@/app/_api/InviteAPI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Inbox } from "@/types";
+import { formatDistanceToNow } from "date-fns";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { toast } from "sonner";
 
-const InboxInviteCard = (notif: Inbox, router: AppRouterInstance) => {
+const InboxInviteCard = (
+  notif: Inbox,
+  handleMark: (id: string, read: boolean) => void,
+  router: AppRouterInstance
+) => {
   const notifDate = new Date(notif.createdAt);
 
   const handleInviteAccept = async (inviteId: string, workspaceId: string) => {
@@ -49,7 +53,6 @@ const InboxInviteCard = (notif: Inbox, router: AppRouterInstance) => {
         (isAccepted ? "hover:bg-muted/50 hover:cursor-pointer" : "")
       }`}
     >
-      <Checkbox id={`notif-${notif.id}`} />
       <div className="grid flex-1 gap-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -60,23 +63,22 @@ const InboxInviteCard = (notif: Inbox, router: AppRouterInstance) => {
                   : "Notification"}
               </div>
             )}
-            {!notif.read && (
-              <Badge variant="secondary" className="ml-2">
-                Unread
-              </Badge>
-            )}
+            <Badge variant="outline" className="text-xs">
+              {notif.read ? "Read" : "Unread"}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleMark(notif.id, !notif.read)}
+            >
+              {notif.read ? "Mark as unread" : "Mark as read"}
+            </Button>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {Date.now() - notifDate.getTime() < 1000 * 60
-              ? "Just now"
-              : notifDate.toLocaleDateString("fr-MA", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-          </div>
+          <p className="mt-0 text-xs text-muted-foreground">
+            {formatDistanceToNow(notifDate, {
+              addSuffix: true,
+            })}
+          </p>
         </div>
         <div className="text-sm font-medium">
           You have been invited to {notif.details?.invite.workspace.name}
