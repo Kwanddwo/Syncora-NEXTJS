@@ -3,89 +3,87 @@ export const prisma = new PrismaClient();
 import { addToInbox } from "../controllers/inboxhandlers.js";
 
 export const createWorkspace = async (req, res) => {
-    const { name, description, isPersonal,icon } = req.body;
-    const currentUserId = req.userId;
-    try {
-        const workspace = await prisma.workspace.create({
-            data: {
-                name,
-                description,
-                isPersonal,
-                ownerId: currentUserId,
-                createdAt: new Date(),
-                icon,
-            },
-        });
-        await prisma.workspaceMember.create(
-            {
-                data: {
-                    workspaceId: workspace.id,
-                    userId: currentUserId,
-                    role: 'admin',
-                },
-            });
-        // add to inbox
-        // what I need 
-        // const {recievers,senderId,message,type, Inboxdetails}
-        req.body.recievers = [currentUserId];
-        req.body.senderId = currentUserId;
-        req.body.message = "You have created a new workspace with the name " + name;
-        req.body.type = "workspace_create";
-        req.body.Inboxdetails = {
-            workspaceId: workspace.id,
-            workspaceName: name,
-        };
-        // add to inbox
-        await addToInbox(req, res);
+  const { name, description, isPersonal, icon } = req.body;
+  const currentUserId = req.userId;
+  try {
+    const workspace = await prisma.workspace.create({
+      data: {
+        name,
+        description,
+        isPersonal,
+        ownerId: currentUserId,
+        createdAt: new Date(),
+        icon,
+      },
+    });
+    await prisma.workspaceMember.create({
+      data: {
+        workspaceId: workspace.id,
+        userId: currentUserId,
+        role: "admin",
+      },
+    });
+    // add to inbox
+    // what I need
+    // const {recievers,senderId,message,type, Inboxdetails}
+    req.body.recievers = [currentUserId];
+    req.body.senderId = currentUserId;
+    req.body.message = "You have created a new workspace with the name " + name;
+    req.body.type = "workspace_create";
+    req.body.Inboxdetails = {
+      workspaceId: workspace.id,
+      workspaceName: name,
+    };
+    // add to inbox
+    await addToInbox(req, res);
 
-        return res.status(201).json({
-            message: 'Workspace created successfully',
-            workspace,
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            message: 'Error creating workspace',
-            error: error.message,
-        });
-    }
-    
-}
+    return res.status(201).json({
+      message: "Workspace created successfully",
+      workspace,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Error creating workspace",
+      error: error.message,
+    });
+  }
+};
 export const deleteWorkspace = async (req, res) => {
-    const { workspaceId } = req.body
-    try {
-        const membersIds = await prisma.workspaceMember.findMany({
-            where: { workspaceId: workspaceId },
-            select: { userId: true },
-        });
+  const { workspaceId } = req.body;
+  try {
+    const membersIds = await prisma.workspaceMember.findMany({
+      where: { workspaceId: workspaceId },
+      select: { userId: true },
+    });
 
-        await prisma.workspace.delete({
-            where: { id: workspaceId },
-        });
-   
-        // now let us use the addToInbox function to add the message to all the members of the workspace
-        const members = membersIds.map((member) => member.userId);
-        console.log("Members" ,members)
-        req.body.recievers = members;
-        req.body.senderId = req.userId;
-        req.body.message = "This workspace" + workspaceId + " has been deleted by the owner";
-        req.body.type = "workspace_deleted";
-        req.body.Inboxdetails = {
-            workspaceId: workspaceId,
-            workspaceName: "deleted",
-            dateofdeletion: new Date(),
-        };
-        // add to inbox
-        await addToInbox(req, res);
-        return res.status(200).json({ message: 'Workspace deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        console.log("Error deleting workspace:", error);
-        return res.status(500).json({ message: 'Failed to delete workspace', error: error.message });
-    }
-   
-    
+    await prisma.workspace.delete({
+      where: { id: workspaceId },
+    });
 
+    // now let us use the addToInbox function to add the message to all the members of the workspace
+    const members = membersIds.map((member) => member.userId);
+    console.log("Members", members);
+    req.body.recievers = members;
+    req.body.senderId = req.userId;
+    req.body.message =
+      "This workspace" + workspaceId + " has been deleted by the owner";
+    req.body.type = "workspace_deleted";
+    req.body.Inboxdetails = {
+      workspaceId: workspaceId,
+      workspaceName: "deleted",
+      dateofdeletion: new Date(),
+    };
+    // add to inbox
+    await addToInbox(req, res);
+    return res.status(200).json({ message: "Workspace deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    console.log("Error deleting workspace:", error);
+    return res
+      .status(500)
+      .json({ message: "Failed to delete workspace", error: error.message });
+  }
 };
 
 export const getAllworkspaces = async (req, res) => {
@@ -128,7 +126,7 @@ export const getAllworkspaces = async (req, res) => {
       },
     });
 
-    const workspaces = workspaceMemberships.map(m => ({
+    const workspaces = workspaceMemberships.map((m) => ({
       ...m.workspace,
     }));
 
@@ -143,23 +141,23 @@ export const getAllworkspaces = async (req, res) => {
 };
 
 export const getMembersByWorkspaceId = async (req, res) => {
-    try {
-        const { workspaceId } = req.body;
-        const members = await prisma.workspaceMember.findMany({
-            where: {
-                workspaceId: workspaceId,
-            },
-            include: {
-                user: true,
-            },
-        });
-        res.status(200).json(members);
-    } catch (error) {
-        console.error("Error fetching members:", error);
-        res.status(500).json({ error: "Internal server error" });
-        console.log("Error fetching members:", error);
-    }
-}
+  try {
+    const { workspaceId } = req.body;
+    const members = await prisma.workspaceMember.findMany({
+      where: {
+        workspaceId: workspaceId,
+      },
+      include: {
+        user: true,
+      },
+    });
+    res.status(200).json(members);
+  } catch (error) {
+    console.error("Error fetching members:", error);
+    res.status(500).json({ error: "Internal server error" });
+    console.log("Error fetching members:", error);
+  }
+};
 
 export const addMemberToWorkspace = async (req, res) => {
   if (req.is_personal) {
@@ -245,15 +243,12 @@ export const exitWorkspace = async (req, res) => {
   const { workspaceId } = req.body;
 
   const userId = req.userId;
-  const userRole = await prisma.workspaceMember.findFirst({
-    where: {
-      workspaceId,
-      userId,
-    },
-    select: { role: true },
-  });
+  console.log("Exiting workspace:", { workspaceId, userId });
+  console.log("req.is_owner:", req.is_owner);
+  console.log("req.is_personal:", req.is_personal);
 
   if (req.is_owner && !req.is_personal) {
+    console.log("Owner is leaving a non-personal workspace.");
     const mostSeniorAdmin = await prisma.workspaceMember.findFirst({
       where: {
         workspaceId,
@@ -265,6 +260,7 @@ export const exitWorkspace = async (req, res) => {
     });
 
     if (mostSeniorAdmin) {
+      console.log("Most senior admin found:", mostSeniorAdmin.userId);
       await prisma.workspace.update({
         where: { id: workspaceId },
         data: { ownerId: mostSeniorAdmin.userId },
@@ -288,6 +284,7 @@ export const exitWorkspace = async (req, res) => {
     });
 
     if (mostSeniorMember) {
+      console.log("Most senior member found:", mostSeniorMember.userId);
       await prisma.workspaceMember.update({
         where: {
           id: mostSeniorMember.id,
@@ -310,6 +307,7 @@ export const exitWorkspace = async (req, res) => {
     }
 
     // No members left in the workspace, delete the workspace
+    console.log("No members left in the workspace, deleting it.");
 
     await prisma.workspaceMember.deleteMany({
       where: { workspaceId, userId },
@@ -325,6 +323,7 @@ export const exitWorkspace = async (req, res) => {
   }
 
   if (req.is_owner && req.is_personal) {
+    console.log("Owner is leaving a personal workspace.");
     // If the owner is leaving a personal workspace, delete the workspace
     await prisma.workspace.delete({
       where: { id: workspaceId },
@@ -335,6 +334,7 @@ export const exitWorkspace = async (req, res) => {
   }
 
   if (!req.is_owner) {
+    console.log("non-owner is leaving a workspace.");
     await prisma.workspaceMember.deleteMany({
       where: { workspaceId, userId },
     });
