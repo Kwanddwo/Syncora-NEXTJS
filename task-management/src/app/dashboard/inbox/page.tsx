@@ -63,6 +63,7 @@ export default function InboxPage() {
         prev.map((item) => (item.id === id ? { ...item, read: !read } : item))
       );
       toast.error("Failed to update notification.");
+      console.error("Failed to update notification",error);
     }
   };
 
@@ -139,9 +140,22 @@ export default function InboxPage() {
             {notifications.map((notif) => {
               switch (notif.type) {
                 case "workspace_invite":
-                  return InboxInviteCard(notif, handleMark, router);
+                  return (
+                      <InboxInviteCard
+                          key={notif.id}
+                          notif={notif}
+                          handleMark={handleMark}
+                          router={router}
+                      />
+                  );
                 default:
-                  return InboxGeneralCard(notif, handleMark);
+                  return (
+                      <InboxGeneralCard
+                          key={notif.id}
+                          notif={notif}
+                          handleMark={handleMark}
+                      />
+                  );
               }
             })}
           </div>

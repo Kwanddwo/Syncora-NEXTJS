@@ -6,13 +6,15 @@ import { formatDistanceToNow } from "date-fns";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { toast } from "sonner";
 
-const InboxInviteCard = (
-  notif: Inbox,
-  handleMark: (id: string, read: boolean) => void,
-  router: AppRouterInstance
-) => {
+interface InboxInviteCardProps {
+  notif: Inbox;
+  handleMark: (id: string, read: boolean) => void;
+  router: AppRouterInstance;
+}
+const InboxInviteCard =({ notif, handleMark, router }: InboxInviteCardProps)  => {
   const notifDate = new Date(notif.createdAt);
-
+  const inviteDetails = notif.details?.invite;
+  console.log("NOTIFICATION DETAILS", notif.details);
   const handleInviteAccept = async (inviteId: string, workspaceId: string) => {
     try {
       const response = await acceptInviteAPI(inviteId);
@@ -37,8 +39,7 @@ const InboxInviteCard = (
     }
   };
 
-  const isAccepted = notif.details?.invite.status === "accepted";
-
+  const isAccepted = inviteDetails.status === "accepted";
   return (
     <div
       key={notif.id}

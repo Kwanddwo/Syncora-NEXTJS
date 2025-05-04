@@ -4,10 +4,12 @@ import { getNotificationTitle } from "@/app/dashboard/inbox/_inboxComponents/inb
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 
-const InboxGeneralCard = (
-  notif: Inbox,
-  handleMark: (id: string, read: boolean) => void
-) => {
+
+interface InboxGeneralCardProps {
+  notif: Inbox;
+  handleMark: (id: string, read: boolean) => void;
+}
+const InboxGeneralCard = ({ notif, handleMark }: InboxGeneralCardProps)  => {
   const notifDate = new Date(notif.createdAt);
   return (
     <div
