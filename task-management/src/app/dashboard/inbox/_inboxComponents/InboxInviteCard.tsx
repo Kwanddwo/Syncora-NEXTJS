@@ -4,6 +4,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { toast } from "sonner";
 import InboxGeneralCard, { InboxGeneralCardProps } from "./InboxGeneralCard";
 import { useWorkspaces } from "@/context/WorkspaceContext";
+import { useInbox } from "@/context/InboxContext";
 
 interface InboxInviteCardProps extends InboxGeneralCardProps {
   router: AppRouterInstance;
@@ -15,13 +16,19 @@ const InboxInviteCard = ({
   router,
 }: InboxInviteCardProps) => {
   const { refreshWorkspaces } = useWorkspaces();
+  const { fetchInbox } = useInbox();
 
-  const handleInviteAccept = async (inviteId: string, workspaceId: string) => {
+  const handleInviteAccept = async (
+    inboxId: string,
+    inviteId: string,
+    workspaceId: string
+  ) => {
     try {
       const response = await acceptInviteAPI(inviteId);
       console.log("Invite accepted:", response.data);
       toast.success("Invite accepted successfully!");
       await refreshWorkspaces();
+      await handleMark(inboxId, true);
       router.push("/dashboard/workspace/" + workspaceId);
     } catch (error) {
       console.error("Error accepting invite:", error);
@@ -29,12 +36,13 @@ const InboxInviteCard = ({
     }
   };
 
-  const handleInviteDecline = async (inviteId: string) => {
+  const handleInviteDecline = async (inboxId: string, inviteId: string) => {
     try {
       const response = await declineInviteAPI(inviteId);
       console.log("Invite declined:", response.data);
       toast.success("Invite declined successfully!");
-      router.refresh();
+      await handleMark(inboxId, true);
+      await fetchInbox();
     } catch (error) {
       console.error("Error declining invite:", error);
       toast.error("Failed to decline invite.");
@@ -52,6 +60,7 @@ const InboxInviteCard = ({
           <Button
             onClick={() =>
               handleInviteAccept(
+                notif.id,
                 notif.details?.invite.id,
                 notif.details?.invite.workspaceId
               )
@@ -59,7 +68,11 @@ const InboxInviteCard = ({
           >
             Accept
           </Button>
-          <Button onClick={() => handleInviteDecline(notif.details?.invite.id)}>
+          <Button
+            onClick={() =>
+              handleInviteDecline(notif.id, notif.details?.invite.id)
+            }
+          >
             Decline
           </Button>
         </div>
