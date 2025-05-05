@@ -9,13 +9,7 @@ const prisma = new PrismaClient();
 export const CreateTask = async (req, res) => {
   try {
     const userId = req.userId;
-    const {
-      title,
-      description,
-      workspaceId,
-      priority,
-      dueDate,
-    } = req.body;
+    const { title, description, workspaceId, priority, dueDate } = req.body;
 
     const newTask = await prisma.task.create({
       data: {
@@ -25,7 +19,7 @@ export const CreateTask = async (req, res) => {
         workspaceId,
         dueDate: new Date(dueDate),
         createdById: userId,
-        status: 'pending',
+        status: "pending",
         priorityOrder: 0,
       },
     });
@@ -75,8 +69,10 @@ export const CreateTask = async (req, res) => {
       task: fullTask,
     });
   } catch (error) {
-    console.error('Error creating task:', error);
-    res.status(500).json({ error: 'Internal server error', details: error.message });
+    console.error("Error creating task:", error);
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 };
 
@@ -109,7 +105,7 @@ export const DeleteTask = async (req, res) => {
 
 export const UpdateTask = async (req, res) => {
   const userId = req.userId;
-  const { workspaceId, taskId,...updateFields } = req.body;
+  const { workspaceId, taskId, ...updateFields } = req.body;
 
   if (!workspaceId || !taskId) {
     return res
@@ -129,7 +125,6 @@ export const UpdateTask = async (req, res) => {
   }
 
   try {
-
     const updatedTask = await prisma.task.update({
       where: {
         id: taskId,
@@ -150,9 +145,9 @@ export const UpdateTask = async (req, res) => {
                 avatarUrl: true,
               },
             },
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     res.status(200).json({
@@ -273,7 +268,6 @@ export const updateTaskStatus = async (req, res) => {
       },
     });
 
-
     if (!isAssignee && !isAdmin) {
       return res
         .status(403)
@@ -378,11 +372,16 @@ export const getTasksByUserId = async (req, res) => {
 
     const tasks = await prisma.task.findMany({
       where: {
-        assignees: {
-          some: {
-            userId: userId,
+        OR: [
+          {
+            assignees: {
+              some: {
+                userId: userId,
+              },
+            },
           },
-        },
+          { workspace: { ownerId: userId, isPersonal: true } },
+        ],
         dueDate: {
           gte: lowerDate ? new Date(lowerDate) : undefined,
           lte: higherDate ? new Date(higherDate) : undefined,
