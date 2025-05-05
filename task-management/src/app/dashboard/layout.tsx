@@ -7,6 +7,7 @@ import ProtectedPage from "@/components/ProtectedPage";
 import { WorkspacesProvider } from "@/context/WorkspaceContext";
 import { RecentWorkspacesProvider } from "@/context/RecentWorkspacesContext";
 import { InboxProvider } from "@/context/InboxContext";
+import {ProfileProvider} from "@/context/ProfileContext";
 
 function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,11 +18,13 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             <WorkspacesProvider>
               <InboxProvider>
                 <RecentWorkspacesProvider>
+                  <ProfileProvider>
                   <AppSidebar />
                   <SidebarInset>
                     <DashboardHeader />
                     {children}
                   </SidebarInset>
+                  </ProfileProvider>
                 </RecentWorkspacesProvider>
               </InboxProvider>
             </WorkspacesProvider>

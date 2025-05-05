@@ -1,5 +1,5 @@
 "use client"
-import React, {forwardRef, useEffect, useRef} from "react"
+import React, {forwardRef,useRef} from "react"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -25,24 +25,18 @@ import {
     XIcon,
 } from "lucide-react"
 import {Slot} from "@radix-ui/react-slot";
-import {getUserDetailsAPI, updateUserDetailsAPI} from "@/app/_api/UsersAPIs";
+import {updateUserDetailsAPI} from "@/app/_api/UsersAPIs";
 import {updateUserRequest, UserDetails} from "@/types";
 import {toast} from "sonner";
 import DeleteProfileAlert from "@/components/profileComponents/DeleteProfileAlert";
 import {useEdgeStore} from "@/lib/edgestore";
+import {useProfile} from "@/context/ProfileContext";
 
 interface UserProfileSheetProps {
     children: React.ReactNode;
 }
 const UserProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({ children }, ref) => {
-    const [userDetailsState,setUserDetailsState] =useState<UserDetails>({
-        name: "",
-        lastName: "",
-        email: "",
-        avatarUrl: "",
-        createdAt: new Date(),
-        workspaces :[]
-    })
+    const {userDetailsState,setUserDetailsState} = useProfile();
     const [isEditing, setIsEditing] = useState(false)
     const [formData, setFormData] = useState<UserDetails>(userDetailsState)
     const [open, setOpen] = useState(false)
@@ -71,18 +65,6 @@ const UserProfileSheet = forwardRef<HTMLButtonElement, UserProfileSheetProps>(({
     const triggerFileInput = () => {
         fileInputRef.current?.click()
     }
-
-    useEffect(()=>{
-        const fetchUserDetails =async() =>{
-            try{
-                const data = await getUserDetailsAPI();
-                setUserDetailsState(data);
-            } catch (error) {
-                console.error("Failed to fetch workspaces:", error);
-            }
-        }
-        fetchUserDetails();
-    },[])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
