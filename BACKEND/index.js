@@ -21,11 +21,17 @@ console.log("Environment variables loaded:", process.env.FRONTEND_URL);
 const app = express();
 app.use(express.json());
 const corsOptions = {
-  origin: process.env.FRONTEND_URL, // single origin
-  // or for multiple:
-  // origin: ['https://site1.com','https://site2.com'],
-  optionsSuccessStatus: 200, // some legacy browsers choke on 204
+  origin: process.env.FRONTEND_URL,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
+
+// 1) Handle preflight for every path
+app.options("*", cors(corsOptions));
+
+// 2) Attach CORS headers to all routes
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -40,4 +46,6 @@ app.use("/api/inbox", inboxRoutes);
 app.use("/api/recentWorkspace", recentWorkspaceRoutes);
 app.use("/api/user", userRoutes);
 
-app.listen(3001, () => console.log("Server running on port 3001"));
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => console.log("Server running on port " + PORT));
