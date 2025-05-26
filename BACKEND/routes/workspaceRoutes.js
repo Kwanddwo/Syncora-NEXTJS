@@ -6,7 +6,6 @@ import * as workspaceMiddleware from "../middleware/workspacemiddleware.js";
 import { authenticateUser } from "../middleware/middleware.js";
 export const routerr = express.Router();
 
-
 routerr.put(
   "/update",
   handleInputError,
@@ -91,5 +90,9 @@ routerr.post(
   handleInputError,
   workspaceHandlers.getMembersByWorkspaceId
 );
-routerr.get('/Dashboard', authenticateUser, workspaceHandlers.getAllworkspaces);
+
+routerr.get("/active", authenticateUser, workspaceHandlers.getActiveWorkspaces);
+
+routerr.get("/all", authenticateUser, workspaceHandlers.getAllworkspaces);
+
 export default routerr;

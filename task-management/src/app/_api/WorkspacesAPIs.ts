@@ -23,7 +23,8 @@ const CHANGE_ROLE_API = `${API_URL}/api/workspace/change-role`;
 const TRANSFER_OWNERSHIP_API = `${API_URL}/api/workspace/transfer-ownership`;
 const REMOVE_MEMBER_API = `${API_URL}/api/workspace/remove-member`;
 const LEAVE_API = `${API_URL}/api/workspace/leave`;
-const GET_WORKSPACES_API = `${API_URL}/api/workspace/Dashboard`;
+const GET_ACTIVE_WORKSPACES_API = `${API_URL}/api/workspace/active`;
+const GET_WORKSPACES_API = `${API_URL}/api/workspace/all`;
 
 export const createWorkspaceAPI = async (workspace: WorkspaceCreateRequest) => {
   const token = localStorage.getItem("token");
@@ -48,16 +49,24 @@ export const createWorkspaceAPI = async (workspace: WorkspaceCreateRequest) => {
   }
 };
 
-export const fetchActiveWorkspacesAPI = async () => {
+export const fetchWorkspacesAPI = async () => {
   const token = localStorage.getItem("token");
   const response = await axios.get(GET_WORKSPACES_API, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const workspacesData = response.data as Workspace[];
-  workspacesData.filter((workspace) => {
-    // Filter out workspaces that are not active
-    return workspace.tasks.length > 0;
+  const workspacesWithTasks = workspacesData.map((workspace) => {
+    return { ...workspace, defaultOpen: false };
   });
+  return workspacesWithTasks;
+};
+
+export const fetchActiveWorkspacesAPI = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(GET_ACTIVE_WORKSPACES_API, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const workspacesData = response.data as Workspace[];
   const workspacesWithTasks = workspacesData.map((workspace) => {
     return { ...workspace, defaultOpen: false };
   });

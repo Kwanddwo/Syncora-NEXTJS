@@ -86,7 +86,7 @@ export const deleteWorkspace = async (req, res) => {
   }
 };
 
-export const getAllworkspaces = async (req, res) => {
+export const getActiveWorkspaces = async (req, res) => {
   const userId = req.userId;
 
   try {
@@ -125,6 +125,61 @@ export const getAllworkspaces = async (req, res) => {
                 status: true,
                 priority: true,
                 description: true,
+              },
+            },
+            members: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const workspaces = workspaceMemberships.map((m) => ({
+      ...m.workspace,
+    }));
+
+    return res.status(200).json(workspaces);
+  } catch (error) {
+    console.error("Error fetching workspaces:", error);
+    return res.status(500).json({
+      message: "Error fetching workspaces",
+      error: error.message,
+    });
+  }
+};
+
+export const getAllworkspaces = async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const workspaceMemberships = await prisma.workspaceMember.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        workspace: {
+          select: {
+            id: true,
+            icon: true,
+            name: true,
+            description: true,
+            ownerId: true,
+            createdAt: true,
+            updatedAt: true,
+            isPersonal: true,
+            successorId: true,
+            tasks: {
+              select: {
+                id: true,
+                title: true,
+                dueDate: true,
+                status: true,
+                priority: true,
+                description: true,
+                assignees: true,
               },
             },
             members: {
