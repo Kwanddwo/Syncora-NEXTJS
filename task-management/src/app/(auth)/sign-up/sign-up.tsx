@@ -96,7 +96,7 @@ export function SignUpForm({
   return (
     <form
       className={cn(
-        "w-full max-w-md mx-auto rounded-lg border border-border px-6 shadow-sm",
+        "w-full max-w-md mx-auto rounded-lg border border-border p-6 shadow-sm",
         className
       )}
       onSubmit={handleSubmit}
