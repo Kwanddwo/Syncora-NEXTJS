@@ -10,7 +10,7 @@ function CalendarSection({
   onMonthChange: (newMonth: Date) => void;
 }) {
   return (
-    <section>
+    <section id="calendar">
       <h2 className="mb-4 text-xl font-bold">Calendar</h2>
       <Calendar todos={todos} onMonthChange={onMonthChange} />
     </section>
