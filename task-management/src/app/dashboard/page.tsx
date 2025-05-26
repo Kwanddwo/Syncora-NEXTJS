@@ -4,7 +4,7 @@ import RecentWorkspaces from "./_dashbordComponents/RecentWorkspaces";
 import TaskForToday from "./_dashbordComponents/TaskForToday";
 import ActiveWorkspaces from "./_dashbordComponents/ActiveWorkspaces";
 import CalendarSection from "./_dashbordComponents/CalendarSection";
-import {useState, useEffect, useCallback} from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Task } from "@/lib/types";
 import {
   startOfMonth,
@@ -95,7 +95,7 @@ export default function Page() {
           // Merge new tasks with existing tasks, avoiding duplicates
           const taskIds = new Set(prevTodos.map((task) => task.id));
           const uniqueNewTasks = newTasks.filter(
-            (task:Task) => !taskIds.has(task.id)
+            (task: Task) => !taskIds.has(task.id)
           );
 
           return [...prevTodos, ...uniqueNewTasks];
@@ -143,13 +143,12 @@ export default function Page() {
     return <SkeletonDashboard />;
   }
 
-
   return (
-    <div className="flex flex-1 flex-col gap-8 p-6">
+    <div className="flex flex-1 flex-col gap-4 sm:gap-6 p-3 sm:p-6">
       {/* Recent Workspaces */}
       <RecentWorkspaces />
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
         {/* Your tasks for today */}
         <TaskForToday
           todos={todos.filter((t) => isSameDay(t.dueDate, new Date()))}

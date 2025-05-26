@@ -11,8 +11,12 @@ function CalendarSection({
 }) {
   return (
     <section id="calendar">
-      <h2 className="mb-4 text-xl font-bold">Calendar</h2>
-      <Calendar todos={todos} onMonthChange={onMonthChange} />
+      <h2 className="mb-2 sm:mb-4 text-lg sm:text-xl font-bold">Calendar</h2>
+      <div className="overflow-x-auto">
+        <div className="min-w-[300px]">
+          <Calendar todos={todos} onMonthChange={onMonthChange} />
+        </div>
+      </div>
     </section>
   );
 }

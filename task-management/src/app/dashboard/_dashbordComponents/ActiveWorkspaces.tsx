@@ -74,12 +74,13 @@ function ActiveWorkspaces() {
       setUpdateDialogOpen(true);
     }, 10);
   };
-
   return (
     <>
       <section>
-        <h2 className="mb-4 text-xl font-bold">Active Workspaces</h2>
-        <ScrollArea className="h-41 pr-4">
+        <h2 className="mb-2 sm:mb-4 text-lg sm:text-xl font-bold">
+          Active Workspaces
+        </h2>
+        <ScrollArea className="h-40 sm:h-41 pr-2 sm:pr-4">
           <div className="space-y-2">
             {workspaces.map((workspace) => (
               <Collapsible

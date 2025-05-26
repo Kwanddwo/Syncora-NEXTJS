@@ -150,17 +150,17 @@ function KanbanBoard({
       )}
     </Draggable>
   );
-
   return (
-      <TabsContent value="kanban" className="space-y-6">
+      <TabsContent value="kanban" className="space-y-3 sm:space-y-6">
         <DragDropContext
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
             onDragUpdate={onDragUpdate}
         >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {/* To Do Column */}
-            <Card className={`border-t-4 border-t-gray-200 transition-all ${activeDroppableId === 'todo' ? 'ring-2 ring-blue-400 bg-blue-50/20' : ''}`}>
+          <div className="overflow-x-auto pb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 min-w-[320px] w-full">
+              {/* To Do Column */}
+              <Card className={`border-t-4 border-t-gray-200 transition-all ${activeDroppableId === 'todo' ? 'ring-2 ring-blue-400 bg-blue-50/20' : ''}`}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <h3 className="font-semibold">Pending</h3>
                 <Badge variant="outline" className="text-xs font-normal">

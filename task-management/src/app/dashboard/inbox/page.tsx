@@ -63,7 +63,7 @@ export default function InboxPage() {
         prev.map((item) => (item.id === id ? { ...item, read: !read } : item))
       );
       toast.error("Failed to update notification.");
-      console.error("Failed to update notification",error);
+      console.error("Failed to update notification", error);
     }
   };
 
@@ -89,42 +89,44 @@ export default function InboxPage() {
       setNotifications(filtered);
     }
   };
-
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-        <h1 className="text-xl font-semibold">Inbox</h1>
-        <div className="ml-auto flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleMarkAllAsRead}
-            disabled={inbox.every((item) => item.read)}
-          >
-            Mark all as read
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8"
-            onClick={fetchInbox}
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span className="sr-only">Refresh</span>
-          </Button>
-          {/* Keep just search and refresh */}
-          <div className="relative">
+      <header className="sticky top-0 z-10 flex flex-col sm:flex-row h-auto sm:h-16 items-start sm:items-center gap-2 sm:gap-4 border-b bg-background p-2 sm:px-4 md:px-6">
+        <h1 className="text-lg sm:text-xl font-semibold pt-1 sm:pt-0">Inbox</h1>
+        <div className="w-full sm:ml-auto flex flex-col sm:flex-row items-start sm:items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleMarkAllAsRead}
+              disabled={inbox.every((item) => item.read)}
+              className="text-xs sm:text-sm h-8"
+            >
+              Mark all as read
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              onClick={fetchInbox}
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span className="sr-only">Refresh</span>
+            </Button>
+          </div>
+          {/* Search box with full width on mobile */}
+          <div className="relative w-full sm:w-auto">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search inbox..."
-              className="h-8 w-[150px] pl-8 sm:w-[250px] md:w-[300px]"
-              onChange={(e) => filterInbox(e.target.value)} // Add actual filtering function
+              className="h-8 w-full pl-8 sm:w-[200px] md:w-[300px]"
+              onChange={(e) => filterInbox(e.target.value)}
             />
           </div>
         </div>
       </header>
-      <main className="flex-1 p-4 md:p-6">
+      <main className="flex-1 p-2 sm:p-4 md:p-6">
         {inbox.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[50vh] text-center">
             <div className="rounded-full bg-muted p-4 mb-4">
@@ -141,20 +143,20 @@ export default function InboxPage() {
               switch (notif.type) {
                 case "workspace_invite":
                   return (
-                      <InboxInviteCard
-                          key={notif.id}
-                          notif={notif}
-                          handleMark={handleMark}
-                          router={router}
-                      />
+                    <InboxInviteCard
+                      key={notif.id}
+                      notif={notif}
+                      handleMark={handleMark}
+                      router={router}
+                    />
                   );
                 default:
                   return (
-                      <InboxGeneralCard
-                          key={notif.id}
-                          notif={notif}
-                          handleMark={handleMark}
-                      />
+                    <InboxGeneralCard
+                      key={notif.id}
+                      notif={notif}
+                      handleMark={handleMark}
+                    />
                   );
               }
             })}

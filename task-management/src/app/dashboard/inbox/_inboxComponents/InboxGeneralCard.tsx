@@ -22,14 +22,14 @@ const InboxGeneralCard = ({
   return (
     <div
       key={notif.id}
-      className={`flex items-start gap-4 rounded-lg border p-3 transition-colors ${
+      className={`flex items-start gap-2 sm:gap-4 rounded-lg border p-2 sm:p-3 transition-colors ${
         !notif.read ? "bg-muted/30" : ""
       }`}
     >
       <div className="grid flex-1 gap-1">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="font-semibold">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+            <div className="font-semibold text-sm sm:text-base">
               {notif.sender && notif.sender != null
                 ? notif.sender.name + " " + notif.sender.lastName
                 : "Alert"}
