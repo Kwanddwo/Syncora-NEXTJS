@@ -49,7 +49,7 @@ function EmailConfirmation() {
     }
   };
   return (
-    <div className="flex justify-center items-center h-screen bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="bg-background p-6 rounded-lg shadow-lg max-w-sm w-full">
         <h2 className="text-2xl font-semibold text-center mb-4">
           Enter Verification Code
@@ -58,7 +58,7 @@ function EmailConfirmation() {
           A verification code has been sent to your email address. Please check
           your inbox and enter the 6-digit code below to proceed.
         </p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="mb-4">
             <input
               type="text"
@@ -67,7 +67,9 @@ function EmailConfirmation() {
               placeholder="Enter 6-digit code"
             />
           </div>
-          <Button type="submit">Verify</Button>
+          <Button type="submit" className="w-full">
+            Verify
+          </Button>
         </form>
       </div>
     </div>

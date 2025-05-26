@@ -3,10 +3,10 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useRef} from "react";
+import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 export function LoginForm({
   className,
   ...props
@@ -32,12 +32,14 @@ export function LoginForm({
       router.push("/dashboard");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      toast.error(err.response ? err.response.data.message : "An error occurred");
+      toast.error(
+        err.response ? err.response.data.message : "An error occurred"
+      );
     }
   };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6 w-full", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Login to your account</h1>
         <p className="text-muted-foreground text-sm text-balance">
@@ -53,6 +55,7 @@ export function LoginForm({
             placeholder="name@example.com"
             ref={emailRef}
             required
+            className="w-full"
           />
         </div>
         <div className="grid gap-3">
@@ -65,7 +68,13 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" ref={passwordRef} required />
+          <Input
+            id="password"
+            type="password"
+            ref={passwordRef}
+            required
+            className="w-full"
+          />
         </div>
         <Button
           type="button"

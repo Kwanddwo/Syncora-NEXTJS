@@ -10,9 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {checkEmailAPI} from "@/app/_api/AuthAPIs";
-import {sendEmailAPI} from "@/app/_api/ResetPassAPIs";
-import {toast} from "sonner";
+import { checkEmailAPI } from "@/app/_api/AuthAPIs";
+import { sendEmailAPI } from "@/app/_api/ResetPassAPIs";
+import { toast } from "sonner";
 
 export default function ForgotPassowrd() {
   const emailRef = useRef<HTMLInputElement>(null);
@@ -20,7 +20,7 @@ export default function ForgotPassowrd() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const email = emailRef.current?.value;
-    if(!email){
+    if (!email) {
       toast.error("Email is required");
       return;
     }
@@ -53,8 +53,8 @@ export default function ForgotPassowrd() {
     }
   };
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <form onSubmit={handleSubmit}>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <form className="w-full max-w-md" onSubmit={handleSubmit}>
         <Card className="flex flex-col h-full">
           <CardHeader>
             <CardTitle>Reset Password</CardTitle>
@@ -74,11 +74,13 @@ export default function ForgotPassowrd() {
               placeholder="john@example.com"
               ref={emailRef}
               required
-            ></Input>
+            />
           </CardContent>
           <CardFooter className="mt-auto flex justify-end">
-            <div className="cursor-pointer">
-              <Button type="submit">Reset</Button>
+            <div className="cursor-pointer w-full">
+              <Button type="submit" className="w-full">
+                Reset
+              </Button>
             </div>
           </CardFooter>
         </Card>
