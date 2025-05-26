@@ -179,17 +179,17 @@ const TaskTable = ({
           <TableHeader>
             <TableRow>
               <TableHead className="whitespace-nowrap">Title</TableHead>
-              <TableHead className="whitespace-nowrap hidden sm:table-cell">
+              <TableHead className="whitespace-nowrap sm:table-cell">
                 Status
               </TableHead>
-              <TableHead className="whitespace-nowrap hidden sm:table-cell">
+              <TableHead className="whitespace-nowrap sm:table-cell">
                 Priority
               </TableHead>
-              <TableHead className="whitespace-nowrap hidden md:table-cell">
+              <TableHead className="whitespace-nowrap md:table-cell">
                 Due Date
               </TableHead>
               {!isPersonal && (
-                <TableHead className="whitespace-nowrap hidden md:table-cell">
+                <TableHead className="whitespace-nowrap md:table-cell">
                   Assignee
                 </TableHead>
               )}
