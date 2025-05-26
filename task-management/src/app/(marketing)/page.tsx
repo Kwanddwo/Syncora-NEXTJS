@@ -26,7 +26,7 @@ export default function LandingPage() {
           Minimal task app which keeps track of all your projects in one place.
         </p>
         <div className="flex justify-center md:justify-start gap-5 pt-3">
-          <Button variant="outline">Take a Look</Button>
+          {/* <Button variant="outline">Take a Look</Button> */}
           <Link href="/sign-up">
             <Button>Get Started</Button>
           </Link>
