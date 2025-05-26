@@ -9,10 +9,10 @@ export interface Workspace {
   name: string;
   description?: string;
   ownerId?: string;
-  defaultOpen: boolean;
+  defaultOpen?: boolean;
   isPersonal?: boolean;
   icon?: string;
-  updatedAt:string;
+  updatedAt?: string;
   tasks: Task[];
 }
 interface User {
@@ -68,11 +68,11 @@ export type RecentWorkspace = {
   viewedAt: string;
   workspace: Workspace;
 };
-export type TaskAssignee={
+export type TaskAssignee = {
   taskId: string;
   workspaceId: string;
-  workspaceMemberIds ?: string[];
-}
+  workspaceMemberIds?: string[];
+};
 export type InboxType =
   | "workspace_invite"
   | "workspace_role_updated"
@@ -112,7 +112,7 @@ export interface UserDetails {
   email: string;
   avatarUrl?: string | undefined;
   createdAt: Date;
-  workspaces : WorkspaceUserDetails[];
+  workspaces: WorkspaceUserDetails[];
 }
 
 export interface updateUserRequest {
