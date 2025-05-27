@@ -82,7 +82,10 @@ function Page() {
           setNotFoundError(true);
           toast.error("Workspace not found.");
         } else {
-          console.error(`Error fetching tasks for workspace ${workspaceId}:`, e);
+          console.error(
+            `Error fetching tasks for workspace ${workspaceId}:`,
+            e
+          );
           toast.error("Error fetching tasks for workspace.");
         }
       } finally {
@@ -101,80 +104,97 @@ function Page() {
 
   if (loading || isLoading) {
     return (
-        <div className="flex flex-1 items-center justify-center">
-          <p className="text-gray-500">Loading workspace...</p>
-        </div>
+      <div className="flex flex-1 items-center justify-center">
+        <p className="text-gray-500">Loading workspace...</p>
+      </div>
     );
   }
 
   if (notFoundError) {
     return (
-        <div className="flex flex-1 items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
-            <p className="text-lg text-gray-600">Workspace not found</p>
-            <p className="text-sm text-gray-500 mt-2">Please check the URL or go back to your dashboard.</p>
-          </div>
+      <div className="flex flex-1 items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
+          <p className="text-lg text-gray-600">Workspace not found</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Please check the URL or go back to your dashboard.
+          </p>
         </div>
+      </div>
     );
   }
 
   if (forbiddenError) {
     return (
-        <div className="flex flex-1 items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-red-600 mb-4">403</h1>
-            <p className="text-lg text-gray-600">You are not authorized to access this workspace.</p>
-          </div>
+      <div className="flex flex-1 items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-red-600 mb-4">403</h1>
+          <p className="text-lg text-gray-600">
+            You are not authorized to access this workspace.
+          </p>
         </div>
+      </div>
     );
   }
 
   if (!workspace) {
     return (
-        <div className="flex flex-1 items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
-            <p className="text-lg text-gray-600">Workspace not found</p>
-            <p className="text-sm text-gray-500 mt-2">Please check the URL or go back to your dashboard.</p>
-          </div>
+      <div className="flex flex-1 items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
+          <p className="text-lg text-gray-600">Workspace not found</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Please check the URL or go back to your dashboard.
+          </p>
         </div>
+      </div>
     );
   }
-
   return (
-      <div className="flex flex-1 flex-col gap-6 p-6">
-        <Tabs defaultValue="kanban">
-          <TabsList className="mb-4">
-            <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar</TabsTrigger>
-            {!isPersonal && <TabsTrigger value="members">Members</TabsTrigger>}
+    <div className="flex flex-1 flex-col gap-3 sm:gap-6 p-2 sm:p-4 md:p-6">
+      <Tabs defaultValue="kanban">
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="mb-4 w-full min-w-[300px]">
+            <TabsTrigger value="kanban" className="text-xs sm:text-sm">
+              Kanban Board
+            </TabsTrigger>
+            <TabsTrigger value="tasks" className="text-xs sm:text-sm">
+              Tasks
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="text-xs sm:text-sm">
+              Calendar
+            </TabsTrigger>
+            {!isPersonal && (
+              <TabsTrigger value="members" className="text-xs sm:text-sm">
+                Members
+              </TabsTrigger>
+            )}
           </TabsList>
-          <KanbanBoard
-              workspaceId={workspaceId}
-              todos={todos}
-              setTodos={setTodos}
-              isPersonal={isPersonal}
+        </div>
+        <KanbanBoard
+          workspaceId={workspaceId}
+          todos={todos}
+          setTodos={setTodos}
+          isPersonal={isPersonal}
+        />
+        <TaskTab
+          workspaceId={workspaceId}
+          todos={todos}
+          members={members}
+          setTodos={setTodos}
+          isPersonal={isPersonal}
+        />
+        {!isPersonal && (
+          <MembersTab
+            workspace={workspace}
+            setWorkspace={setWorkspace}
+            members={members}
+            setMembers={setMembers}
           />
-          <TaskTab
-              workspaceId={workspaceId}
-              todos={todos}
-              members={members}
-              setTodos={setTodos}
-              isPersonal={isPersonal}
-          />
-          {!isPersonal && (
-              <MembersTab
-                  workspace={workspace}
-                  setWorkspace={setWorkspace}
-                  members={members}
-                  setMembers={setMembers}
-              />
-          )}
-          <CalendarTab todos={todos} />
-        </Tabs>
-      </div>
+        )}
+        <CalendarTab todos={todos} />
+      </Tabs>
+    </div>
   );
 }
 

@@ -2,7 +2,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Workspace } from "@/types";
-import {fetchActiveWorkspacesAPI} from "@/app/_api/WorkspacesAPIs";
+import { fetchWorkspacesAPI } from "@/app/_api/WorkspacesAPIs";
 
 type WorkspacesContextType = {
   workspaces: Workspace[];
@@ -22,7 +22,7 @@ export const WorkspacesProvider = ({
   const [loading, setLoading] = useState(true);
   const getWorkspaces = async () => {
     try {
-      const data = await fetchActiveWorkspacesAPI();
+      const data = await fetchWorkspacesAPI();
       setWorkspaces(data);
     } catch (error) {
       console.error("Failed to fetch workspaces:", error);
@@ -37,7 +37,9 @@ export const WorkspacesProvider = ({
   };
 
   return (
-    <WorkspacesContext.Provider value={{ workspaces, setWorkspaces, loading,refreshWorkspaces }}>
+    <WorkspacesContext.Provider
+      value={{ workspaces, setWorkspaces, loading, refreshWorkspaces }}
+    >
       {children}
     </WorkspacesContext.Provider>
   );

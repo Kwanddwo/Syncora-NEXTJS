@@ -10,8 +10,10 @@ import {
   Inbox,
   LayoutDashboard,
   LogOut,
-  Settings2,
-  User, UserRound,
+  MessageCircle,
+  // Settings2,
+  User,
+  UserRound,
 } from "lucide-react";
 import {
   Sidebar,
@@ -63,25 +65,31 @@ const data = {
       title: "Profile",
       url: "", //no need
       icon: UserRound,
-      hasButton : true,
+      hasButton: true,
     },
     {
       title: "Calendar",
       url: "#calendar",
       icon: Calendar,
-      hasButton : false,
+      hasButton: false,
     },
+    // {
+    //   title: "Settings",
+    //   url: "/dashboard/settings",
+    //   icon: Settings2,
+    //   hasButton : false,
+    // },
     {
-      title: "Settings",
-      url: "/dashboard/settings",
-      icon: Settings2,
-      hasButton : false,
+      title: "Feedback & Bugs",
+      url: "/dashboard/feedback",
+      icon: MessageCircle,
+      hasButton: false,
     },
     {
       title: "Logout",
       url: "/logout",
       icon: LogOut,
-      hasButton : false,
+      hasButton: false,
     },
   ],
 };

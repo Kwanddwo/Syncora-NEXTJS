@@ -12,11 +12,14 @@ import inviteRoutes from "./routes/invitesroutes.js";
 import inboxRoutes from "./routes/inboxroutes.js";
 import recentWorkspaceRoutes from "./routes/recentWorkspaceRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import { authenticateUser } from "./middleware/middleware.js";
+import feedbackHandler from "./controllers/feedbackHandler.js";
 
 import dotenv from "dotenv";
 dotenv.config();
 // process.env.FRONTEND_URL
 console.log("Environment variables loaded:", process.env.FRONTEND_URL);
+
 
 const app = express();
 app.use(express.json());
@@ -45,6 +48,7 @@ app.use("/api/invite", inviteRoutes);
 app.use("/api/inbox", inboxRoutes);
 app.use("/api/recentWorkspace", recentWorkspaceRoutes);
 app.use("/api/user", userRoutes);
+app.post("/api/feedback", authenticateUser, feedbackHandler);
 
 const PORT = process.env.PORT || 3001;
 

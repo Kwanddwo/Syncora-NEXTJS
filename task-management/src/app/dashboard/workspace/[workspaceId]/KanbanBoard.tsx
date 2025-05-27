@@ -1,16 +1,23 @@
-"use client"
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { TabsContent } from '@/components/ui/tabs';
-import { Task, TaskAssignee, TaskStatus } from '@/lib/types';
-import { MoreVertical, GripVertical } from 'lucide-react';
-import React, { useState } from 'react'
-import {DragDropContext, Droppable, Draggable, DropResult, DragStart, DragUpdate} from "@hello-pangea/dnd"
+"use client";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { TabsContent } from "@/components/ui/tabs";
+import { Task, TaskAssignee, TaskStatus } from "@/lib/types";
+import { MoreVertical, GripVertical } from "lucide-react";
+import React, { useState } from "react";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+  DragStart,
+  DragUpdate,
+} from "@hello-pangea/dnd";
 import { updateStatusAPI } from "@/app/_api/TasksAPI";
-import {toast} from "sonner";
-import {AxiosError} from "axios";
-import { format } from "date-fns"
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { format } from "date-fns";
 function KanbanBoard({
   workspaceId,
   todos,
@@ -45,7 +52,7 @@ function KanbanBoard({
     let draggedTask;
     let newStatus;
 
-    if (source.droppableId === 'todo') {
+    if (source.droppableId === "todo") {
       draggedTask = todoTasks[source.index];
       newStatus = "pending";
     } else if (source.droppableId === "ongoing") {
@@ -56,37 +63,45 @@ function KanbanBoard({
       newStatus = "completed";
     }
 
-    if (destination.droppableId === 'todo') {
-      newStatus = 'pending';
-    } else if (destination.droppableId === 'ongoing') {
-      newStatus = 'in_progress';
-    } else if (destination.droppableId === 'done') {
-      newStatus = 'completed';
+    if (destination.droppableId === "todo") {
+      newStatus = "pending";
+    } else if (destination.droppableId === "ongoing") {
+      newStatus = "in_progress";
+    } else if (destination.droppableId === "done") {
+      newStatus = "completed";
     }
 
     if (draggedTask.status !== newStatus) {
       const pastTodos = todos;
       try {
-        setTodos((prev) => prev.map((todo) =>
-            todo.id === draggedTask.id ? { ...todo, status: newStatus as TaskStatus } : todo
-        ));
-        const response = await updateStatusAPI(workspaceId, draggedTask.id, newStatus);
+        setTodos((prev) =>
+          prev.map((todo) =>
+            todo.id === draggedTask.id
+              ? { ...todo, status: newStatus as TaskStatus }
+              : todo
+          )
+        );
+        const response = await updateStatusAPI(
+          workspaceId,
+          draggedTask.id,
+          newStatus
+        );
 
         if (response && response.message == "Task status updated") {
-          toast.success('Task status updated successfully.');
+          toast.success("Task status updated successfully.");
           return;
         } else {
           setTodos(pastTodos);
-          console.log("test")
-          return ;
+          console.log("test");
+          return;
         }
       } catch (e) {
         const error = e as AxiosError<{ message: string }>;
-        if(error.response?.status === 403){
+        if (error.response?.status === 403) {
           setTodos(pastTodos);
           toast.error("Unauthorized: Not an assignee or workspace admin");
-          return ;
-        }else{
+          return;
+        } else {
           console.error("Error Updating Status", e);
         }
       }
@@ -124,7 +139,11 @@ function KanbanBoard({
                 <h4 className="text-sm font-medium">{task.title}</h4>
               </div>
               <div className="text-xs text-muted-foreground ml-6">
-                Due: {format(new Date(task.dueDate).toISOString().split("T")[0],"MMMM d, yyyy")}
+                Due:{" "}
+                {format(
+                  new Date(task.dueDate).toISOString().split("T")[0],
+                  "MMMM d, yyyy"
+                )}
               </div>
               {!isPersonal && (
                 <div className="text-xs text-muted-foreground ml-6 mt-1">
@@ -150,17 +169,19 @@ function KanbanBoard({
       )}
     </Draggable>
   );
-
   return (
-      <TabsContent value="kanban" className="space-y-6">
-        <DragDropContext
-            onDragEnd={onDragEnd}
-            onDragStart={onDragStart}
-            onDragUpdate={onDragUpdate}
-        >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <TabsContent value="kanban" className="space-y-3 sm:space-y-6">
+      <DragDropContext
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+        onDragUpdate={onDragUpdate}
+      >
+        <div className="overflow-x-auto pb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 min-w-[320px] w-full">
             {/* To Do Column */}
-            <Card className={`border-t-4 border-t-gray-200 transition-all ${activeDroppableId === 'todo' ? 'ring-2 ring-blue-400 bg-blue-50/20' : ''}`}>
+            <Card
+              className={`border-t-4 border-t-gray-200 transition-all ${activeDroppableId === "todo" ? "ring-2 ring-blue-400 bg-blue-50/20" : ""}`}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <h3 className="font-semibold">Pending</h3>
                 <Badge variant="outline" className="text-xs font-normal">
@@ -169,24 +190,28 @@ function KanbanBoard({
               </CardHeader>
               <Droppable droppableId="todo">
                 {(provided, snapshot) => (
-                    <CardContent className={`min-h-64 transition-colors ${snapshot.isDraggingOver ? 'bg-blue-50/50' : ''}`}>
-                      <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className="space-y-2 p-1"
-                      >
-                        {todoTasks.map((todo, index) => (
-                            <TaskCard key={todo.id} task={todo} index={index} />
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    </CardContent>
+                  <CardContent
+                    className={`min-h-64 transition-colors ${snapshot.isDraggingOver ? "bg-blue-50/50" : ""}`}
+                  >
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="space-y-2 p-1"
+                    >
+                      {todoTasks.map((todo, index) => (
+                        <TaskCard key={todo.id} task={todo} index={index} />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  </CardContent>
                 )}
               </Droppable>
             </Card>
 
             {/* Ongoing Column */}
-            <Card className={`border-t-4 border-t-blue-200 transition-all ${activeDroppableId === 'ongoing' ? 'ring-2 ring-blue-400 bg-blue-50/30' : 'bg-blue-50/10'}`}>
+            <Card
+              className={`border-t-4 border-t-blue-200 transition-all ${activeDroppableId === "ongoing" ? "ring-2 ring-blue-400 bg-blue-50/30" : "bg-blue-50/10"}`}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <h3 className="font-semibold">In Progress</h3>
                 <Badge variant="outline" className="text-xs font-normal">
@@ -195,24 +220,28 @@ function KanbanBoard({
               </CardHeader>
               <Droppable droppableId="ongoing">
                 {(provided, snapshot) => (
-                    <CardContent className={`min-h-64 transition-colors ${snapshot.isDraggingOver ? 'bg-blue-100/50' : ''}`}>
-                      <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className="space-y-2 p-1"
-                      >
-                        {ongoingTasks.map((todo, index) => (
-                            <TaskCard key={todo.id} task={todo} index={index} />
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    </CardContent>
+                  <CardContent
+                    className={`min-h-64 transition-colors ${snapshot.isDraggingOver ? "bg-blue-100/50" : ""}`}
+                  >
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="space-y-2 p-1"
+                    >
+                      {ongoingTasks.map((todo, index) => (
+                        <TaskCard key={todo.id} task={todo} index={index} />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  </CardContent>
                 )}
               </Droppable>
             </Card>
 
             {/* Done Column */}
-            <Card className={`border-t-4 border-t-green-200 transition-all ${activeDroppableId === 'done' ? 'ring-2 ring-green-400 bg-green-50/30' : 'bg-green-50/10'}`}>
+            <Card
+              className={`border-t-4 border-t-green-200 transition-all ${activeDroppableId === "done" ? "ring-2 ring-green-400 bg-green-50/30" : "bg-green-50/10"}`}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <h3 className="font-semibold">Completed</h3>
                 <Badge variant="outline" className="text-xs font-normal">
@@ -221,24 +250,27 @@ function KanbanBoard({
               </CardHeader>
               <Droppable droppableId="done">
                 {(provided, snapshot) => (
-                    <CardContent className={`min-h-64 transition-colors ${snapshot.isDraggingOver ? 'bg-green-100/50' : ''}`}>
-                      <div
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className="space-y-2 p-1"
-                      >
-                        {doneTasks.map((todo, index) => (
-                            <TaskCard key={todo.id} task={todo} index={index} />
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    </CardContent>
+                  <CardContent
+                    className={`min-h-64 transition-colors ${snapshot.isDraggingOver ? "bg-green-100/50" : ""}`}
+                  >
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="space-y-2 p-1"
+                    >
+                      {doneTasks.map((todo, index) => (
+                        <TaskCard key={todo.id} task={todo} index={index} />
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  </CardContent>
                 )}
               </Droppable>
             </Card>
           </div>
-        </DragDropContext>
-      </TabsContent>
+        </div>
+      </DragDropContext>
+    </TabsContent>
   );
 }
 

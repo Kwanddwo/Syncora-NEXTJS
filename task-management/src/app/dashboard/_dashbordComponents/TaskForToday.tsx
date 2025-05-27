@@ -10,7 +10,7 @@ import {
 import { Task } from "@/lib/types";
 
 import React from "react";
-import {ScrollArea} from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 function TaskForToday({ todos }: { todos: Task[] }) {
   const tasks = todos;
@@ -50,45 +50,62 @@ function TaskForToday({ todos }: { todos: Task[] }) {
   };
   return (
     <section>
-      <h2 className="mb-4 text-xl font-bold">Your tasks for today</h2>
+      <h2 className="mb-2 sm:mb-4 text-lg sm:text-xl font-bold">
+        Your tasks for today
+      </h2>
       {tasks && tasks.length !== 0 ? (
-          <div className="rounded-md border">
-            <ScrollArea className="h-40" >
+        <div className="rounded-md border">
+          <ScrollArea className="h-40 sm:h-48">
             <Table>
               <TableHeader>
+                {" "}
                 <TableRow className="bg-accent">
-                  <TableHead>Title</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
+                  <TableHead className="py-2">Title</TableHead>
+                  <TableHead className="py-2 hidden sm:table-cell">
+                    Status
+                  </TableHead>
+                  <TableHead className="py-2">Priority</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tasks.map((task) => (
-                    <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.title}</TableCell>
-                      <TableCell>
-                        <Badge
+                  <TableRow key={task.id}>
+                    <TableCell className="font-medium py-2 text-xs sm:text-sm">
+                      <div className="flex flex-col">
+                        {task.title}
+                        <span className="sm:hidden mt-1">
+                          <Badge
                             variant="outline"
                             className={getStatusStyle(task.status)}
-                        >
-                          {task.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getPriorityStyle(task.priority)}>
-                          {task.priority}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
+                          >
+                            {task.status}
+                          </Badge>
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-2 hidden sm:table-cell">
+                      <Badge
+                        variant="outline"
+                        className={getStatusStyle(task.status)}
+                      >
+                        {task.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-2">
+                      <Badge className={getPriorityStyle(task.priority)}>
+                        {task.priority}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
-            </ScrollArea>
-          </div>
+          </ScrollArea>
+        </div>
       ) : (
-          <div className="flex w-full items-center justify-center p-6 text-lg font-semibold text-muted-foreground">
-            No tasks for today
-          </div>
+        <div className="flex w-full items-center justify-center p-3 sm:p-6 text-base sm:text-lg font-semibold text-muted-foreground">
+          No tasks for today
+        </div>
       )}
     </section>
   );

@@ -7,6 +7,7 @@ import { Task, TaskStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TaskListProps {
   selectedDate: Date | null;
@@ -43,54 +44,57 @@ export function TaskList({ selectedDate, tasks }: TaskListProps) {
       <CardHeader>
         <CardTitle>Tasks for {format(selectedDate, "MMMM d, yyyy")}</CardTitle>
       </CardHeader>
-      <CardContent>
-        {dayTasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No tasks scheduled for this day
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {dayTasks.map((task, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "rounded-lg border p-3",
-                  task.status === TaskStatus.pending &&
-                    "bg-tag-neutral text-tag-neutral-foreground",
-                  task.status === TaskStatus.in_progress &&
-                    "bg-tag-blue text-tag-blue-foreground",
-                  task.status === TaskStatus.completed &&
-                    "bg-teg-green text-tag-green-foreground"
-                )}
-              >
-                <h3 className="font-medium mt-0">{task.title}</h3>
-                <p className="mt-0">{task.status}</p>
-                <div className="mt-2 flex flex-col space-y-1 text-sm text-muted-foreground">
-                  <div className="flex items-center">
-                    <Clock className="mr-1 h-3.5 w-3.5" />
-                    <span>
-                      {format(new Date(task.dueDate), "yy/MM/dd - h:mm a")}
-                    </span>
-                  </div>
-                  <Link
-                    href={`/dashboard/workspace/${task.workspaceId}`}
-                    className="flex items-center text-muted-foreground hover:text-primary"
-                  >
-                      {(task.workspace?.icon !=null && task.workspace?.icon != "" ) ?(
-                          <span className="mr-1">{task.workspace?.icon}</span>
-                      ):(
-                          <Building className="mr-1 h-3.5 w-3.5" />
+      <CardContent className="p-2">
+        <ScrollArea className="h-120 rounded-md pr-4 w-full">
+          {dayTasks.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No tasks scheduled for this day
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {dayTasks.map((task, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "rounded-lg border p-3",
+                    task.status === TaskStatus.pending &&
+                      "bg-tag-neutral text-tag-neutral-foreground",
+                    task.status === TaskStatus.in_progress &&
+                      "bg-tag-blue text-tag-blue-foreground",
+                    task.status === TaskStatus.completed &&
+                      "bg-teg-green text-tag-green-foreground"
+                  )}
+                >
+                  <h3 className="font-medium mt-0">{task.title}</h3>
+                  <p className="mt-0">{task.status}</p>
+                  <div className="mt-2 flex flex-col space-y-1 text-sm text-muted-foreground">
+                    <div className="flex items-center">
+                      <Clock className="mr-1 h-3.5 w-3.5" />
+                      <span>
+                        {format(new Date(task.dueDate), "yy/MM/dd - h:mm a")}
+                      </span>
+                    </div>
+                    <Link
+                      href={`/dashboard/workspace/${task.workspaceId}`}
+                      className="flex items-center text-muted-foreground hover:text-primary"
+                    >
+                      {task.workspace?.icon != null &&
+                      task.workspace?.icon != "" ? (
+                        <span className="mr-1">{task.workspace?.icon}</span>
+                      ) : (
+                        <Building className="mr-1 h-3.5 w-3.5" />
                       )}
-                    <span>{task.workspace?.name}</span>
-                  </Link>
+                      <span>{task.workspace?.name}</span>
+                    </Link>
+                  </div>
+                  {task.description && (
+                    <p className="mt-2 text-sm">{task.description}</p>
+                  )}
                 </div>
-                {task.description && (
-                  <p className="mt-2 text-sm">{task.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </ScrollArea>
       </CardContent>
     </Card>
   );

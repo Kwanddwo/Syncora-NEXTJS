@@ -14,8 +14,8 @@ interface Workspace {
   tasks: Task[];
 }
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL ;
-const CREATE_WORKSPACE_API=`${API_URL}/api/workspace/create`;
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const CREATE_WORKSPACE_API = `${API_URL}/api/workspace/create`;
 const MEMBERS_API = `${API_URL}/api/workspace/members`;
 const DELETE_WORKSPACE_API = `${API_URL}/api/workspace/delete`;
 const UPDATE_WORKSPACE_API = `${API_URL}/api/workspace/update`;
@@ -23,38 +23,55 @@ const CHANGE_ROLE_API = `${API_URL}/api/workspace/change-role`;
 const TRANSFER_OWNERSHIP_API = `${API_URL}/api/workspace/transfer-ownership`;
 const REMOVE_MEMBER_API = `${API_URL}/api/workspace/remove-member`;
 const LEAVE_API = `${API_URL}/api/workspace/leave`;
-const GET_WORKSPACES_API = `${API_URL}/api/workspace/Dashboard`;
+const GET_ACTIVE_WORKSPACES_API = `${API_URL}/api/workspace/active`;
+const GET_WORKSPACES_API = `${API_URL}/api/workspace/all`;
 
-export const createWorkspaceAPI = async(workspace : WorkspaceCreateRequest) => {
-    const token = localStorage.getItem("token");
-        try{
-            const response=await axios.post(CREATE_WORKSPACE_API,{
-                name : workspace.name,
-                description : workspace.description,
-                isPersonal : workspace.isPersonal,
-                icon : workspace.icon,
-            },{
-                headers : {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            return response.data;
-        }catch(error){
-            console.log("Error in the REST API :",error)
-        }
-}
+export const createWorkspaceAPI = async (workspace: WorkspaceCreateRequest) => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await axios.post(
+      CREATE_WORKSPACE_API,
+      {
+        name: workspace.name,
+        description: workspace.description,
+        isPersonal: workspace.isPersonal,
+        icon: workspace.icon,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log("Error in the REST API :", error);
+  }
+};
 
-export const fetchActiveWorkspacesAPI =async() =>{
-    const token = localStorage.getItem("token");
-    const response = await axios.get(GET_WORKSPACES_API, {
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    const workspacesData = response.data as Workspace[];
-    const workspacesWithTasks = workspacesData.map((workspace) =>{
-        return {...workspace,defaultOpen : false}
-    })
-    return workspacesWithTasks;
-}
+export const fetchWorkspacesAPI = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(GET_WORKSPACES_API, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const workspacesData = response.data as Workspace[];
+  const workspacesWithTasks = workspacesData.map((workspace) => {
+    return { ...workspace, defaultOpen: false };
+  });
+  return workspacesWithTasks;
+};
+
+export const fetchActiveWorkspacesAPI = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(GET_ACTIVE_WORKSPACES_API, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const workspacesData = response.data as Workspace[];
+  const workspacesWithTasks = workspacesData.map((workspace) => {
+    return { ...workspace, defaultOpen: false };
+  });
+  return workspacesWithTasks;
+};
 
 export const fetchMembersFromWorkspace = async (
   workspaceId: string

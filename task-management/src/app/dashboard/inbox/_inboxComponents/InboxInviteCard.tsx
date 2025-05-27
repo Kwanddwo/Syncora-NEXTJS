@@ -55,9 +55,12 @@ const InboxInviteCard = ({
       title={`You have been invited to ${notif.details?.invite.workspace.name}`}
       handleMark={handleMark}
     >
+      {" "}
       {notif.details?.invite.status === "pending" ? (
-        <div className="flex gap-2 align-items-center">
+        <div className="flex flex-wrap gap-2 align-items-center mt-2">
           <Button
+            size="sm"
+            className="text-xs sm:text-sm h-8"
             onClick={() =>
               handleInviteAccept(
                 notif.id,
@@ -69,6 +72,8 @@ const InboxInviteCard = ({
             Accept
           </Button>
           <Button
+            size="sm"
+            className="text-xs sm:text-sm h-8"
             onClick={() =>
               handleInviteDecline(notif.id, notif.details?.invite.id)
             }

@@ -14,6 +14,9 @@ import LeaveWorkspaceAlert from "./_MembersCRUDComponents/LeaveWorkspaceAlert";
 import { TransferOwnershipAlert } from "./_MembersCRUDComponents/TransferOwnershipAlert";
 import AvatarUser from "@/components/Avatar-User";
 
+import UpdateWorkspaceDialog from "@/app/dashboard/_dashbordComponents/_workspaceCrudComponents/workspaceUpdateDialog";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
 export default function MembersTab({
   workspace,
@@ -28,6 +31,13 @@ export default function MembersTab({
 }) {
   const { currentUser } = useAuth();
   const [filter, setFilter] = useState<string>("");
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+
+  const handleOpenUpdateDialog = () => {
+    setTimeout(() => {
+      setUpdateDialogOpen(true);
+    }, 10);
+  };
 
   const canChangePermission = (
     currentUser: User | null,
@@ -107,13 +117,13 @@ export default function MembersTab({
                 >
                   <div className="flex items-center gap-2">
                     <AvatarUser
-                        name={member.user.name}
-                        lastName={member.user.lastName}
-                        avatarUrl={member.user.avatarUrl}
-                        height={10}
-                        width={10}
-                        borderSize={2}
-                        hasBorder={true}
+                      name={member.user.name}
+                      lastName={member.user.lastName}
+                      avatarUrl={member.user.avatarUrl}
+                      height={10}
+                      width={10}
+                      borderSize={2}
+                      hasBorder={true}
                     />
                     <div>
                       <div className="text-sm font-medium">
@@ -157,6 +167,21 @@ export default function MembersTab({
               ))}
           </div>
         </div>
+        {currentUser && workspace.ownerId === currentUser.id && (
+          <>
+            <div className="mt-4">
+              <Button onClick={() => handleOpenUpdateDialog()}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit Workspace Information
+              </Button>
+            </div>
+            <UpdateWorkspaceDialog
+              workspaceId={workspace.id}
+              open={updateDialogOpen}
+              onOpenChange={setUpdateDialogOpen}
+            />
+          </>
+        )}
       </div>
     </TabsContent>
   );

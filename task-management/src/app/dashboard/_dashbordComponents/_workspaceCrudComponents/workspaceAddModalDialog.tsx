@@ -76,9 +76,9 @@ export default function AddWorkspaceDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Card className="flex h-36 w-36 flex-col items-center justify-center bg-tag-green text-tag-green-foreground cursor-pointer">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-tag-green-foreground">
-            <Plus className="h-8 w-8" />
+        <Card className="flex h-28 w-28 sm:h-36 sm:w-36 flex-col items-center justify-center bg-tag-green text-tag-green-foreground cursor-pointer">
+          <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full border-2 border-tag-green-foreground">
+            <Plus className="h-8 w-8 sm:h-10 sm:w-10" />
           </div>
           <div className="mt-2 text-center">Create</div>
         </Card>

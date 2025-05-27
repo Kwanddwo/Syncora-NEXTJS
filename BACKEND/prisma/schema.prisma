@@ -32,6 +32,7 @@ model User {
   invitedBy            WorkspaceMember[]   @relation("InvitedBy")
   workspaceMembership  WorkspaceMember[]
   successorWorkspaces  Workspace[]         @relation("Successor")
+  feedbacks            Feedback[]          @relation("FeedbackMessages")
 }
 
 model UserPreferences {
@@ -185,6 +186,15 @@ model WorkspaceInvite {
   inviteSender   User         @relation("InviteSenderRelation", fields: [inviteSenderId], references: [id], onDelete: Cascade)
   invitedUser    User         @relation("InvitedUserRelation", fields: [invitedUserId], references: [id], onDelete: Cascade)
   workspace      Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Feedback {
+  id          String   @id @default(uuid())
+  senderId    String
+  message     String
+  type        String
+  createdAt   DateTime @default(now())
+  sender      User     @relation("FeedbackMessages", fields: [senderId], references: [id], onDelete: Cascade)
 }
 
 enum WorkspaceRoles {
