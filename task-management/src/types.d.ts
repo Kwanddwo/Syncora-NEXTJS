@@ -128,3 +128,14 @@ export interface workspaceUpdateRequest {
   description?: string;
   icon?: string;
 }
+
+export type FeedbackType = "bug" | "feature_request" | "general";
+
+export interface Feedback {
+  id?: string;
+  senderId: string;
+  type: FeedbackType;
+  message: string;
+  createdAt?: Date;
+  sender?: User; // Optional user field for feedback with a user
+}

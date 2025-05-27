@@ -30,7 +30,6 @@ export function LoginForm({
       await login(email, password);
       toast.success("Login successful");
       router.push("/dashboard");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(
         err.response ? err.response.data.message : "An error occurred"

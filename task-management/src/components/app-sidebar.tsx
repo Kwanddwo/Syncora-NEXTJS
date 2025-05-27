@@ -10,6 +10,7 @@ import {
   Inbox,
   LayoutDashboard,
   LogOut,
+  MessageCircle,
   // Settings2,
   User,
   UserRound,
@@ -78,6 +79,12 @@ const data = {
     //   icon: Settings2,
     //   hasButton : false,
     // },
+    {
+      title: "Feedback & Bugs",
+      url: "/dashboard/feedback",
+      icon: MessageCircle,
+      hasButton: false,
+    },
     {
       title: "Logout",
       url: "/logout",

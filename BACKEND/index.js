@@ -13,6 +13,9 @@ import inboxRoutes from "./routes/inboxroutes.js";
 import recentWorkspaceRoutes from "./routes/recentWorkspaceRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
+import { authenticateUser } from "./middleware/middleware.js";
+import feedbackHandler from "./controllers/feedbackHandler.js";
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -28,5 +31,6 @@ app.use("/api/invite", inviteRoutes);
 app.use("/api/inbox", inboxRoutes);
 app.use("/api/recentWorkspace", recentWorkspaceRoutes);
 app.use("/api/user", userRoutes);
+app.post("/api/feedback", authenticateUser, feedbackHandler);
 
 app.listen(3001, () => console.log("Server running on port 3001"));
