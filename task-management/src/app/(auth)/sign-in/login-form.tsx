@@ -76,7 +76,7 @@ export function LoginForm({
           />
         </div>
         <Button
-          type="button"
+          type="submit"
           className="w-full cursor-pointer"
           onClick={handleSubmit}
         >
