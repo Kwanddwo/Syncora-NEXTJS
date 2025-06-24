@@ -5,13 +5,13 @@
 <p align="center">A structured, collaborative task management platform built with Next.js, Express & PostgreSQL. Syncora aims to simplifiy task management in teams with an intiuitive interface.</p>
 
 ## ⚙️ Core Features
-- Role-Based Access & Group Chats
+- Role-Based Access & Group Chats:
 Organize discussions with permissions tailored to teams and task roles
-- Smart Notifications
+- Smart Notifications:
 Automatic task alerts and deadline reminders.
-- Collaborative Task Management
+- Collaborative Task Management:
 Seamless task creation, assignment, and tracking, built for teamwork and clarity
-- Secure & Scalable Architecture
+- Secure & Scalable Architecture:
 Built on Express and PostgreSQL, Syncora ensures robustness and reliability
 
 ## 🛠️ Tech Stack
